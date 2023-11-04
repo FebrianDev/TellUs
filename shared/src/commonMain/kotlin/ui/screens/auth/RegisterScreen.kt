@@ -119,7 +119,8 @@ class RegisterScreen : Screen {
                         textEmail = newText
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = colorPrimary
+                        focusedBorderColor = colorPrimary,
+                        cursorColor = colorPrimary,
                     ),
 
                     trailingIcon = {
@@ -153,7 +154,8 @@ class RegisterScreen : Screen {
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = colorPrimary
+                        focusedBorderColor = colorPrimary,
+                        cursorColor = colorPrimary,
                     ),
                     trailingIcon = {
                         val image = if (passwordVisible)

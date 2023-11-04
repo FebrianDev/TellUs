@@ -1,5 +1,6 @@
 package ui.screens.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,8 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
 import ui.screens.post.HomeScreen
 import ui.themes.colorPrimary
@@ -61,7 +64,7 @@ import utils.showSnackBar
 
 class LoginScreen : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
     @Composable
     override fun Content() {
 
@@ -83,7 +86,8 @@ class LoginScreen : Screen {
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = scaffoldState)
-            }
+            },
+            containerColor = Color.White
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -100,6 +104,10 @@ class LoginScreen : Screen {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 //Image
+                Image(
+                    painter = painterResource("drawable/icon_app.png"),
+                    contentDescription ="I"
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -121,6 +129,7 @@ class LoginScreen : Screen {
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorPrimary,
+                        cursorColor = colorPrimary,
                     ),
 
                     trailingIcon = {
@@ -155,6 +164,7 @@ class LoginScreen : Screen {
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorPrimary,
+                        cursorColor = colorPrimary,
                     ),
                     trailingIcon = {
                         val image = if (passwordVisible)
