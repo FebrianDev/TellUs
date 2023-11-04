@@ -3,6 +3,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.9.0"
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -48,7 +49,8 @@ kotlin {
                 // Android ViewModel integration
                 implementation("cafe.adriel.voyager:voyager-androidx:$voyagerVersion")
 
-              //  implementation("dev.gitlive:firebase-auth:1.10.0")
+                implementation("dev.gitlive:firebase-auth:1.10.0")
+                implementation("dev.gitlive:firebase-common:1.8.1")//
             }
         }
         val androidMain by getting {
