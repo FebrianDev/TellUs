@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "112575158930",
+    "project_id": "sharekmp",
+    "storage_bucket": "sharekmp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112575158930:android:6ee81a7efe5c07a800e44b",
+        "android_client_info": {
+          "package_name": "com.febrian.sharekmm.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDfjsMZAXm-p1qgcuEiREmGOnCbZlLgTA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112575158930:android:481052e4dadcd59b00e44b",
+        "android_client_info": {
+          "package_name": "com.myapplication.MyApplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDfjsMZAXm-p1qgcuEiREmGOnCbZlLgTA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

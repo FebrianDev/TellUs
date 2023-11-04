@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.application")
     id("org.jetbrains.compose")
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -37,5 +38,6 @@ android {
     }
 }
 dependencies {
-    implementation("androidx.compose.ui:ui-tooling-preview-android:1.5.4")
+    implementation("com.google.firebase:firebase-common-ktx:20.3.3")
+    implementation("com.google.firebase:firebase-auth:22.2.0")
 }
