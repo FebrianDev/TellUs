@@ -1,5 +1,6 @@
 package data.post.model
 
+import data.like.model.LikeResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,5 +14,6 @@ data class PostResponse (
     val tag: String,
     val token: String,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val Likes : List<LikeResponse>
 )

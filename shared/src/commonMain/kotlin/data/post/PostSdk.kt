@@ -1,5 +1,6 @@
 package data.post
 
+import data.post.model.PostRequest
 import data.post.network.PostApi
 import data.post.state.ListPostState
 import data.post.state.PostState
@@ -36,5 +37,15 @@ class PostSdk {
     @Throws(Exception::class)
     suspend fun deletePost(id: String): PostState {
         return api.deletePost(id)
+    }
+
+    @Throws(Exception::class)
+    suspend fun insertPost(postRequest: PostRequest): PostState {
+        return api.insertPost(postRequest)
+    }
+
+    @Throws(Exception::class)
+    suspend fun insertLike(postRequest: PostRequest): PostState {
+        return api.insertLike(postRequest)
     }
 }
