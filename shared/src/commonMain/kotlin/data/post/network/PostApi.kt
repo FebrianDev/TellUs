@@ -7,7 +7,9 @@ import data.response.ApiErrorResponse
 import data.utils.Constant
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -27,6 +29,7 @@ class PostApi {
                 useAlternativeNames = false
             })
         }
+        install(HttpTimeout)
     }
 
     suspend fun getAllPost(): ListPostState {
@@ -37,6 +40,9 @@ class PostApi {
                     "api-token",
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
+            }
+            timeout {
+                requestTimeoutMillis = 3000
             }
         }
 
@@ -49,6 +55,7 @@ class PostApi {
             in 400..404 -> {
                 listPostState = ListPostState.Error((data.body() as ApiErrorResponse).message)
             }
+
         }
 
         return listPostState
@@ -62,6 +69,9 @@ class PostApi {
                     "api-token",
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
+            }
+            timeout {
+                requestTimeoutMillis = 3000
             }
         }
 
@@ -88,6 +98,9 @@ class PostApi {
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
             }
+            timeout {
+                requestTimeoutMillis = 3000
+            }
         }
 
         var listPostState: ListPostState = ListPostState.Empty
@@ -112,6 +125,9 @@ class PostApi {
                     "api-token",
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
+            }
+            timeout {
+                requestTimeoutMillis = 3000
             }
         }
 
@@ -138,6 +154,9 @@ class PostApi {
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
             }
+            timeout {
+                requestTimeoutMillis = 3000
+            }
         }
 
         var postState: PostState = PostState.Empty
@@ -163,6 +182,9 @@ class PostApi {
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
             }
+            timeout {
+                requestTimeoutMillis = 3000
+            }
         }
 
         var postState: PostState = PostState.Empty
@@ -183,8 +205,18 @@ class PostApi {
         val data = client.post("${Constant.BASE_URL}/api/post") {
             contentType(ContentType.Application.Json)
             setBody(postRequest)
+            headers {
+                append(
+                    "api-token",
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                )
+            }
+            timeout {
+                requestTimeoutMillis = 3000
+            }
         }
         var postState: PostState = PostState.Empty
+
         when (data.status.value) {
             200, 201 -> {
                 postState = PostState.Success(data.body())
@@ -202,33 +234,16 @@ class PostApi {
         val data = client.post("${Constant.BASE_URL}/api/like") {
             contentType(ContentType.Application.Json)
             setBody(postRequest)
-        }
-        var postState: PostState = PostState.Empty
-        when (data.status.value) {
-            200, 201 -> {
-                postState = PostState.Success(data.body())
-            }
-
-            in 400..404 -> {
-                postState = PostState.Error((data.body() as ApiErrorResponse).message)
-            }
-        }
-
-        return postState
-    }
-
-    suspend fun getLikeById(id: String, postRequest: PostRequest): PostState {
-        val data = client.get("${Constant.BASE_URL}/api/like/$id") {
-            contentType(ContentType.Application.Json)
-            setBody(postRequest)
             headers {
                 append(
                     "api-token",
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
             }
+            timeout {
+                requestTimeoutMillis = 3000
+            }
         }
-
         var postState: PostState = PostState.Empty
         when (data.status.value) {
             200, 201 -> {
@@ -242,4 +257,5 @@ class PostApi {
 
         return postState
     }
+
 }

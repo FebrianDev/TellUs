@@ -10,42 +10,74 @@ class PostSdk {
     private val api = PostApi()
 
     @Throws(Exception::class)
-    suspend fun getAllPost(): ListPostState {
-        return api.getAllPost()
+    suspend fun getAllPost(): Result<ListPostState> {
+        return try {
+            Result.success(api.getAllPost())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun getTrendingPost(): ListPostState {
-        return api.getTrendingPost()
+    suspend fun getTrendingPost(): Result<ListPostState> {
+        return try {
+            Result.success(api.getTrendingPost())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun getPostByIdUser(id: String): ListPostState {
-        return api.getPostByIdUser(id)
+    suspend fun getPostByIdUser(id: String): Result<ListPostState> {
+        return try {
+            Result.success(api.getPostByIdUser(id))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun getPostByTag(tag: String): ListPostState {
-        return api.getPostByTag(tag)
+    suspend fun getPostByTag(tag: String): Result<ListPostState> {
+        return try {
+            Result.success(api.getPostByTag(tag))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun getPostById(id: String): PostState {
-        return api.getPostById(id)
+    suspend fun getPostById(id: String): Result<PostState> {
+        return try {
+            Result.success(api.getPostById(id))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun deletePost(id: String): PostState {
-        return api.deletePost(id)
+    suspend fun deletePost(id: String): Result<PostState> {
+        return try {
+            Result.success(api.deletePost(id))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun insertPost(postRequest: PostRequest): PostState {
-        return api.insertPost(postRequest)
+    suspend fun insertPost(postRequest: PostRequest): Result<PostState> {
+        return try {
+            Result.success(api.insertPost(postRequest))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun insertLike(postRequest: PostRequest): PostState {
-        return api.insertLike(postRequest)
+    suspend fun insertLike(postRequest: PostRequest): Result<PostState> {
+        return try {
+            Result.success(api.insertLike(postRequest))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
