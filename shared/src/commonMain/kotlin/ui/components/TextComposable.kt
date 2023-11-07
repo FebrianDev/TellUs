@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import ui.themes.colorPrimary
 
 fun TextTitle(text: String) {
 
@@ -46,13 +47,16 @@ fun TextBodyBold(
 
 @Composable
 fun TextBodyMedium(
-    text: String,
+    text: String = "",
     textAlign: TextAlign = TextAlign.Start,
+    color: Color = colorPrimary,
+    modifier: Modifier = Modifier.fillMaxWidth(),
 ) {
     Text(
         text = text,
         fontSize = 16.sp,
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = textAlign
+        modifier = modifier,
+        textAlign = textAlign,
+        color = colorPrimary
     )
 }

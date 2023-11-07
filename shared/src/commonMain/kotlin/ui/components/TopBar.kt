@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ui.themes.bgColor
 import ui.themes.colorPrimary
 
 @Composable
@@ -27,8 +28,8 @@ fun TopBar(
                 textAlign = TextAlign.Center
             )
         },
-        backgroundColor = Color.White,
-        contentColor = Color.White,
+        backgroundColor = bgColor,
+        contentColor = bgColor,
         elevation = 4.dp
     )
 }

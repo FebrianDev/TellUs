@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.9.0"
     id("com.google.gms.google-services")
+    id("com.squareup.sqldelight")
 }
 
 kotlin {
@@ -50,7 +51,11 @@ kotlin {
                 implementation("cafe.adriel.voyager:voyager-androidx:$voyagerVersion")
 
                 implementation("dev.gitlive:firebase-auth:1.10.0")
-                implementation("dev.gitlive:firebase-common:1.8.1")//
+                implementation("dev.gitlive:firebase-common:1.8.1")
+
+                implementation("com.squareup.sqldelight:runtime:1.5.5")
+                implementation("com.squareup.sqldelight:coroutines-extensions:1.5.5")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
             }
         }
         val androidMain by getting {
@@ -91,4 +96,19 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+}
+
+sqldelight {
+    database("PostDatabase") {
+        packageName = "com.myapplication.database"
+        sourceFolders = listOf("sqldelight")
+    }
+}
+
+dependencies {
+    implementation("androidx.core:core:1.10.1")
+    commonMainApi("dev.icerock.moko:mvvm-core:0.16.1")
+    commonMainApi("dev.icerock.moko:mvvm-compose:0.16.1")
+    commonMainApi("dev.icerock.moko:mvvm-flow:0.16.1")
+    commonMainApi("dev.icerock.moko:mvvm-flow-compose:0.16.1")
 }

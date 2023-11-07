@@ -1,6 +1,7 @@
 buildscript {
     dependencies {
         classpath("com.google.gms:google-services:4.4.0")
+        classpath("com.squareup.sqldelight:gradle-plugin:1.5.5")
     }
 }
 plugins {

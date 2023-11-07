@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,7 +23,7 @@ import ui.themes.colorPrimary
 @Composable
 fun TitleHeader(title: String = "", navigator: Navigator = LocalNavigator.currentOrThrow) {
 
-    Row(modifier = Modifier.padding(start = 12.dp, top = 16.dp)) {
+    Row(modifier = Modifier.padding(start = 12.dp, top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = Icons.Default.ArrowBackIosNew,
             contentDescription = "Back",

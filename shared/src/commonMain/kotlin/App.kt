@@ -10,6 +10,7 @@ import ui.screens.auth.RegisterScreen
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.HomeScreen
 import ui.screens.post.InsertPostScreen
+import ui.themes.bgColor
 import ui.themes.colorPrimary
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -17,7 +18,7 @@ import ui.themes.colorPrimary
 fun App() {
     MaterialTheme {
         Surface(
-            contentColor = Color.White
+            contentColor = bgColor
         ) {
             Navigator(
                 HomeScreen()

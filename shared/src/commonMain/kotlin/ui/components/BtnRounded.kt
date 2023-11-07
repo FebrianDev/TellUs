@@ -12,25 +12,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ui.themes.bgColor
 import ui.themes.colorPrimary
 
 @Composable
 fun BtnRounded(
     text: String = "",
-    onClick: () -> Unit = {}
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(48.dp)
+        .padding(24.dp, 0.dp),
+    enable : Boolean = true,
+    onClick: () -> Unit = {},
 ) {
     Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .padding(24.dp, 0.dp),
+        modifier = modifier,
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = colorPrimary)
+        colors = ButtonDefaults.buttonColors(backgroundColor = colorPrimary),
+        enabled = enable
     ) {
         Text(
             text = text,
-            color = Color.White,
+            color = bgColor,
             fontWeight = FontWeight.Bold,
         )
     }
