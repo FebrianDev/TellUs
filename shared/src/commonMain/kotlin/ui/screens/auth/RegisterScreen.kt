@@ -1,5 +1,6 @@
 package ui.screens.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -53,12 +55,18 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
+import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.KeyValueStorage
+import utils.KeyValueStorageImpl
 import utils.showSnackBar
 
 class RegisterScreen : Screen {
 
+    @OptIn(ExperimentalResourceApi::class)
     @Composable
     override fun Content() {
 
@@ -78,10 +86,13 @@ class RegisterScreen : Screen {
             mutableStateOf(false)
         }
 
+        val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = scaffoldState)
-            }
+            },
+            containerColor = bgColor
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -99,6 +110,10 @@ class RegisterScreen : Screen {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 //Image
+                Image(
+                    painter = painterResource("drawable/icon_app.png"),
+                    contentDescription ="I"
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -121,6 +136,7 @@ class RegisterScreen : Screen {
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = colorPrimary,
                         cursorColor = colorPrimary,
+                        textColor = colorPrimary
                     ),
 
                     trailingIcon = {
@@ -129,6 +145,7 @@ class RegisterScreen : Screen {
                     },
                     singleLine = true,
                     isError = isEmailError,
+                    textStyle = TextStyle(colorPrimary)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -156,6 +173,7 @@ class RegisterScreen : Screen {
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = colorPrimary,
                         cursorColor = colorPrimary,
+                        textColor = colorPrimary
                     ),
                     trailingIcon = {
                         val image = if (passwordVisible)
@@ -175,8 +193,11 @@ class RegisterScreen : Screen {
                             Icon(Icons.Filled.Info, "Error", tint = Color.Red)
                     },
                     isError = isPasswordError,
+                    textStyle = TextStyle(colorPrimary)
                 )
+
                 Spacer(modifier = Modifier.height(24.dp))
+
                 BtnRounded("Register") {
                     if (textEmail.text.isEmpty()) {
                         showSnackBar("Email must be filled", coroutineScope, scaffoldState)
@@ -250,14 +271,15 @@ class RegisterScreen : Screen {
             is AuthState.Error -> {
                 coroutineScope.launch {
                     scaffoldState.showSnackbar(
-                        message = (authState.value as AuthState.Error).message,
+                        message = "Something was wrong!",
                         duration = SnackbarDuration.Short
                     )
                 }
             }
 
             is AuthState.Success -> {
-                authState.value
+                val data = (authState.value as AuthState.Success).data.user
+                keyValueStorage.uid = data?.uid.toString()
                 navigator.push(VerificationScreen())
             }
 

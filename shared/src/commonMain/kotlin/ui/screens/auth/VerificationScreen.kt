@@ -38,7 +38,7 @@ class VerificationScreen : Screen {
                 Spacer(modifier = Modifier.height(8.dp))
                 TextBodyMedium(
                     "Verification information has been sent to email f@gmail.com",
-                    TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 BtnRounded("Return to the Homepage") {
@@ -63,7 +63,7 @@ class VerificationScreen : Screen {
                 Spacer(modifier = Modifier.height(8.dp))
                 TextBodyMedium(
                     "Congratulations, your verification was successful. Please log in to the app and tell your story without fear of your identity being discovered.",
-                    TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 BtnRounded("Log in to the app") {

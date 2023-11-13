@@ -3,7 +3,6 @@ package ui.screens.auth
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,16 +14,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -40,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -51,6 +50,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import data.auth.AuthState
+import utils.KeyValueStorage
+import utils.KeyValueStorageImpl
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -58,7 +59,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
+import ui.components.ProgressBarLoading
 import ui.screens.post.HomeScreen
+import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.showSnackBar
 
@@ -83,11 +86,14 @@ class LoginScreen : Screen {
         var isPasswordError by remember {
             mutableStateOf(false)
         }
+
+        val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = scaffoldState)
             },
-            containerColor = Color.White
+            containerColor = bgColor
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -106,7 +112,7 @@ class LoginScreen : Screen {
                 //Image
                 Image(
                     painter = painterResource("drawable/icon_app.png"),
-                    contentDescription ="I"
+                    contentDescription ="Icon App"
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -123,13 +129,14 @@ class LoginScreen : Screen {
                         )
                     },
                     value = textEmail,
-                    placeholder = { Text(text = "Email") },
+                    placeholder = { androidx.compose.material.Text(text = "Email") },
                     onValueChange = { newText ->
                         textEmail = newText
                     },
-                    colors = OutlinedTextFieldDefaults.colors(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = colorPrimary,
                         cursorColor = colorPrimary,
+                        textColor = colorPrimary
                     ),
 
                     trailingIcon = {
@@ -138,6 +145,7 @@ class LoginScreen : Screen {
                     },
                     singleLine = true,
                     isError = isEmailError,
+                    textStyle = TextStyle(colorPrimary)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -156,15 +164,16 @@ class LoginScreen : Screen {
                         )
                     },
                     value = textPassword,
-                    placeholder = { Text(text = "Password") },
+                    placeholder = { androidx.compose.material.Text(text = "Password") },
                     onValueChange = { newText ->
                         textPassword = newText
                     },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    colors = OutlinedTextFieldDefaults.colors(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = colorPrimary,
                         cursorColor = colorPrimary,
+                        textColor = colorPrimary
                     ),
                     trailingIcon = {
                         val image = if (passwordVisible)
@@ -184,7 +193,9 @@ class LoginScreen : Screen {
                             Icon(Icons.Filled.Info, "Error", tint = Color.Red)
                     },
                     isError = isPasswordError,
+                    textStyle = TextStyle(colorPrimary)
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
@@ -193,9 +204,7 @@ class LoginScreen : Screen {
                 ) {
                     Text(
                         text = "Forgot Password? ",
-                        color = colorPrimary,
-
-                        )
+                        color = colorPrimary,)
 
                     Text(
                         text = "Click Here",
@@ -240,6 +249,7 @@ class LoginScreen : Screen {
                     } else {
                         isEmailError = false
                         isPasswordError = false
+
                         authViewModel.login(textEmail.text, textPassword.text)
                     }
                 }
@@ -271,11 +281,7 @@ class LoginScreen : Screen {
 
         when (authState.value) {
             is AuthState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        color = colorPrimary
-                    )
-                }
+               ProgressBarLoading()
             }
 
             is AuthState.Error -> {
@@ -288,11 +294,14 @@ class LoginScreen : Screen {
             }
 
             is AuthState.Success -> {
-                authState.value
+                val data = (authState.value as AuthState.Success).data.user
+                keyValueStorage.uid = data?.uid.toString()
                 navigator.push(HomeScreen())
             }
 
-            else -> {}
+            else -> {
+
+            }
         }
     }
 }
