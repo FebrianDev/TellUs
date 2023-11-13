@@ -8,11 +8,15 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import ui.themes.bgColor
+import ui.themes.colorPrimary
 
 @Composable
 fun ItemTag(
-    tag: String = "Random",
+    tag: String,
+    isHighlight : Boolean,
     onClick : () -> Unit
 ) {
     Card(
@@ -20,7 +24,8 @@ fun ItemTag(
             onClick = onClick)
         ,
         shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp
+        elevation = 4.dp,
+        backgroundColor = if (isHighlight) colorPrimary else bgColor
     ) {
         Text(tag, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
     }

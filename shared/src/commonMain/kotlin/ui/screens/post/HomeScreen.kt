@@ -16,7 +16,11 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,12 +31,14 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ui.components.TopBar
 import ui.screens.post.tabs.BestPostScreen
 import ui.screens.post.tabs.LatestPostScreen
 import ui.screens.post.tabs.MyPostScreen
 import ui.screens.post.tabs.TabRowItem
+import ui.themes.bgColor
 import ui.themes.colorPrimary
 
 class HomeScreen : Screen {
@@ -59,34 +65,59 @@ class HomeScreen : Screen {
 
         val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
 
-        Column(
-            modifier = Modifier.fillMaxWidth().wrapContentSize().background(Color.White)
+        val scaffoldState = remember { SnackbarHostState() }
+        val coroutineScope = rememberCoroutineScope()
+
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = scaffoldState)
+            },
+            containerColor = bgColor
         ) {
-            TopBar("Home")
-            TabLayout(postViewModel)
+            Column(
+                modifier = Modifier.fillMaxWidth().wrapContentSize()
+            ) {
+                TopBar("Home")
+                TabLayout(postViewModel, scaffoldState, coroutineScope)
+            }
         }
     }
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun TabLayout(
-        postViewModel: PostViewModel
+        postViewModel: PostViewModel,
+        scaffoldState: SnackbarHostState,
+        coroutineScope: CoroutineScope
     ) {
-
-        val coroutineScope = rememberCoroutineScope()
 
         val tabRowItems = listOf(
             TabRowItem(
                 title = "Latest",
-                screen = { LatestPostScreen(postViewModel) }
+                screen = {
+                    LatestPostScreen(
+                        postViewModel, scaffoldState,
+                        coroutineScope
+                    )
+                }
             ),
             TabRowItem(
                 title = "Best",
-                screen = { BestPostScreen(postViewModel) }
+                screen = {
+                    BestPostScreen(
+                        postViewModel, scaffoldState,
+                        coroutineScope
+                    )
+                }
             ),
             TabRowItem(
                 title = "Mine",
-                screen = { MyPostScreen(postViewModel) }
+                screen = {
+                    MyPostScreen(
+                        postViewModel, scaffoldState,
+                        coroutineScope
+                    )
+                }
             ))
 
         val pagerState = rememberPagerState {
@@ -97,19 +128,19 @@ class HomeScreen : Screen {
             modifier = Modifier.padding(horizontal = 0.dp).widthIn(min = 24.dp),
             divider = {
                 TabRowDefaults.Divider(
-                    color = Color.White
+                    color = bgColor
                 )
             },
             indicator = {},
             selectedTabIndex = pagerState.currentPage,
-            backgroundColor = Color.White
+            backgroundColor = bgColor
         ) {
             tabRowItems.forEachIndexed { index, item ->
                 Tab(
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 0.dp)
                         .clip(CircleShape)
-                        .background(if (pagerState.currentPage == index) colorPrimary else Color.White),
+                        .background(if (pagerState.currentPage == index) colorPrimary else bgColor),
                     selected = pagerState.currentPage == index,
                     onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                     text = {
@@ -118,7 +149,7 @@ class HomeScreen : Screen {
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             fontWeight = FontWeight.Bold,
-                            color = if (pagerState.currentPage == index) Color.White else colorPrimary
+                            color = if (pagerState.currentPage == index) bgColor else colorPrimary
                         )
                     }
                 )

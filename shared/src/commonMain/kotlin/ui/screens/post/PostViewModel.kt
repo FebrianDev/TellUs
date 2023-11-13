@@ -1,6 +1,5 @@
 package ui.screens.post
 
-
 import data.post.PostSdk
 import data.post.model.PostRequest
 import data.post.state.ListPostState
@@ -18,58 +17,63 @@ class PostViewModel : ViewModel() {
 
     private val postSdk = PostSdk()
 
-    private val _listPostState = MutableStateFlow<ListPostState>(ListPostState.Empty)
-    val listPostState: StateFlow<ListPostState> get() = _listPostState.asStateFlow()
+    private val _listPostState =
+        MutableStateFlow<Result<ListPostState>>(Result.success(ListPostState.Empty))
+    val listPostState: StateFlow<Result<ListPostState>> get() = _listPostState.asStateFlow()
 
-    private val _postState = MutableStateFlow<PostState>(PostState.Empty)
-    val postState: StateFlow<PostState> get() = _postState.asStateFlow()
+    private val _postState = MutableStateFlow<Result<PostState>>(Result.success(PostState.Empty))
+    val postState: StateFlow<Result<PostState>> get() = _postState.asStateFlow()
+
+    private val _insertPostState =
+        MutableStateFlow<Result<PostState>>(Result.success(PostState.Empty))
+    val insertPostState: StateFlow<Result<PostState>> get() = _insertPostState.asStateFlow()
 
     fun getAllPost() {
-        _listPostState.value = ListPostState.Loading
+        _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _listPostState.value = postSdk.getAllPost()
         }
     }
 
     fun getTrending() {
-        _listPostState.value = ListPostState.Loading
+        _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _listPostState.value = postSdk.getTrendingPost()
         }
     }
 
     fun getPostByIdUser(id: String) {
-        _listPostState.value = ListPostState.Loading
+        _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _listPostState.value = postSdk.getPostByIdUser(id)
         }
     }
 
     fun getPostByTag(tag: String) {
-        _listPostState.value = ListPostState.Loading
+        _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _listPostState.value = postSdk.getPostByTag(tag)
         }
     }
 
     fun getPostById(id: String) {
-        _postState.value = PostState.Loading
+        _postState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _postState.value = postSdk.getPostById(id)
         }
     }
 
     fun deletePost(id: String) {
-        _postState.value = PostState.Loading
+        _postState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _postState.value = postSdk.deletePost(id)
         }
     }
 
     fun insertPost(postRequest: PostRequest) {
-        _postState.value = PostState.Loading
+        _insertPostState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _postState.value = postSdk.insertPost(postRequest)
+            _insertPostState.value = postSdk.insertPost(postRequest)
         }
     }
 }

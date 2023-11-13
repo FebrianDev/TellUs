@@ -1,7 +1,9 @@
 package ui.screens.post.items
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -17,7 +21,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
@@ -52,12 +55,11 @@ import utils.getUid
 import utils.showSnackBar
 
 @Composable
-fun ItemPost(
+fun ItemMyPost(
     postResponse: PostResponse,
     coroutineScope: CoroutineScope,
     scaffoldState: SnackbarHostState
 ) {
-
     val navigator = LocalNavigator.currentOrThrow
 
     val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
@@ -129,7 +131,25 @@ fun ItemPost(
                         )
                     }
 
-                    OptionPost(scaffoldState, coroutineScope)
+                    MyOptionPost(postResponse.is_private == true)
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .background(
+                            color = colorPrimary, // Background color
+                            shape = CircleShape // Circular shape
+                        )
+                ) {
+                    Text(
+                        text = if (postResponse.is_private == true) "Private" else "Public",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            .wrapContentSize(),
+                        color = bgColor
+                    )
                 }
 
                 Divider(
@@ -221,89 +241,3 @@ fun ItemPost(
         }
     }
 }
-
-@Composable
-fun LikePost(postResponse: PostResponse, likeViewModel: LikeViewModel) {
-
-    var likeIcon = remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
-
-//    when (val likeState = likeViewModel.likeState.collectAsState().value) {
-//        is LikeState.Success -> {
-//            likeIcon = if (likeState.data.data?.id == 0) {
-//                Icons.Filled.FavoriteBorder
-//            } else {
-//                Icons.Filled.Favorite
-//            }
-//
-//        }
-//
-//        else -> {}
-//    }
-
-//    if (postResponse.Likes?.isEmpty() == true) {
-//        likeIcon.value = Icons.Filled.FavoriteBorder
-//    } else {
-//        postResponse.Likes?.forEach {
-//            likeIcon.value = if (it.id_post == postResponse.id && it.id_user == uid) {
-//                Icons.Filled.Favorite
-//            } else {
-//                Icons.Filled.FavoriteBorder
-//            }
-//        }
-//
-//    }
-
-//    Icon(
-//        modifier = Modifier
-//            .padding(top = 4.dp, start = 4.dp)
-//            .width(24.dp)
-//            .height(24.dp).clickable {
-//                likeViewModel.insertLike(LikeRequest(postResponse.id ?: 0, uid))
-////                likeIcon.value = if (likeIcon.value == Icons.Filled.Favorite) {
-////                    Icons.Filled.FavoriteBorder
-////                } else {
-////                    Icons.Filled.Favorite
-////                }
-//
-//            },
-//        imageVector = likeIcon.value,
-//        contentDescription = "Btn Like",
-//        tint = colorPrimary
-//    )
-
-    // Text Like Count
-    Text(
-        text = postResponse.like.toString(),
-        color = colorPrimary,
-        modifier = Modifier
-            .padding(top = 4.dp, start = 6.dp),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold
-    )
-}
-
-@Composable
-fun CommentPost(comment: Int) {
-    Icon(
-        modifier = Modifier
-            .padding(top = 4.dp, start = 4.dp)
-            .width(24.dp)
-            .height(24.dp),
-
-        imageVector = Icons.Filled.Comment,
-        contentDescription = "Btn Comment",
-        tint = colorPrimary
-    )
-
-    // Text Like Count
-    Text(
-        text = comment.toString(),
-        color = colorPrimary,
-        modifier = Modifier
-            .padding(top = 4.dp, start = 6.dp),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold
-    )
-
-}
-

@@ -23,13 +23,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -51,23 +54,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import data.bookmark.model.BookmarkRequest
+import data.comment.model.CommentRequest
 import data.comment.state.CommentState
 import data.comment.state.InsertCommentState
-import data.comment.model.CommentRequest
+import data.like.model.LikeRequest
 import data.post.model.PostResponse
 import data.post.state.PostState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import ui.components.EmptyState
+import ui.components.ProgressBarLoading
 import ui.components.TextBodyBold
 import ui.components.TitleHeader
+import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.comment.CommentViewModel
 import ui.screens.comment.ItemComment
 import ui.screens.post.items.OptionPost
+import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.getTime
+import utils.getUid
+import utils.showSnackBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 class DetailPostScreen(private val id: Int) : Screen {
 
     @Composable
@@ -82,23 +93,25 @@ class DetailPostScreen(private val id: Int) : Screen {
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
+        val uid = getUid()
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = scaffoldState)
             },
-            containerColor = Color.White,
-            contentColor = Color.White
+            containerColor = bgColor,
+            contentColor = bgColor
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 TitleHeader("Detail Post")
                 Spacer(modifier = Modifier.height(24.dp))
 
                 //    DetailPostDummy()
-                ShowDetailPost(postViewModel)
+                ShowDetailPost(postViewModel, scaffoldState, coroutineScope, uid)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ShowComment(commentViewModel)
+                ShowComment(commentViewModel, scaffoldState, coroutineScope)
 
 //                LazyColumn {
 //                    items(5) {
@@ -109,15 +122,20 @@ class DetailPostScreen(private val id: Int) : Screen {
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                SendComment(commentViewModel)
+                SendComment(commentViewModel, scaffoldState, coroutineScope, uid)
             }
         }
     }
 
     @Composable
-    fun SendComment(commentViewModel: CommentViewModel) {
+    fun SendComment(
+        commentViewModel: CommentViewModel,
+        scaffoldState: SnackbarHostState,
+        coroutineScope: CoroutineScope,
+        uid: String
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth().background(Color.White),
+            modifier = Modifier.fillMaxWidth().background(bgColor),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
 
@@ -129,11 +147,11 @@ class DetailPostScreen(private val id: Int) : Screen {
                     textComment = it
                 },
                 placeholder = { Text(text = "Type your message") },
-                modifier = Modifier.fillMaxWidth(0.8f).background(Color.White),
+                modifier = Modifier.fillMaxWidth(0.8f).background(bgColor),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    disabledContainerColor = Color.White,
+                    focusedContainerColor = bgColor,
+                    unfocusedContainerColor = bgColor,
+                    disabledContainerColor = bgColor,
                     disabledIndicatorColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
@@ -147,10 +165,8 @@ class DetailPostScreen(private val id: Int) : Screen {
                         commentViewModel.insertComment(
                             CommentRequest(
                                 id_post = id,
-                                id_user = 5,
-                                id_reply = 0,
+                                id_user = uid,
                                 message = textComment.text,
-                                root = false,
                                 token = "token"
                             )
                         )
@@ -160,86 +176,156 @@ class DetailPostScreen(private val id: Int) : Screen {
             )
         }
 
-        when (val insertCommentState = commentViewModel.insertCommentState.collectAsState().value) {
-            is InsertCommentState.Loading -> {}
-            is InsertCommentState.Error -> {}
-            is InsertCommentState.Success -> {
-                commentViewModel.getCommentById(id.toString())
-            }
+        commentViewModel.insertCommentState.collectAsState().value.onSuccess {
+            when (it) {
+                is InsertCommentState.Loading -> {
+                    ProgressBarLoading()
+                }
 
-            else -> {
+                is InsertCommentState.Error -> {
+                    showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
+                }
 
+                is InsertCommentState.Success -> {
+                    commentViewModel.getCommentById(id.toString())
+                }
+
+                else -> {
+
+                }
             }
+        }.onFailure {
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
+
     }
 
     @Composable()
-    fun ShowComment(commentViewModel: CommentViewModel) {
-        when (val commentState = commentViewModel.commentState.collectAsState().value) {
-            is CommentState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = colorPrimary
-                    )
+    fun ShowComment(
+        commentViewModel: CommentViewModel,
+        scaffoldState: SnackbarHostState,
+        coroutineScope: CoroutineScope
+    ) {
+
+        commentViewModel.commentState.collectAsState().value.onSuccess {
+            when (it) {
+                is CommentState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = colorPrimary
+                        )
+                    }
                 }
-            }
 
-            is CommentState.Error -> {
+                is CommentState.Error -> {
+                    showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
+                }
 
-            }
+                is CommentState.Success -> {
+                    it.data.data?.let { comment ->
+                        if (comment.isEmpty()) {
+                            EmptyState("drawable/ic_no_comment.png", "No Comment")
+                        } else {
+                            LazyColumn(modifier = Modifier.fillMaxHeight(0.9f)) {
 
-            is CommentState.Success -> {
-                commentState.data.data?.let { comment ->
-                    if (comment.isEmpty()) {
-                        EmptyState("drawable/ic_no_comment.png", "No Comment")
-                    } else {
-                        LazyColumn(modifier = Modifier.fillMaxHeight(0.9f)) {
-
-                            items(comment) {
-                                ItemComment(it)
+                                items(comment) {
+                                    ItemComment(it, scaffoldState, coroutineScope)
+                                }
                             }
                         }
                     }
                 }
+
+                else -> {}
+
             }
-
-            else -> {}
-
+        }.onFailure {
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
     }
 
     @Composable
-    fun ShowDetailPost(postViewModel: PostViewModel) {
-        when (val postState = postViewModel.postState.collectAsState().value) {
-            is PostState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = colorPrimary
-                    )
+    fun ShowDetailPost(
+        postViewModel: PostViewModel,
+        scaffoldState: SnackbarHostState,
+        coroutineScope: CoroutineScope,
+        uid: String
+    ) {
+
+        postViewModel.postState.collectAsState().value.onSuccess {
+            when (it) {
+                is PostState.Loading -> {
+                    ProgressBarLoading()
+                }
+
+                is PostState.Error -> {
+                    showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
+                }
+
+                is PostState.Success -> {
+                    it.data.data?.let { data ->
+                        DetailPost(
+                            data,
+                            scaffoldState,
+                            coroutineScope,
+                            uid
+                        )
+                    }
+                }
+
+                else -> {}
+
+            }
+        }.onFailure {
+            coroutineScope.launch {
+                scaffoldState.showSnackbar(
+                    message = it.message.toString(),
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun DetailPost(
+        postResponse: PostResponse,
+        scaffoldState: SnackbarHostState,
+        coroutineScope: CoroutineScope,
+        uid: String
+    ) {
+
+        val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
+        val bookmarkViewModel = getViewModel(Unit, viewModelFactory { BookmarkViewModel() })
+
+        var likeIcon by remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
+        var like by remember { mutableStateOf(postResponse.like) }
+
+        var bookmarkIcon by remember { mutableStateOf(Icons.Filled.BookmarkBorder) }
+
+        if (postResponse.Likes?.isEmpty() == true) {
+            likeIcon = Icons.Filled.FavoriteBorder
+        } else {
+            postResponse.Likes?.forEach {
+                likeIcon = if (it.id_post == postResponse.id && it.id_user == uid) {
+                    Icons.Filled.Favorite
+                } else {
+                    Icons.Filled.FavoriteBorder
                 }
             }
-
-            is PostState.Error -> {
-
-            }
-
-            is PostState.Success -> {
-                postState.data.data?.let { DetailPost(it) }
-            }
-
-            else -> {}
-
         }
-    }
 
-    @Composable
-    fun DetailPost(postResponse: PostResponse) {
+        if (postResponse.Bookmarks?.isEmpty() == true) {
+            bookmarkIcon = Icons.Filled.BookmarkBorder
+        } else {
+            postResponse.Bookmarks?.forEach {
+                bookmarkIcon =
+                    if (it.id_post == postResponse.id && it.id_user == uid) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -248,11 +334,10 @@ class DetailPostScreen(private val id: Int) : Screen {
             Card(
                 modifier = Modifier
                     .padding(0.dp, 4.dp, 16.dp, 4.dp)
-                    .fillMaxWidth()
-                    .heightIn(min = 96.dp, max = 256.dp),
+                    .fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp, 24.dp, 24.dp, 0.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = bgColor)
 
             ) {
                 Column(
@@ -262,14 +347,16 @@ class DetailPostScreen(private val id: Int) : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        androidx.compose.material.Text(
-                            postResponse.message,
-                            color = colorPrimary,
-                            fontSize = 14.sp,
-                            modifier = Modifier.fillMaxWidth(0.9f)
-                        )
+                        postResponse.message?.let {
+                            androidx.compose.material.Text(
+                                it,
+                                color = colorPrimary,
+                                fontSize = 14.sp,
+                                modifier = Modifier.fillMaxWidth(0.9f)
+                            )
+                        }
 
-                        OptionPost()
+                        OptionPost(scaffoldState, coroutineScope)
                     }
 
                     Divider(
@@ -283,18 +370,82 @@ class DetailPostScreen(private val id: Int) : Screen {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row {
-                            LikePost(postResponse.like)
+                            //postResponse.let { LikePost(it) }
+
+                            androidx.compose.material.Icon(
+                                modifier = Modifier
+                                    .padding(top = 4.dp, start = 4.dp)
+                                    .width(24.dp)
+                                    .height(24.dp).clickable {
+                                        likeViewModel.insertLike(
+                                            LikeRequest(
+                                                postResponse.id ?: 0,
+                                                uid
+                                            )
+                                        )
+                                        if (likeIcon == Icons.Filled.Favorite) {
+                                            likeIcon = Icons.Filled.FavoriteBorder
+                                            like = like?.minus(1)
+                                            showSnackBar(
+                                                "Cancel Add Like Post",
+                                                coroutineScope,
+                                                scaffoldState
+                                            )
+                                        } else {
+                                            likeIcon = Icons.Filled.Favorite
+                                            like = like?.plus(1)
+                                            showSnackBar(
+                                                "Success Add Like Post",
+                                                coroutineScope,
+                                                scaffoldState
+                                            )
+                                        }
+                                    },
+
+                                imageVector = likeIcon,
+                                contentDescription = "Btn Like",
+                                tint = colorPrimary
+                            )
+
+                            // Text Like Count
+                            androidx.compose.material.Text(
+                                text = like.toString(),
+                                color = colorPrimary,
+                                modifier = Modifier
+                                    .padding(top = 4.dp, start = 6.dp),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
                             Spacer(Modifier.width(4.dp))
-                            CommentPost(postResponse.comment)
+                            postResponse.comment?.let { CommentPost(it) }
                         }
 
                         androidx.compose.material.Icon(
                             modifier = Modifier
                                 .padding(top = 4.dp, start = 4.dp)
                                 .width(24.dp)
-                                .height(24.dp),
-
-                            imageVector = Icons.Filled.Bookmark,
+                                .height(24.dp).clickable {
+                                    bookmarkViewModel.insertBookmark(
+                                        BookmarkRequest(postResponse.id ?: 0, uid)
+                                    )
+                                    if (bookmarkIcon == Icons.Filled.Bookmark) {
+                                        bookmarkIcon = Icons.Filled.BookmarkBorder
+                                        showSnackBar(
+                                            "Cancel Add to Bookmark",
+                                            coroutineScope,
+                                            scaffoldState
+                                        )
+                                    } else {
+                                        bookmarkIcon = Icons.Filled.Bookmark
+                                        showSnackBar(
+                                            "Success Add to Bookmark",
+                                            coroutineScope,
+                                            scaffoldState
+                                        )
+                                    }
+                                },
+                            imageVector = bookmarkIcon,
                             contentDescription = "Btn Bookmark",
                             tint = colorPrimary
                         )
@@ -303,11 +454,12 @@ class DetailPostScreen(private val id: Int) : Screen {
             }
 
             androidx.compose.material.Text(
-                text = "2d\nday",
+                text = getTime(postResponse.createdAt.toString()),
                 color = colorPrimary,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)
+                modifier = Modifier.padding(end = 16.dp, start = 16.dp)
+                    .align(Alignment.CenterVertically)
             )
         }
 
@@ -327,7 +479,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                     .heightIn(min = 96.dp, max = 256.dp),
                 shape = RoundedCornerShape(0.dp, 24.dp, 24.dp, 0.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = bgColor)
 
             ) {
                 Column(
@@ -344,7 +496,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                             modifier = Modifier.fillMaxWidth(0.9f)
                         )
 
-                        OptionPost()
+                        //OptionPost(s)
                     }
 
                     Divider(
@@ -358,7 +510,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row {
-                            LikePost(1)
+                            // LikePost()
                             Spacer(Modifier.width(4.dp))
                             CommentPost(1)
                         }
@@ -377,42 +529,69 @@ class DetailPostScreen(private val id: Int) : Screen {
                 }
             }
 
-            androidx.compose.material.Text(
-                text = "2d\nday",
-                color = colorPrimary,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)
-            )
+//            androidx.compose.material.Text(
+//                text = getTime(postResponse.createdAt.toString()),
+//                color = colorPrimary,
+//                fontSize = 12.sp,
+//                textAlign = TextAlign.Center,
+//                modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)
+//            )
         }
 
     }
 
 
-    @Composable
-    fun LikePost(like: Int) {
-        androidx.compose.material.Icon(
-            modifier = Modifier
-                .padding(top = 4.dp, start = 4.dp)
-                .width(24.dp)
-                .height(24.dp),
-
-            imageVector = Icons.Filled.Favorite,
-            contentDescription = "Btn Like",
-            tint = colorPrimary
-        )
-
-        // Text Like Count
-        androidx.compose.material.Text(
-            text = like.toString(),
-            color = colorPrimary,
-            modifier = Modifier
-                .padding(top = 4.dp, start = 6.dp),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-    }
+//    @Composable
+//    fun LikePost(postResponse: PostResponse) {
+//
+//        val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
+//
+//        var likeIcon by remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
+//        var like by remember { mutableStateOf(postResponse.like) }
+//
+//        if (postResponse.Likes?.isEmpty() == true) {
+//            likeIcon = Icons.Filled.FavoriteBorder
+//        } else {
+//            postResponse.Likes?.forEach {
+//                likeIcon = if (it.id_post == postResponse.id && it.id_user == 5) {
+//                    Icons.Filled.Favorite
+//                } else {
+//                    Icons.Filled.FavoriteBorder
+//                }
+//            }
+//        }
+//
+//        androidx.compose.material.Icon(
+//            modifier = Modifier
+//                .padding(top = 4.dp, start = 4.dp)
+//                .width(24.dp)
+//                .height(24.dp).clickable {
+//                    likeViewModel.insertLike(LikeRequest(postResponse.id ?: 0, 5))
+//                    if (likeIcon == Icons.Filled.Favorite) {
+//                        likeIcon = Icons.Filled.FavoriteBorder
+//                        like = like?.minus(1)
+//                    } else {
+//                        likeIcon = Icons.Filled.Favorite
+//                        like = like?.plus(1)
+//                    }
+//                },
+//
+//            imageVector = likeIcon,
+//            contentDescription = "Btn Like",
+//            tint = colorPrimary
+//        )
+//
+//        // Text Like Count
+//        androidx.compose.material.Text(
+//            text = like.toString(),
+//            color = colorPrimary,
+//            modifier = Modifier
+//                .padding(top = 4.dp, start = 6.dp),
+//            fontSize = 16.sp,
+//            fontWeight = FontWeight.Bold
+//        )
+//
+//    }
 
     @Composable
     fun CommentPost(comment: Int) {

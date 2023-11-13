@@ -16,18 +16,11 @@ class LikeViewModel : ViewModel() {
 
     private val sdk = LikeSdk()
 
-    private val _likeState = MutableStateFlow<LikeState>(LikeState.Empty)
-    val likeState: StateFlow<LikeState> get() = _likeState.asStateFlow()
-
-//    fun getLikeById(likeRequest: LikeRequest ){
-//        _likeState.value = LikeState.Loading
-//        CoroutineScope(Dispatchers.IO).launch {
-//            _likeState.value = sdk.getLikeById(likeRequest)
-//        }
-//    }
+    private val _likeState = MutableStateFlow<Result<LikeState>>(Result.success(LikeState.Empty))
+    val likeState: StateFlow<Result<LikeState>> get() = _likeState.asStateFlow()
 
     fun insertLike(likeRequest: LikeRequest){
-        _likeState.value = LikeState.Loading
+        _likeState.value = Result.success(LikeState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _likeState.value = sdk.insertLike(likeRequest)
         }
