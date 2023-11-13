@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LikeResponse(
-    val id: Int,
-    val id_post: Int,
-    val id_user: Int,
-    val createdAt: String,
-    val updatedAt: String
+    val id: Int? = 0,
+    val id_post: Int? = 0,
+    val id_user: String? = "",
+    val createdAt: String? = "",
+    val updatedAt: String? = ""
 )

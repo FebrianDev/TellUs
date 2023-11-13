@@ -8,14 +8,13 @@ class LikeSdk {
 
     private val api = LikeApi()
 
-//    @Throws(Exception::class)
-//    suspend fun getLikeById(likeRequest: LikeRequest): LikeState {
-//        return api.getLikeById(likeRequest)
-//    }
-
     @Throws(Exception::class)
-    suspend fun insertLike(likeRequest: LikeRequest): LikeState {
-        return api.insertLike(likeRequest)
+    suspend fun insertLike(likeRequest: LikeRequest): Result<LikeState> {
+        return try {
+            Result.success(api.insertLike(likeRequest))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
 }
