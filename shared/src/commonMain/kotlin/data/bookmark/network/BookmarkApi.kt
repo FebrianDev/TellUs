@@ -6,6 +6,7 @@ import data.response.ApiErrorResponse
 import data.utils.Constant
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -24,6 +25,7 @@ class BookmarkApi {
                 ignoreUnknownKeys = true
                 useAlternativeNames = false
             })
+            install(HttpTimeout)
         }
     }
 
@@ -31,12 +33,17 @@ class BookmarkApi {
         val data = client.post("${Constant.BASE_URL}/api/bookmark") {
             contentType(ContentType.Application.Json)
             setBody(bookmarkRequest)
+            headers {
+                append(
+                    "api-token",
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                )
+            }
         }
 
         var bookmarkState: BookmarkState = BookmarkState.Empty
         when (data.status.value) {
             200, 201 -> {
-
                 bookmarkState = BookmarkState.Success(data.body())
             }
 

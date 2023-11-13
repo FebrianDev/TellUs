@@ -9,17 +9,32 @@ class BookmarkSdk {
     private val api = BookmarkApi()
 
     @Throws(Exception::class)
-    suspend fun getAllBookmark(idUser: String): BookmarkState {
-        return api.getAllBookmark(idUser)
+    suspend fun getAllBookmark(idUser: String): Result<BookmarkState> {
+        return try {
+            Result.success(api.getAllBookmark(idUser))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun getBookmarkById(idUser: String, bookmarkRequest: BookmarkRequest): BookmarkState {
-        return api.getBookmarkById(idUser, bookmarkRequest)
+    suspend fun getBookmarkById(
+        idUser: String,
+        bookmarkRequest: BookmarkRequest
+    ): Result<BookmarkState> {
+        return try {
+            Result.success(api.getBookmarkById(idUser, bookmarkRequest))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     @Throws(Exception::class)
-    suspend fun insertBookmark(bookmarkRequest: BookmarkRequest): BookmarkState {
-        return api.insertBookmark(bookmarkRequest)
+    suspend fun insertBookmark(bookmarkRequest: BookmarkRequest): Result<BookmarkState> {
+        return try {
+            Result.success(api.insertBookmark(bookmarkRequest))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
