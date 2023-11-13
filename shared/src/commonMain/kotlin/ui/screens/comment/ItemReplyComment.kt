@@ -37,6 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 import ui.screens.post.items.OptionPost
 import ui.themes.colorPrimary
 import ui.themes.colorThird
+import utils.getTime
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -60,7 +61,7 @@ fun ItemReplyComment(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "2d\nday",
+            text = getTime(replyCommentResponse.createdAt.toString()),
             color = Color.Black,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,

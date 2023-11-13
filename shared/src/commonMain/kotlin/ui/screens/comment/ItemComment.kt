@@ -33,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.themes.colorPrimary
+import utils.getTime
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -55,7 +56,7 @@ fun ItemComment(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "2d\nday",
+            text = getTime(commentResponse.createdAt.toString()),
             color = Color.Black,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
@@ -131,51 +132,51 @@ fun ItemComment(
 
 @Composable
 fun ItemCommentDummy() {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(
-            text = "2d\nday",
-            color = Color.Black,
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)
-        )
-
-        Card(
-            modifier = Modifier
-                .padding(16.dp, 4.dp, 0.dp, 4.dp)
-                .fillMaxWidth()
-                .heightIn(min = 96.dp, max = 256.dp)
-                .clickable {
-                    // navigator.push(DetailPostTab)
-                },
-            shape = RoundedCornerShape(24.dp, 0.dp, 0.dp, 24.dp),
-            elevation = 4.dp,
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    Text(
-                        "Lörem ipsum ohet tynett nysare kårade. ",
-                        color = Color.Black,
-                        fontSize = 14.sp,
-                        modifier = Modifier.fillMaxWidth(0.9f)
-                    )
-
-                    //OptionComment(s)
-                }
-
-                Text(
-                    "Reply",
-                    color = Color.Black,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Light,
-                )
-            }
-        }
-    }
+//    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+//        Text(
+//            text = getTime(co.createdAt.toString()),
+//            color = Color.Black,
+//            fontSize = 12.sp,
+//            textAlign = TextAlign.Center,
+//            modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)
+//        )
+//
+//        Card(
+//            modifier = Modifier
+//                .padding(16.dp, 4.dp, 0.dp, 4.dp)
+//                .fillMaxWidth()
+//                .heightIn(min = 96.dp, max = 256.dp)
+//                .clickable {
+//                    // navigator.push(DetailPostTab)
+//                },
+//            shape = RoundedCornerShape(24.dp, 0.dp, 0.dp, 24.dp),
+//            elevation = 4.dp,
+//        ) {
+//            Column(
+//                modifier = Modifier.fillMaxWidth().padding(16.dp)
+//            ) {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//
+//                    Text(
+//                        "Lörem ipsum ohet tynett nysare kårade. ",
+//                        color = Color.Black,
+//                        fontSize = 14.sp,
+//                        modifier = Modifier.fillMaxWidth(0.9f)
+//                    )
+//
+//                    //OptionComment(s)
+//                }
+//
+//                Text(
+//                    "Reply",
+//                    color = Color.Black,
+//                    fontSize = 12.sp,
+//                    fontWeight = FontWeight.Light,
+//                )
+//            }
+//        }
+//    }
 }

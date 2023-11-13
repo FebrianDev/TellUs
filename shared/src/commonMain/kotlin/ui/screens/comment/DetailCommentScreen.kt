@@ -60,6 +60,7 @@ import ui.components.TextBodyBold
 import ui.components.TitleHeader
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.getTime
 import utils.getUid
 import utils.showSnackBar
 
@@ -301,7 +302,7 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             androidx.compose.material.Text(
-                text = "2d\nday",
+                text = getTime(commentResponse.createdAt.toString()),
                 color = Color.Black,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
