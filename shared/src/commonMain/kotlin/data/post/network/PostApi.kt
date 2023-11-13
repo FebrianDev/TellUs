@@ -42,7 +42,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
 
@@ -71,7 +71,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
 
@@ -99,7 +99,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
 
@@ -127,7 +127,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
 
@@ -155,7 +155,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
 
@@ -183,7 +183,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
 
@@ -212,7 +212,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
         var postState: PostState = PostState.Empty
@@ -241,7 +241,7 @@ class PostApi {
                 )
             }
             timeout {
-                requestTimeoutMillis = 3000
+                requestTimeoutMillis = 4000
             }
         }
         var postState: PostState = PostState.Empty
