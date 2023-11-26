@@ -18,7 +18,7 @@ class KeyValueStorageImpl : KeyValueStorage {
             settings[StorageKeys.UID.key] = value
         }
     @OptIn(ExperimentalSettingsApi::class)
-    override val observableUid: Flow<String>?
+    override val observableUid: Flow<String>
         get() = observableSettings.getStringFlow(StorageKeys.UID.key, "")
 
     override fun cleanStorage() {
