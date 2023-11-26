@@ -50,8 +50,10 @@ kotlin {
                 // Android ViewModel integration
                 implementation("cafe.adriel.voyager:voyager-androidx:$voyagerVersion")
 
+                //firebase
                 implementation("dev.gitlive:firebase-auth:1.10.0")
                 implementation("dev.gitlive:firebase-common:1.10.0")
+                implementation("dev.gitlive:firebase-firestore:1.10.4")
 
                 implementation("com.squareup.sqldelight:runtime:1.5.5")
                 implementation("com.squareup.sqldelight:coroutines-extensions:1.5.5")

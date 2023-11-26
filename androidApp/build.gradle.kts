@@ -18,12 +18,12 @@ kotlin {
 
 android {
     compileSdk = (findProperty("android.compileSdk") as String).toInt()
-    namespace = "com.myapplication"
+    namespace = "com.febriandev"
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {
-        applicationId = "com.myapplication.MyApplication"
+        applicationId = "com.febriandev.MyApplication"
         minSdk = (findProperty("android.minSdk") as String).toInt()
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
         versionCode = 1
@@ -38,6 +38,7 @@ android {
     }
 }
 dependencies {
-    implementation("com.google.firebase:firebase-common-ktx:20.3.3")
+    implementation("com.google.firebase:firebase-common-ktx:20.4.2")
     implementation("com.google.firebase:firebase-auth:22.2.0")
+    implementation("com.google.firebase:firebase-messaging:23.3.1")
 }
