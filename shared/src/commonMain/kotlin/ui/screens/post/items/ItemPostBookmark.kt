@@ -1,9 +1,7 @@
 package ui.screens.post.items
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -21,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
@@ -33,8 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +46,7 @@ import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.LikeViewModel
 import ui.screens.post.OptionPostEvent
+import ui.screens.post.PostViewModel
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getTime
@@ -58,12 +54,15 @@ import utils.getUid
 import utils.showSnackBar
 
 @Composable
-fun ItemMyPost(
+fun ItemPostBookmark(
     postResponse: PostResponse,
+    uid:String,
     coroutineScope: CoroutineScope,
     scaffoldState: SnackbarHostState,
-    event: OptionPostEvent
+    event : OptionPostEvent,
+    onBookmarkPost : () -> Unit = {}
 ) {
+
     val navigator = LocalNavigator.currentOrThrow
 
     val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
@@ -74,17 +73,18 @@ fun ItemMyPost(
 
     var bookmarkIcon by remember { mutableStateOf(Icons.Filled.BookmarkBorder) }
 
-    val uid = getUid()
-
     if (postResponse.Likes?.isEmpty() == true) {
         likeIcon.value = Icons.Filled.FavoriteBorder
     } else {
-        postResponse.Likes?.forEach {
-            likeIcon.value = if (it.id_post == postResponse.id && it.id_user == uid) {
-                Icons.Filled.Favorite
-            } else {
-                Icons.Filled.FavoriteBorder
-            }
+
+        val likedPosts = postResponse.Likes?.filter {
+            it.id_post == postResponse.id && it.id_user == uid
+        }
+
+        likeIcon.value = if (!likedPosts.isNullOrEmpty()) {
+            Icons.Filled.Favorite
+        } else {
+            Icons.Filled.FavoriteBorder
         }
     }
 
@@ -95,23 +95,6 @@ fun ItemMyPost(
             bookmarkIcon =
                 if (it.id_post == postResponse.id && it.id_user == uid) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder
         }
-    }
-
-    var isPrivateState by remember { mutableStateOf(postResponse.is_private) }
-
-    val cp = LocalClipboardManager.current
-
-    event.onCopyText = {
-        cp.setText(AnnotatedString(it))
-        showSnackBar(
-            "The text has been copied successfully",
-            coroutineScope,
-            scaffoldState
-        )
-    }
-
-    event.onChangePrivatePost = {
-        isPrivateState = it
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -152,32 +135,10 @@ fun ItemMyPost(
                         )
                     }
 
-                    MineOptionPost(
-                        postResponse,
-                        scaffoldState,
-                        coroutineScope,
-                        isPrivateState == true,
-                        event
-                    )
-
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Box(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .background(
-                            color = colorPrimary, // Background color
-                            shape = CircleShape // Circular shape
-                        )
-                ) {
-                    Text(
-                        text = if (isPrivateState == true) "Private" else "Public",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            .wrapContentSize(),
-                        color = bgColor
-                    )
+                    if (uid == postResponse.id_user) {
+                        MyOptionPost(postResponse, scaffoldState, coroutineScope, event)
+                    } else
+                        OptionPost(postResponse, scaffoldState, coroutineScope, event)
                 }
 
                 Divider(
@@ -186,6 +147,7 @@ fun ItemMyPost(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
+                // Like
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
@@ -239,26 +201,7 @@ fun ItemMyPost(
                         modifier = Modifier
                             .padding(top = 4.dp, start = 4.dp)
                             .width(24.dp)
-                            .height(24.dp).clickable {
-                                bookmarkViewModel.insertBookmark(
-                                    BookmarkRequest(postResponse.id ?: 0, uid)
-                                )
-                                if (bookmarkIcon == Icons.Filled.Bookmark) {
-                                    bookmarkIcon = Icons.Filled.BookmarkBorder
-                                    showSnackBar(
-                                        "Cancel Add to Bookmark",
-                                        coroutineScope,
-                                        scaffoldState
-                                    )
-                                } else {
-                                    bookmarkIcon = Icons.Filled.Bookmark
-                                    showSnackBar(
-                                        "Success Add to Bookmark",
-                                        coroutineScope,
-                                        scaffoldState
-                                    )
-                                }
-                            },
+                            .height(24.dp).clickable (onClick = onBookmarkPost),
 
                         imageVector = bookmarkIcon,
                         contentDescription = "Btn Bookmark",
@@ -269,3 +212,4 @@ fun ItemMyPost(
         }
     }
 }
+

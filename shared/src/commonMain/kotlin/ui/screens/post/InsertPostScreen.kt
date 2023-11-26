@@ -62,6 +62,7 @@ import ui.themes.bgColor
 import ui.themes.colorPrimary
 import ui.themes.colorSecondary
 import utils.getUid
+import utils.showSnackBar
 
 class InsertPostScreen : Screen {
     @OptIn(ExperimentalResourceApi::class, ExperimentalLayoutApi::class)
@@ -215,12 +216,7 @@ class InsertPostScreen : Screen {
                 }
 
                 is PostState.Error -> {
-                    coroutineScope.launch {
-                        scaffoldState.showSnackbar(
-                            message = "Something was wrong!",
-                            duration = SnackbarDuration.Short
-                        )
-                    }
+                    showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
                 }
 
                 is PostState.Success -> {
@@ -252,12 +248,7 @@ class InsertPostScreen : Screen {
                 }
             }
         }.onFailure {
-            coroutineScope.launch {
-                scaffoldState.showSnackbar(
-                    message = "Internal server error",
-                    duration = SnackbarDuration.Short
-                )
-            }
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
 
     }

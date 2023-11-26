@@ -30,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,17 +47,19 @@ import kotlinx.coroutines.CoroutineScope
 import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.LikeViewModel
+import ui.screens.post.OptionPostEvent
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getTime
-import utils.getUid
 import utils.showSnackBar
 
 @Composable
 fun ItemPost(
     postResponse: PostResponse,
+    uid: String,
     coroutineScope: CoroutineScope,
-    scaffoldState: SnackbarHostState
+    scaffoldState: SnackbarHostState,
+    event: OptionPostEvent
 ) {
 
     val navigator = LocalNavigator.currentOrThrow
@@ -68,17 +72,29 @@ fun ItemPost(
 
     var bookmarkIcon by remember { mutableStateOf(Icons.Filled.BookmarkBorder) }
 
-    val uid = getUid()
+    val cp = LocalClipboardManager.current
+
+    event.onCopyText = {
+        cp.setText(AnnotatedString(it))
+        showSnackBar(
+            "The text has been copied successfully",
+            coroutineScope,
+            scaffoldState
+        )
+    }
 
     if (postResponse.Likes?.isEmpty() == true) {
         likeIcon.value = Icons.Filled.FavoriteBorder
     } else {
-        postResponse.Likes?.forEach {
-            likeIcon.value = if (it.id_post == postResponse.id && it.id_user == uid) {
-                Icons.Filled.Favorite
-            } else {
-                Icons.Filled.FavoriteBorder
-            }
+
+        val likedPosts = postResponse.Likes?.filter {
+            it.id_post == postResponse.id && it.id_user == uid
+        }
+
+        likeIcon.value = if (!likedPosts.isNullOrEmpty()) {
+            Icons.Filled.Favorite
+        } else {
+            Icons.Filled.FavoriteBorder
         }
     }
 
@@ -129,7 +145,15 @@ fun ItemPost(
                         )
                     }
 
-                    OptionPost(scaffoldState, coroutineScope)
+                    if (uid == postResponse.id_user) {
+                        MyOptionPost(
+                            postResponse,
+                            scaffoldState,
+                            coroutineScope,
+                            event
+                        )
+                    } else
+                        OptionPost(postResponse, scaffoldState, coroutineScope, event)
                 }
 
                 Divider(
@@ -138,6 +162,7 @@ fun ItemPost(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
+                // Like
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
@@ -220,66 +245,6 @@ fun ItemPost(
             }
         }
     }
-}
-
-@Composable
-fun LikePost(postResponse: PostResponse, likeViewModel: LikeViewModel) {
-
-    var likeIcon = remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
-
-//    when (val likeState = likeViewModel.likeState.collectAsState().value) {
-//        is LikeState.Success -> {
-//            likeIcon = if (likeState.data.data?.id == 0) {
-//                Icons.Filled.FavoriteBorder
-//            } else {
-//                Icons.Filled.Favorite
-//            }
-//
-//        }
-//
-//        else -> {}
-//    }
-
-//    if (postResponse.Likes?.isEmpty() == true) {
-//        likeIcon.value = Icons.Filled.FavoriteBorder
-//    } else {
-//        postResponse.Likes?.forEach {
-//            likeIcon.value = if (it.id_post == postResponse.id && it.id_user == uid) {
-//                Icons.Filled.Favorite
-//            } else {
-//                Icons.Filled.FavoriteBorder
-//            }
-//        }
-//
-//    }
-
-//    Icon(
-//        modifier = Modifier
-//            .padding(top = 4.dp, start = 4.dp)
-//            .width(24.dp)
-//            .height(24.dp).clickable {
-//                likeViewModel.insertLike(LikeRequest(postResponse.id ?: 0, uid))
-////                likeIcon.value = if (likeIcon.value == Icons.Filled.Favorite) {
-////                    Icons.Filled.FavoriteBorder
-////                } else {
-////                    Icons.Filled.Favorite
-////                }
-//
-//            },
-//        imageVector = likeIcon.value,
-//        contentDescription = "Btn Like",
-//        tint = colorPrimary
-//    )
-
-    // Text Like Count
-    Text(
-        text = postResponse.like.toString(),
-        color = colorPrimary,
-        modifier = Modifier
-            .padding(top = 4.dp, start = 6.dp),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold
-    )
 }
 
 @Composable

@@ -2,6 +2,7 @@ package ui.screens.post
 
 import data.post.PostSdk
 import data.post.model.PostRequest
+import data.post.model.PrivatePostRequest
 import data.post.state.ListPostState
 import data.post.state.PostState
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
@@ -74,6 +75,13 @@ class PostViewModel : ViewModel() {
         _insertPostState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _insertPostState.value = postSdk.insertPost(postRequest)
+        }
+    }
+
+    fun changePrivatePost(privatePostRequest: PrivatePostRequest, idPost: String) {
+        _postState.value = Result.success(PostState.Loading)
+        CoroutineScope(Dispatchers.IO).launch {
+            _postState.value = postSdk.changePrivatePost(privatePostRequest, idPost)
         }
     }
 }

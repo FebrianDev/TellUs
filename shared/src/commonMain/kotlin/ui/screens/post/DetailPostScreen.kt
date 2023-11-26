@@ -32,7 +32,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -64,7 +63,6 @@ import data.post.state.PostState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.TextBodyBold
@@ -72,6 +70,7 @@ import ui.components.TitleHeader
 import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.comment.CommentViewModel
 import ui.screens.comment.ItemComment
+import ui.screens.post.items.MyOptionPost
 import ui.screens.post.items.OptionPost
 import ui.themes.bgColor
 import ui.themes.colorPrimary
@@ -95,6 +94,8 @@ class DetailPostScreen(private val id: Int) : Screen {
 
         val uid = getUid()
 
+        val event = OptionPostEvent()
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = scaffoldState)
@@ -107,18 +108,11 @@ class DetailPostScreen(private val id: Int) : Screen {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 //    DetailPostDummy()
-                ShowDetailPost(postViewModel, scaffoldState, coroutineScope, uid)
+                ShowDetailPost(postViewModel, scaffoldState, coroutineScope, uid, event)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ShowComment(commentViewModel, scaffoldState, coroutineScope)
-
-//                LazyColumn {
-//                    items(5) {
-//                        ItemComment()
-//                    }
-//                }
-
+                ShowComment(commentViewModel, scaffoldState, coroutineScope, uid, event)
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -204,7 +198,9 @@ class DetailPostScreen(private val id: Int) : Screen {
     fun ShowComment(
         commentViewModel: CommentViewModel,
         scaffoldState: SnackbarHostState,
-        coroutineScope: CoroutineScope
+        coroutineScope: CoroutineScope,
+        uid: String,
+        event: OptionPostEvent
     ) {
 
         commentViewModel.commentState.collectAsState().value.onSuccess {
@@ -225,14 +221,16 @@ class DetailPostScreen(private val id: Int) : Screen {
                 }
 
                 is CommentState.Success -> {
-                    it.data.data?.let { comment ->
+
+                    val listComment = it.data.data
+                    listComment?.let { comment ->
                         if (comment.isEmpty()) {
                             EmptyState("drawable/ic_no_comment.png", "No Comment")
                         } else {
                             LazyColumn(modifier = Modifier.fillMaxHeight(0.9f)) {
+                                items(comment) { item ->
 
-                                items(comment) {
-                                    ItemComment(it, scaffoldState, coroutineScope)
+                                    ItemComment(item, scaffoldState, coroutineScope, uid, event)
                                 }
                             }
                         }
@@ -252,7 +250,8 @@ class DetailPostScreen(private val id: Int) : Screen {
         postViewModel: PostViewModel,
         scaffoldState: SnackbarHostState,
         coroutineScope: CoroutineScope,
-        uid: String
+        uid: String,
+        event: OptionPostEvent
     ) {
 
         postViewModel.postState.collectAsState().value.onSuccess {
@@ -271,7 +270,8 @@ class DetailPostScreen(private val id: Int) : Screen {
                             data,
                             scaffoldState,
                             coroutineScope,
-                            uid
+                            uid,
+                            event
                         )
                     }
                 }
@@ -280,12 +280,7 @@ class DetailPostScreen(private val id: Int) : Screen {
 
             }
         }.onFailure {
-            coroutineScope.launch {
-                scaffoldState.showSnackbar(
-                    message = it.message.toString(),
-                    duration = SnackbarDuration.Short
-                )
-            }
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
     }
 
@@ -294,7 +289,8 @@ class DetailPostScreen(private val id: Int) : Screen {
         postResponse: PostResponse,
         scaffoldState: SnackbarHostState,
         coroutineScope: CoroutineScope,
-        uid: String
+        uid: String,
+        event: OptionPostEvent
     ) {
 
         val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
@@ -355,8 +351,20 @@ class DetailPostScreen(private val id: Int) : Screen {
                                 modifier = Modifier.fillMaxWidth(0.9f)
                             )
                         }
-
-                        OptionPost(scaffoldState, coroutineScope)
+                        if (uid == postResponse.id_user) {
+                            MyOptionPost(
+                                postResponse,
+                                scaffoldState,
+                                coroutineScope,
+                                event
+                            )
+                        } else
+                            OptionPost(
+                                postResponse,
+                                scaffoldState,
+                                coroutineScope,
+                                event
+                            )
                     }
 
                     Divider(
