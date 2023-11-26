@@ -1,6 +1,7 @@
 package data.post
 
 import data.post.model.PostRequest
+import data.post.model.PrivatePostRequest
 import data.post.network.PostApi
 import data.post.state.ListPostState
 import data.post.state.PostState
@@ -76,6 +77,15 @@ class PostSdk {
     suspend fun insertLike(postRequest: PostRequest): Result<PostState> {
         return try {
             Result.success(api.insertLike(postRequest))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    @Throws(Exception::class)
+    suspend fun changePrivatePost(privatePostRequest: PrivatePostRequest, idPost:String): Result<PostState> {
+        return try {
+            Result.success(api.changePrivatePost(privatePostRequest, idPost))
         } catch (e: Exception) {
             Result.failure(e)
         }

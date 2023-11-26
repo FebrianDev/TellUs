@@ -1,6 +1,7 @@
 package data.post.network
 
 import data.post.model.PostRequest
+import data.post.model.PrivatePostRequest
 import data.post.state.ListPostState
 import data.post.state.PostState
 import data.response.ApiErrorResponse
@@ -14,6 +15,7 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -234,6 +236,34 @@ class PostApi {
         val data = client.post("${Constant.BASE_URL}/api/like") {
             contentType(ContentType.Application.Json)
             setBody(postRequest)
+            headers {
+                append(
+                    "api-token",
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                )
+            }
+            timeout {
+                requestTimeoutMillis = 4000
+            }
+        }
+        var postState: PostState = PostState.Empty
+        when (data.status.value) {
+            200, 201 -> {
+                postState = PostState.Success(data.body())
+            }
+
+            in 400..404 -> {
+                postState = PostState.Error((data.body() as ApiErrorResponse).message)
+            }
+        }
+
+        return postState
+    }
+
+    suspend fun changePrivatePost(privatePostRequest: PrivatePostRequest, idPost:String): PostState {
+        val data = client.put("${Constant.BASE_URL}/api/post/${idPost}") {
+            contentType(ContentType.Application.Json)
+            setBody(privatePostRequest)
             headers {
                 append(
                     "api-token",

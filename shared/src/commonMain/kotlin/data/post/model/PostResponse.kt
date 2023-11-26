@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class PostResponse (
     val id: Int? = 0,
     val id_user: String? = "",
-    val is_private: Boolean? = false,
+    var is_private: Boolean? = false,
     val like: Int? = 0,
     val comment: Int? = 0,
     val message: String? = "",

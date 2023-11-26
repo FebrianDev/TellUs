@@ -3,16 +3,18 @@ package data.bookmark
 import data.bookmark.model.BookmarkRequest
 import data.bookmark.network.BookmarkApi
 import data.bookmark.state.BookmarkState
+import data.bookmark.state.ListBookmarkState
 
 class BookmarkSdk {
 
     private val api = BookmarkApi()
 
     @Throws(Exception::class)
-    suspend fun getAllBookmark(idUser: String): Result<BookmarkState> {
+    suspend fun getAllBookmark(idUser: String): Result<ListBookmarkState> {
         return try {
             Result.success(api.getAllBookmark(idUser))
         } catch (e: Exception) {
+            println("ERRCode2"+e.message.toString())
             Result.failure(e)
         }
     }

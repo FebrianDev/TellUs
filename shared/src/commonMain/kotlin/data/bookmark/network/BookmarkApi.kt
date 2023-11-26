@@ -2,12 +2,14 @@ package data.bookmark.network
 
 import data.bookmark.state.BookmarkState
 import data.bookmark.model.BookmarkRequest
+import data.bookmark.state.ListBookmarkState
 import data.response.ApiErrorResponse
 import data.utils.Constant
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -25,6 +27,7 @@ class BookmarkApi {
                 ignoreUnknownKeys = true
                 useAlternativeNames = false
             })
+
             install(HttpTimeout)
         }
     }
@@ -49,13 +52,14 @@ class BookmarkApi {
 
             in 400..404 -> {
                 bookmarkState = BookmarkState.Error((data.body() as ApiErrorResponse).message)
+
             }
         }
 
         return bookmarkState
     }
 
-    suspend fun getAllBookmark(idUser: String): BookmarkState {
+    suspend fun getAllBookmark(idUser: String): ListBookmarkState {
         val data = client.get("${Constant.BASE_URL}/api/bookmark/$idUser") {
             contentType(ContentType.Application.Json)
             headers {
@@ -64,16 +68,19 @@ class BookmarkApi {
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
                 )
             }
+
+
         }
 
-        var bookmarkState: BookmarkState = BookmarkState.Empty
+        var bookmarkState: ListBookmarkState = ListBookmarkState.Empty
         when (data.status.value) {
             200, 201 -> {
-                bookmarkState = BookmarkState.Success(data.body())
+                bookmarkState = ListBookmarkState.Success(data.body())
             }
 
             in 400..404 -> {
-                bookmarkState = BookmarkState.Error((data.body() as ApiErrorResponse).message)
+                bookmarkState = ListBookmarkState.Error((data.body() as ApiErrorResponse).message)
+                println("ERRCode"+bookmarkState.toString())
             }
         }
 
