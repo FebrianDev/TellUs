@@ -58,6 +58,7 @@ import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.TextBodyBold
 import ui.components.TitleHeader
+import ui.screens.post.items.OptionComment
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getTime
@@ -342,7 +343,11 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                     modifier = Modifier.fillMaxWidth(0.9f)
                                 )
 
-                                OptionComment(scaffoldState, coroutineScope)
+                                OptionComment(
+                                    scaffoldState,
+                                    coroutineScope,
+                                    commentResponse.message.toString()
+                                )
                             }
 
                             androidx.compose.material.Text(

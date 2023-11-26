@@ -32,6 +32,9 @@ import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.screens.post.OptionPostEvent
+import ui.screens.post.items.MyOptionComment
+import ui.screens.post.items.OptionComment
 import ui.themes.colorPrimary
 import utils.getTime
 
@@ -40,7 +43,9 @@ import utils.getTime
 fun ItemComment(
     commentResponse: CommentResponse,
     scaffoldState: SnackbarHostState,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    uid: String,
+    event:OptionPostEvent
 ) {
 
     val navigator = LocalNavigator.currentOrThrow
@@ -99,7 +104,16 @@ fun ItemComment(
                                 modifier = Modifier.fillMaxWidth(0.9f)
                             )
 
-                            OptionComment(scaffoldState, coroutineScope)
+                            if (commentResponse.id_user == uid)
+                                MyOptionComment(scaffoldState,
+                                    coroutineScope,
+                                    commentResponse.message.toString(), event)
+                            else
+                                OptionComment(
+                                    scaffoldState,
+                                    coroutineScope,
+                                    commentResponse.message.toString()
+                                )
                         }
 
                         Text(

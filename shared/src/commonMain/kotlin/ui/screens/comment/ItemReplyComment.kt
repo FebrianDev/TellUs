@@ -34,6 +34,7 @@ import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.screens.post.items.OptionComment
 import ui.screens.post.items.OptionPost
 import ui.themes.colorPrimary
 import ui.themes.colorThird
@@ -107,7 +108,7 @@ fun ItemReplyComment(
                             ).padding(2.dp).align(Alignment.CenterVertically)
                         )
 
-                        OptionComment(scaffoldState, coroutineScope)
+                        OptionComment(scaffoldState, coroutineScope, replyCommentResponse.message.toString())
                     }
 
                     Text(
