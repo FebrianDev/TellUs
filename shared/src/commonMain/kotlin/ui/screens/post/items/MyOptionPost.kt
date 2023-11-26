@@ -1,6 +1,5 @@
 package ui.screens.post.items
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -9,22 +8,38 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import data.post.model.PostResponse
+import data.post.model.PrivatePostRequest
+import data.post.state.PostState
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import ui.components.ProgressBarLoading
 import ui.components.TextSubtitleMedium
+import ui.screens.post.OptionPostEvent
+import ui.screens.post.PostViewModel
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.showSnackBar
 
 @Composable
 fun MyOptionPost(
-    isPrivate: Boolean
+    postResponse: PostResponse,
+    scaffoldState: SnackbarHostState,
+    coroutineScope: CoroutineScope,
+    event: OptionPostEvent,
 ) {
+
+    val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
     var isDialogOpen by remember { mutableStateOf(false) }
 
     Icon(
@@ -51,14 +66,38 @@ fun MyOptionPost(
             },
             text = {
                 Column {
-                    TextOption("Copy Text to Clipboard"){}
-                    TextOption("Share Post"){}
-                    TextOption("Change to ${if (isPrivate) "Public" else "Private"}"){}
-                    TextOption("Delete Post"){}
+                    TextOption("Copy Text to Clipboard") {
+                        isDialogOpen = false
+                        event.onCopyText.invoke(postResponse.message.toString())
+                    }
+
+                    TextOption("Delete Post") {
+                        isDialogOpen = false
+                        event.onDeletePost.invoke(postResponse)
+                    }
                 }
             },
         )
     }
 
+    postViewModel.postState.collectAsState().value.onSuccess {
+        when (it) {
+            is PostState.Loading -> {
+                ProgressBarLoading()
+            }
+
+            is PostState.Error -> {
+                showSnackBar(it.message, coroutineScope, scaffoldState)
+            }
+
+            is PostState.Success -> {
+
+            }
+
+            else -> {}
+        }
+    }.onFailure {
+        showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
+    }
 
 }

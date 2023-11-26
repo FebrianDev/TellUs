@@ -1,4 +1,4 @@
-package ui.screens.comment
+package ui.screens.post.items
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import ui.components.TextSubtitleMedium
-import ui.screens.post.items.TextOption
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.showSnackBar
@@ -29,11 +28,10 @@ import utils.showSnackBar
 @Composable
 fun OptionComment(
     scaffoldState: SnackbarHostState,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    copyText: String
 ) {
-
     var isDialogOpen by remember { mutableStateOf(false) }
-    val cp = LocalClipboardManager.current
 
     Icon(
         modifier = Modifier
@@ -47,6 +45,7 @@ fun OptionComment(
         tint = colorPrimary
     )
 
+    val cp = LocalClipboardManager.current
 
     if (isDialogOpen) {
         AlertDialog(
@@ -62,17 +61,17 @@ fun OptionComment(
             text = {
                 Column {
                     TextOption("Copy Text to Clipboard") {
-                        cp.setText(AnnotatedString("Copy Data"))
+                        isDialogOpen = false
+                        cp.setText(AnnotatedString(copyText))
                         showSnackBar(
                             "The text has been copied successfully",
                             coroutineScope,
                             scaffoldState
                         )
                     }
-                    TextOption("Share Post")
-                    TextOption("Send Private Message")
-                    TextOption("Report Post")
-                    TextOption("Block User")
+                    TextOption("Send Private Message") {
+
+                    }
                 }
             },
         )

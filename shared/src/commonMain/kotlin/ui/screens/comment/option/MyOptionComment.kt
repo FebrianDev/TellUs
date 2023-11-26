@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import data.post.model.PostResponse
 import kotlinx.coroutines.CoroutineScope
 import ui.components.BottomSheetComposable
 import ui.components.TextSubtitleMedium
@@ -29,11 +28,11 @@ import ui.themes.colorPrimary
 import utils.showSnackBar
 
 @Composable
-fun OptionPost(
-    postResponse:PostResponse,
+fun MyOptionComment(
     scaffoldState: SnackbarHostState,
     coroutineScope: CoroutineScope,
-    event: OptionPostEvent,
+    copyText: String,
+    event:OptionPostEvent
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
 
@@ -48,6 +47,8 @@ fun OptionPost(
         contentDescription = "Options",
         tint = colorPrimary
     )
+
+    val cp = LocalClipboardManager.current
 
     if (isDialogOpen) {
         AlertDialog(
@@ -64,13 +65,16 @@ fun OptionPost(
                 Column {
                     TextOption("Copy Text to Clipboard") {
                         isDialogOpen = false
-                        event.onCopyText.invoke(postResponse.message.toString())
+                        cp.setText(AnnotatedString(copyText))
+                        showSnackBar(
+                            "The text has been copied successfully",
+                            coroutineScope,
+                            scaffoldState
+                        )
                     }
-                    TextOption("Share Post"){
 
-                    }
-                    TextOption("Send Private Message"){
-
+                    TextOption("Delete Comment") {
+event
                     }
                 }
             },
