@@ -18,12 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import data.chat.ChatEntity
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun ItemChat(
+    chatEntity: ChatEntity,
     onClick: () -> Unit = {}
 ) {
     Column(
@@ -47,14 +49,15 @@ fun ItemChat(
             ) {
 
                 Text(
-                    "Virgie",
+                    chatEntity.name,
                     color = Color.Black,
                     fontSize = 14.sp,
                     modifier = Modifier.fillMaxWidth(0.9f)
                 )
 
                 Text(
-                    "Reply",
+                    if (chatEntity.message.isEmpty()) ""
+                    else chatEntity.message[chatEntity.message.size - 1].message,
                     color = Color.Black,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,

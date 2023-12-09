@@ -16,18 +16,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,22 +39,69 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import data.chat.ChatState
+import data.chat.Message
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
+import ui.components.ProgressBarLoading
 import ui.components.TextBodyBold
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.getUid
+import utils.showSnackBar
 
 
-class ChatRoomScreen : Screen {
+class ChatRoomScreen(private val idChat: String) : Screen {
 
     @Composable
     override fun Content() {
 
         val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
 
-        Column(modifier = Modifier.background(bgColor)) {
+        chatViewModel.getChat(idChat)
 
+        val scaffoldState = remember { SnackbarHostState() }
+        val coroutineScope = rememberCoroutineScope()
+
+        val navigator = LocalNavigator.currentOrThrow
+
+        var textName by remember { mutableStateOf("") }
+        var textPostMessage by remember { mutableStateOf("") }
+        var listMessages by remember { mutableStateOf(listOf<Message>()) }
+
+        val uid = getUid()
+
+        var uidState by remember { mutableStateOf("") }
+        uidState = uid
+
+        chatViewModel.getChat.collectAsState().value.onSuccess {
+            when (it) {
+                is ChatState.Loading -> {
+                    ProgressBarLoading()
+                }
+
+                is ChatState.Error -> {
+                    showSnackBar(it.message, coroutineScope, scaffoldState)
+                }
+
+                is ChatState.Success -> {
+                    val chat = it.data
+                    textName = chat.name
+                    textPostMessage = chat.post_message
+
+                    listMessages = chat.message
+
+                }
+
+                else -> {}
+            }
+        }.onFailure {
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
+        }
+
+        Column(modifier = Modifier.background(bgColor)) {
             Row(
                 modifier = Modifier.fillMaxWidth().background(colorPrimary).padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -59,19 +110,23 @@ class ChatRoomScreen : Screen {
                 Row {
                     Icon(
                         Icons.Default.ArrowBackIosNew,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(24.dp).clickable {
+                            navigator.pop()
+                        },
                         contentDescription = "Back"
                     )
 
                     Spacer(Modifier.width(4.dp))
 
-                    TextBodyBold("Virgie", modifier = Modifier.wrapContentSize(), bgColor)
+                    TextBodyBold(textName, modifier = Modifier.wrapContentSize(), bgColor)
                 }
 
                 Icon(
                     modifier = Modifier
                         .width(24.dp)
-                        .height(24.dp),
+                        .height(24.dp).clickable {
+
+                        },
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = "Options",
                     tint = bgColor
@@ -79,7 +134,7 @@ class ChatRoomScreen : Screen {
             }
 
             Text(
-                "Hello World",
+                textPostMessage,
                 color = colorPrimary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
                     BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
@@ -89,15 +144,16 @@ class ChatRoomScreen : Screen {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            val a = 10
-
             LazyColumn(
                 modifier = Modifier.fillMaxHeight(0.9f).fillMaxWidth(),
             ) {
-                items(a) {
-                    if (it % 2 == 0)
-                        ItemReceiveChat()
-                    else ItemSendChat()
+                if (uidState.isEmpty()) return@LazyColumn
+
+                println("ListMessage" + listMessages.toList())
+                items(listMessages) {
+                    if (it.sender == uidState)
+                        ItemSendChat()
+                    else ItemReceiveChat()
                 }
             }
 
