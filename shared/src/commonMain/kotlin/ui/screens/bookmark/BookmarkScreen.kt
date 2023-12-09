@@ -1,6 +1,8 @@
 package ui.screens.bookmark
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -16,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.bookmark.model.BookmarkRequest
@@ -23,6 +26,7 @@ import data.bookmark.state.ListBookmarkState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.TopBar
 import ui.screens.post.OptionPostEvent
@@ -56,6 +60,7 @@ fun BookmarkScreen(
         Column(
             modifier = Modifier.fillMaxWidth().wrapContentSize()
         ) {
+
             TopBar("Bookmark")
 
             bookmarkViewModel.listBookmarkState.collectAsState().value.onSuccess {
@@ -70,6 +75,13 @@ fun BookmarkScreen(
 
                     is ListBookmarkState.Success -> {
                         val listPost by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
+
+                        if(listPost?.isEmpty() == true){
+                          //  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                EmptyState("drawable/ic_no_bookmark.png", "No Bookmark")
+                          //  }
+                        }
+
                         LazyColumn(modifier = Modifier.padding(bottom = 64.dp, top = 8.dp)) {
                             items(listPost?: listOf()) { data ->
                                 if (data.Bookmarks?.isNotEmpty() == true) {
