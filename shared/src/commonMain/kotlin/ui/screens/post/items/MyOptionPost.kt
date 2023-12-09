@@ -18,11 +18,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.post.model.PostResponse
-import data.post.model.PrivatePostRequest
 import data.post.state.PostState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.AlertDialogComposable
 import ui.components.ProgressBarLoading
 import ui.components.TextSubtitleMedium
 import ui.screens.post.OptionPostEvent
@@ -41,6 +41,8 @@ fun MyOptionPost(
 
     val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
     var isDialogOpen by remember { mutableStateOf(false) }
+
+    var isDialogDelete by remember { mutableStateOf(false) }
 
     Icon(
         modifier = Modifier
@@ -73,10 +75,22 @@ fun MyOptionPost(
 
                     TextOption("Delete Post") {
                         isDialogOpen = false
-                        event.onDeletePost.invoke(postResponse)
+                        isDialogDelete = true
                     }
                 }
             },
+        )
+    }
+
+    if (isDialogDelete) {
+        AlertDialogComposable(
+            onDismissRequest = {isDialogDelete = false},
+            onConfirmation = {
+                event.onDeletePost.invoke(postResponse)
+                isDialogDelete = false
+            },
+            "Delete Post",
+            "Are you sure delete this post?"
         )
     }
 

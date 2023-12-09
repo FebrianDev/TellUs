@@ -47,6 +47,7 @@ fun LatestPostScreen(
 
     val listTag =
         arrayListOf("Random", "Social", "Study", "Politic", "Technology", "Gaming", "Beauty")
+
     val listTagState by rememberSaveable { mutableStateOf(listTag) }
 
     val event = OptionPostEvent()
@@ -59,8 +60,9 @@ fun LatestPostScreen(
                         selectedItem = -1
                         postViewModel.getAllPost()
                     } else {
+                       // println("Tag2 "+listTag[selectedItem])
                         selectedItem = it
-                        postViewModel.getPostByTag(listTag[it])
+                        postViewModel.getPostByTag(listTag[selectedItem])
                     }
                 }
             }

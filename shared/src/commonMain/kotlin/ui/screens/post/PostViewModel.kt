@@ -65,9 +65,9 @@ class PostViewModel : ViewModel() {
     }
 
     fun deletePost(id: String) {
-        _postState.value = Result.success(PostState.Loading)
+      //  _postState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _postState.value = postSdk.deletePost(id)
+             postSdk.deletePost(id)
         }
     }
 

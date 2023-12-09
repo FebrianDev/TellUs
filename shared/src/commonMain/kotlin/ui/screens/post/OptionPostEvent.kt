@@ -1,6 +1,7 @@
 package ui.screens.post
 
 import data.comment.model.CommentResponse
+import data.comment.model.ReplyCommentResponse
 import data.post.model.PostResponse
 
 data class OptionPostEvent(
@@ -8,5 +9,6 @@ data class OptionPostEvent(
     var onShareLink: (text: String) -> Unit = {},
     var onChangePrivatePost: (isPrivate: Boolean) -> Unit = {},
     var onDeletePost: (post: PostResponse) -> Unit = {},
-    var onDeleteComment:(comment:CommentResponse) -> Unit = {}
+    var onDeleteComment:(comment:CommentResponse) -> Unit = {},
+    var onDeleteReplyComment:(comment: ReplyCommentResponse) -> Unit = {}
 )
