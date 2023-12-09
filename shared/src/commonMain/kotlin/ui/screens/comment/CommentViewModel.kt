@@ -10,6 +10,7 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,14 +35,19 @@ class CommentViewModel : ViewModel() {
     fun insertComment(commentRequest: CommentRequest) {
         _insertCommentState.value = Result.success(InsertCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _insertCommentState.value = sdk.insertComment(commentRequest)
+            //_insertCommentState.value =
+            sdk.insertComment(commentRequest)
+            delay(300)
+            getCommentById(commentRequest.id_post.toString())
         }
     }
 
     fun insertReplyComment(commentRequest: CommentReplyRequest) {
         _insertCommentState.value = Result.success(InsertCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _insertCommentState.value = sdk.insertReplyComment(commentRequest)
+            sdk.insertReplyComment(commentRequest)
+            delay(300)
+            getReplyComment(commentRequest.id_post.toString(), commentRequest.id_reply.toString())
         }
     }
 
@@ -57,6 +63,15 @@ class CommentViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             _replyCommentState.value = sdk.getReplyComment(idPost, idComment)
         }
+    }
+
+    fun deleteComment(idPost: String, idComment: String) {
+        //_commentState.value = Result.success(CommentState.Loading)
+        CoroutineScope(Dispatchers.IO).launch {
+            //_commentState.value =
+            sdk.deleteComment(idPost, idComment)
+        }
+
     }
 
 }

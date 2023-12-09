@@ -22,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,11 +36,13 @@ import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.screens.comment.option.MyOptionReplyComment
+import ui.screens.post.OptionPostEvent
 import ui.screens.post.items.OptionComment
-import ui.screens.post.items.OptionPost
 import ui.themes.colorPrimary
 import ui.themes.colorThird
 import utils.getTime
+import utils.showSnackBar
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -46,7 +50,9 @@ fun ItemReplyComment(
     replyCommentResponse: ReplyCommentResponse,
     scaffoldState: SnackbarHostState,
     coroutineScope: CoroutineScope,
-    onClick: (message: String, show:Boolean) -> Unit
+    uid: String,
+    event: OptionPostEvent,
+    onClick: (message: String, show: Boolean) -> Unit
 ) {
 
     val navigator = LocalNavigator.currentOrThrow
@@ -56,6 +62,17 @@ fun ItemReplyComment(
         replyCommentResponse.id_post.toString(),
         replyCommentResponse.id.toString()
     )
+
+    val cp = LocalClipboardManager.current
+
+//    event.onCopyText = {
+//        cp.setText(AnnotatedString(it))
+//        showSnackBar(
+//            "The text has been copied successfully",
+//            coroutineScope,
+//            scaffoldState
+//        )
+//    }
 
     Row(
         modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
@@ -108,7 +125,22 @@ fun ItemReplyComment(
                             ).padding(2.dp).align(Alignment.CenterVertically)
                         )
 
-                        OptionComment(scaffoldState, coroutineScope, replyCommentResponse.message.toString())
+                        if (replyCommentResponse.id_user == uid)
+                            MyOptionReplyComment(
+                                replyCommentResponse, scaffoldState,
+                                coroutineScope, event
+                            )
+                        else
+                            OptionComment(
+                                scaffoldState,
+                                coroutineScope,
+                                replyCommentResponse.message.toString()
+                            )
+//                        OptionComment(
+//                            scaffoldState,
+//                            coroutineScope,
+//                            replyCommentResponse.message.toString()
+//                        )
                     }
 
                     Text(
@@ -124,7 +156,12 @@ fun ItemReplyComment(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light,
                         minLines = 1,
-                        modifier = Modifier.clickable { onClick.invoke(replyCommentResponse.message.toString(), true) }
+                        modifier = Modifier.clickable {
+                            onClick.invoke(
+                                replyCommentResponse.message.toString(),
+                                true
+                            )
+                        }
                     )
                 }
             }

@@ -36,9 +36,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -47,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import data.comment.model.CommentReplyRequest
 import data.comment.model.CommentResponse
-import data.comment.state.InsertCommentState
 import data.comment.state.ReplyCommentState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
@@ -56,8 +58,12 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.EmptyState
 import ui.components.ProgressBarLoading
+import ui.components.SpacerW
 import ui.components.TextBodyBold
+import ui.components.TextFieldComment
 import ui.components.TitleHeader
+import ui.screens.comment.option.MyOptionComment
+import ui.screens.post.OptionPostEvent
 import ui.screens.post.items.OptionComment
 import ui.themes.bgColor
 import ui.themes.colorPrimary
@@ -81,6 +87,21 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
+        val cp = LocalClipboardManager.current
+
+        val event = OptionPostEvent()
+
+        event.onCopyText = {
+            cp.setText(AnnotatedString(it))
+
+            showSnackBar(
+                "The text has been copied successfully",
+                coroutineScope,
+                scaffoldState
+            )
+
+        }
+
         var replyMessage by remember { mutableStateOf("") }
         var showReplyMessage by remember { mutableStateOf(false) }
         var isRoot by remember { mutableStateOf(true) }
@@ -92,12 +113,12 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                 TitleHeader("Detail Comment")
                 Spacer(modifier = Modifier.height(24.dp))
 
-                //    DetailPostDummy()
                 //ItemComment(commentResponse)
                 ShowDetailComment(
-                    commentViewModel,
                     scaffoldState,
-                    coroutineScope
+                    coroutineScope,
+                    uid,
+                    event
                 ) { message: String, show: Boolean ->
                     replyMessage = message
                     showReplyMessage = show
@@ -110,30 +131,49 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
 
                 commentViewModel.replyCommentState.collectAsState().value.onSuccess {
                     when (it) {
-                        is ReplyCommentState.Loading -> {
-                            ProgressBarLoading()
-                        }
-
-                        is ReplyCommentState.Error -> {
-                            showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
-                        }
+                        is ReplyCommentState.Loading -> ProgressBarLoading()
+                        is ReplyCommentState.Error -> showSnackBar(
+                            "Something was wrong!",
+                            coroutineScope,
+                            scaffoldState
+                        )
 
                         is ReplyCommentState.Success -> {
-                            it.data.data?.let { comment ->
-                                if (comment.isEmpty()) {
-                                    EmptyState("drawable/ic_no_comment.png", "No Comment")
-                                } else {
-                                    LazyColumn(modifier = Modifier.fillMaxHeight(if (showReplyMessage) 0.8f else 0.9f)) {
-                                        items(comment) { data ->
-                                            ItemReplyComment(
-                                                data,
-                                                scaffoldState,
-                                                coroutineScope
-                                            ) { message, show ->
-                                                replyMessage = message
-                                                showReplyMessage = show
-                                                isRoot = false
-                                            }
+
+                            val listCommentState by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
+
+                            if (listCommentState?.isEmpty() == true) {
+                                EmptyState("drawable/ic_no_comment.png", "No Comment")
+                            } else {
+                                LazyColumn(modifier = Modifier.fillMaxHeight(if (showReplyMessage) 0.8f else 0.9f)) {
+                                    items(listCommentState ?: listOf()) { data ->
+                                        event.onDeleteReplyComment = { commentResponse ->
+                                            listCommentState?.remove(commentResponse)
+                                            commentViewModel.deleteComment(
+                                                commentResponse.id_post.toString(),
+                                                commentResponse.id.toString()
+                                            )
+                                            showSnackBar(
+                                                "Success delete comment",
+                                                coroutineScope,
+                                                scaffoldState
+                                            )
+                                        }
+
+                                        if (listCommentState?.isEmpty() == true) {
+                                            EmptyState("drawable/ic_no_comment.png", "No Comment")
+                                        }
+
+                                        ItemReplyComment(
+                                            data,
+                                            scaffoldState,
+                                            coroutineScope,
+                                            uid,
+                                            event
+                                        ) { message, show ->
+                                            replyMessage = message
+                                            showReplyMessage = show
+                                            isRoot = false
                                         }
                                     }
                                 }
@@ -189,22 +229,26 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
 
                     var textComment by remember { mutableStateOf(TextFieldValue("")) }
 
-                    TextField(
-                        value = textComment,
-                        onValueChange = {
-                            textComment = it
-                        },
-                        placeholder = { Text(text = "Type your message") },
-                        modifier = Modifier.fillMaxWidth(0.8f).background(bgColor),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = bgColor,
-                            unfocusedContainerColor = bgColor,
-                            disabledContainerColor = bgColor,
-                            disabledIndicatorColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                    )
+                    TextFieldComment(textComment) {
+                        textComment = it
+                    }
+
+//                    TextField(
+//                        value = textComment,
+//                        onValueChange = {
+//                            textComment = it
+//                        },
+//                        placeholder = { Text(text = "Type your message") },
+//                        modifier = Modifier.fillMaxWidth(0.8f).background(bgColor),
+//                        colors = TextFieldDefaults.colors(
+//                            focusedContainerColor = bgColor,
+//                            unfocusedContainerColor = bgColor,
+//                            disabledContainerColor = bgColor,
+//                            disabledIndicatorColor = Color.Transparent,
+//                            focusedIndicatorColor = Color.Transparent,
+//                            unfocusedIndicatorColor = Color.Transparent
+//                        ),
+//                    )
 
                     TextBodyBold(
                         text = "Send",
@@ -230,28 +274,27 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                     )
                 }
 
-                commentViewModel.insertCommentState.collectAsState().value.onSuccess {
-                    when (it) {
-                        is InsertCommentState.Loading -> {
-                            ProgressBarLoading()
-                        }
-
-                        is InsertCommentState.Error -> {
-                            showSnackBar("Something was wrong", coroutineScope, scaffoldState)
-                        }
-
-                        is InsertCommentState.Success -> {
-                            commentViewModel.getReplyComment(
-                                commentResponse.id_post.toString(),
-                                commentResponse.id.toString()
-                            )
-                        }
-
-                        else -> {}
-                    }
-                }.onFailure {
-                    showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
-                }
+//                commentViewModel.insertCommentState.collectAsState().value.onSuccess {
+//                    when (it) {
+//                        is InsertCommentState.Loading -> ProgressBarLoading()
+//                        is InsertCommentState.Error -> showSnackBar(
+//                            "Something was wrong",
+//                            coroutineScope,
+//                            scaffoldState
+//                        )
+//
+//                        is InsertCommentState.Success -> {
+//                            commentViewModel.getReplyComment(
+//                                commentResponse.id_post.toString(),
+//                                commentResponse.id.toString()
+//                            )
+//                        }
+//
+//                        else -> {}
+//                    }
+//                }.onFailure {
+//                    showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
+//                }
 
 
             }
@@ -293,9 +336,10 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
     @OptIn(ExperimentalResourceApi::class)
     @Composable
     fun ShowDetailComment(
-        commentViewModel: CommentViewModel,
         scaffoldState: SnackbarHostState,
         coroutineScope: CoroutineScope,
+        uid: String,
+        event: OptionPostEvent,
         onClick: (message: String, show: Boolean) -> Unit
     ) {
         Row(
@@ -326,7 +370,7 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                             contentDescription = ""
                         )
 
-                        Spacer(modifier = Modifier.width(4.dp))
+                        SpacerW(4.dp)
 
                         Column(
                             modifier = Modifier.fillMaxWidth()
@@ -343,11 +387,17 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                     modifier = Modifier.fillMaxWidth(0.9f)
                                 )
 
-                                OptionComment(
-                                    scaffoldState,
-                                    coroutineScope,
-                                    commentResponse.message.toString()
-                                )
+                                if (uid == commentResponse.id_user) {
+                                    MyOptionComment(
+                                        commentResponse, scaffoldState, coroutineScope, event
+                                    )
+                                } else {
+                                    OptionComment(
+                                        scaffoldState,
+                                        coroutineScope,
+                                        commentResponse.message.toString()
+                                    )
+                                }
                             }
 
                             androidx.compose.material.Text(

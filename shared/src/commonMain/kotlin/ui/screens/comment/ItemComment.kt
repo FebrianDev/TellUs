@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,7 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.screens.post.OptionPostEvent
-import ui.screens.post.items.MyOptionComment
+import ui.screens.comment.option.MyOptionComment
 import ui.screens.post.items.OptionComment
 import ui.themes.colorPrimary
 import utils.getTime
@@ -105,9 +104,8 @@ fun ItemComment(
                             )
 
                             if (commentResponse.id_user == uid)
-                                MyOptionComment(scaffoldState,
-                                    coroutineScope,
-                                    commentResponse.message.toString(), event)
+                                MyOptionComment(commentResponse, scaffoldState,
+                                    coroutineScope, event)
                             else
                                 OptionComment(
                                     scaffoldState,
@@ -142,55 +140,4 @@ fun ItemComment(
 
         }
     }
-}
-
-@Composable
-fun ItemCommentDummy() {
-//    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-//        Text(
-//            text = getTime(co.createdAt.toString()),
-//            color = Color.Black,
-//            fontSize = 12.sp,
-//            textAlign = TextAlign.Center,
-//            modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)
-//        )
-//
-//        Card(
-//            modifier = Modifier
-//                .padding(16.dp, 4.dp, 0.dp, 4.dp)
-//                .fillMaxWidth()
-//                .heightIn(min = 96.dp, max = 256.dp)
-//                .clickable {
-//                    // navigator.push(DetailPostTab)
-//                },
-//            shape = RoundedCornerShape(24.dp, 0.dp, 0.dp, 24.dp),
-//            elevation = 4.dp,
-//        ) {
-//            Column(
-//                modifier = Modifier.fillMaxWidth().padding(16.dp)
-//            ) {
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//
-//                    Text(
-//                        "Lörem ipsum ohet tynett nysare kårade. ",
-//                        color = Color.Black,
-//                        fontSize = 14.sp,
-//                        modifier = Modifier.fillMaxWidth(0.9f)
-//                    )
-//
-//                    //OptionComment(s)
-//                }
-//
-//                Text(
-//                    "Reply",
-//                    color = Color.Black,
-//                    fontSize = 12.sp,
-//                    fontWeight = FontWeight.Light,
-//                )
-//            }
-//        }
-//    }
 }

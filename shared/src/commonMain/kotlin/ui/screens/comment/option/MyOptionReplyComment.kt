@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import data.comment.model.CommentResponse
+import data.comment.model.ReplyCommentResponse
 import kotlinx.coroutines.CoroutineScope
 import ui.components.AlertDialogComposable
 import ui.components.TextSubtitleMedium
@@ -30,8 +31,8 @@ import ui.themes.colorPrimary
 import utils.showSnackBar
 
 @Composable
-fun MyOptionComment(
-    commentResponse: CommentResponse,
+fun MyOptionReplyComment(
+    commentResponse: ReplyCommentResponse,
     scaffoldState: SnackbarHostState,
     coroutineScope: CoroutineScope,
     event: OptionPostEvent
@@ -75,7 +76,6 @@ fun MyOptionComment(
                             coroutineScope,
                             scaffoldState
                         )
-
                         event.onCopyText.invoke(commentResponse.message.toString())
                     }
 
@@ -92,7 +92,7 @@ fun MyOptionComment(
         AlertDialogComposable(
             onDismissRequest = { isDialogDelete = false },
             onConfirmation = {
-                event.onDeleteComment.invoke(commentResponse)
+                event.onDeleteReplyComment.invoke(commentResponse)
                 isDialogDelete = false
             },
             "Delete Post",
