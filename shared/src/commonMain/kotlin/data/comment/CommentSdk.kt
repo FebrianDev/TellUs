@@ -6,6 +6,7 @@ import data.comment.network.CommentApi
 import data.comment.state.CommentState
 import data.comment.state.InsertCommentState
 import data.comment.state.ReplyCommentState
+import data.post.state.PostState
 
 class CommentSdk {
 
@@ -19,6 +20,11 @@ class CommentSdk {
             Result.failure(e)
         }
     }
+
+//    @Throws(Exception::class)
+//    suspend fun insertComment(commentRequest: CommentRequest): Result<String> {
+//        return api.insertComment(commentRequest)
+//    }
 
     @Throws(Exception::class)
     suspend fun insertReplyComment(commentRequest: CommentReplyRequest): Result<InsertCommentState> {
@@ -42,6 +48,15 @@ class CommentSdk {
     suspend fun getReplyComment(idPost: String, idComment: String): Result<ReplyCommentState> {
         return try {
             Result.success(api.getReplyComment(idPost, idComment))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    @Throws(Exception::class)
+    suspend fun deleteComment(idPost: String, idComment: String): Result<CommentState> {
+        return try {
+            Result.success(api.deleteComment(idPost, idComment))
         } catch (e: Exception) {
             Result.failure(e)
         }

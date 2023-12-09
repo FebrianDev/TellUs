@@ -12,6 +12,7 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.timeout
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -47,18 +48,22 @@ class CommentApi {
                 requestTimeoutMillis = 4000
             }
         }
+
         var commentState: InsertCommentState = InsertCommentState.Empty
+
         when (data.status.value) {
             200, 201 -> {
                 commentState = InsertCommentState.Success(data.body())
             }
 
             in 400..404 -> {
-                commentState = InsertCommentState.Error((data.body() as ApiErrorResponse).message)
+                commentState =
+                    InsertCommentState.Error(((data.body() as ApiErrorResponse).message))
             }
         }
 
         return commentState
+
     }
 
     suspend fun insertReplyComment(commentRequest: CommentReplyRequest): InsertCommentState {
@@ -145,5 +150,62 @@ class CommentApi {
 
         return replyCommentState
     }
+
+    suspend fun deleteReplyComment(idPost: String, idComment: String): CommentState {
+        val data = client.delete("${Constant.BASE_URL}/api/comment/$idPost/$idComment") {
+            contentType(ContentType.Application.Json)
+            headers {
+                append(
+                    "api-token",
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                )
+            }
+            timeout {
+                requestTimeoutMillis = 4000
+            }
+        }
+
+        var commentState: CommentState = CommentState.Empty
+        when (data.status.value) {
+            200, 201 -> {
+                commentState = CommentState.Success(data.body())
+            }
+
+            in 400..404 -> {
+                commentState = CommentState.Error((data.body() as ApiErrorResponse).message)
+            }
+        }
+
+        return commentState
+    }
+
+    suspend fun deleteComment(idPost: String, idComment: String): CommentState {
+        val data = client.delete("${Constant.BASE_URL}/api/comment/$idPost/$idComment") {
+            contentType(ContentType.Application.Json)
+            headers {
+                append(
+                    "api-token",
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                )
+            }
+            timeout {
+                requestTimeoutMillis = 4000
+            }
+        }
+
+        var commentState: CommentState = CommentState.Empty
+        when (data.status.value) {
+            200, 201 -> {
+                commentState = CommentState.Success(data.body())
+            }
+
+            in 400..404 -> {
+                commentState = CommentState.Error((data.body() as ApiErrorResponse).message)
+            }
+        }
+
+        return commentState
+    }
+
 
 }
