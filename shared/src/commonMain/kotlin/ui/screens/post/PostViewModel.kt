@@ -32,6 +32,7 @@ class PostViewModel : ViewModel() {
     fun getAllPost() {
         _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
+            println("ListPostGet")
             _listPostState.value = postSdk.getAllPost()
         }
     }
@@ -39,20 +40,21 @@ class PostViewModel : ViewModel() {
     fun getTrending() {
         _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _listPostState.value = postSdk.getTrendingPost()
+           // _listPostState.value = postSdk.getTrendingPost()
         }
     }
 
     fun getPostByIdUser(id: String) {
         _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _listPostState.value = postSdk.getPostByIdUser(id)
+           // _listPostState.value = postSdk.getPostByIdUser(id)
         }
     }
 
     fun getPostByTag(tag: String) {
         _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
+            println("ListPostTag")
             _listPostState.value = postSdk.getPostByTag(tag)
         }
     }

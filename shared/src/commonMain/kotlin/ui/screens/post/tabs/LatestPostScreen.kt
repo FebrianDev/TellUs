@@ -9,13 +9,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.post.state.ListPostState
@@ -43,7 +43,9 @@ fun LatestPostScreen(
     var uidState by remember { mutableStateOf("") }
     uidState = uid
 
-    if (uidState.isNotEmpty()) postViewModel.getAllPost()
+    LaunchedEffect(false) {
+        postViewModel.getAllPost()
+    }
 
     val listTag =
         arrayListOf("Random", "Social", "Study", "Politic", "Technology", "Gaming", "Beauty")
@@ -60,7 +62,6 @@ fun LatestPostScreen(
                         selectedItem = -1
                         postViewModel.getAllPost()
                     } else {
-                       // println("Tag2 "+listTag[selectedItem])
                         selectedItem = it
                         postViewModel.getPostByTag(listTag[selectedItem])
                     }
@@ -81,16 +82,27 @@ fun LatestPostScreen(
 
                 is ListPostState.Success -> {
 
-                    val listPost by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
+                    val list = it.data.data
 
-                    LazyColumn(modifier = Modifier.padding(bottom = 64.dp, top = 8.dp)) {
-                        items(listPost ?: listOf()) { data ->
-                            event.onDeletePost = { post ->
-                                postViewModel.deletePost(post.id.toString())
-                                listPost?.remove(post)
-                                showSnackBar("Success delete post", coroutineScope, scaffoldState)
+                    if (list?.isEmpty() == true) {
+                        LazyColumn {
+
+                        }
+                    } else {
+                        val listPost by remember { mutableStateOf(it.data.data as ArrayList) }
+                        LazyColumn(modifier = Modifier.padding(bottom = 64.dp, top = 8.dp)) {
+                            items(listPost.toList() ?: listOf()) { data ->
+                                event.onDeletePost = { post ->
+                                    postViewModel.deletePost(post.id.toString())
+                                    listPost.remove(post)
+                                    showSnackBar(
+                                        "Success delete post",
+                                        coroutineScope,
+                                        scaffoldState
+                                    )
+                                }
+                                ItemPost(data, uidState, coroutineScope, scaffoldState, event)
                             }
-                            ItemPost(data, uidState, coroutineScope, scaffoldState, event)
                         }
                     }
                 }
