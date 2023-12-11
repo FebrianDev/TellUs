@@ -9,6 +9,7 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,14 @@ class PostViewModel : ViewModel() {
         MutableStateFlow<Result<ListPostState>>(Result.success(ListPostState.Empty))
     val listPostState: StateFlow<Result<ListPostState>> get() = _listPostState.asStateFlow()
 
+    private val _listBestPostState =
+        MutableStateFlow<Result<ListPostState>>(Result.success(ListPostState.Empty))
+    val listBestPostState: StateFlow<Result<ListPostState>> get() = _listBestPostState.asStateFlow()
+
+    private val _listMyPostState =
+        MutableStateFlow<Result<ListPostState>>(Result.success(ListPostState.Empty))
+    val listMyPostState: StateFlow<Result<ListPostState>> get() = _listMyPostState.asStateFlow()
+
     private val _postState = MutableStateFlow<Result<PostState>>(Result.success(PostState.Empty))
     val postState: StateFlow<Result<PostState>> get() = _postState.asStateFlow()
 
@@ -29,33 +38,26 @@ class PostViewModel : ViewModel() {
         MutableStateFlow<Result<PostState>>(Result.success(PostState.Empty))
     val insertPostState: StateFlow<Result<PostState>> get() = _insertPostState.asStateFlow()
 
-    fun getAllPost() {
+    fun getAllPost(tag: String = "") {
         _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            println("ListPostGet")
-            _listPostState.value = postSdk.getAllPost()
+            delay(100)
+            _listPostState.value = if (tag.isEmpty()) postSdk.getAllPost()
+            else postSdk.getPostByTag(tag)
         }
     }
 
     fun getTrending() {
-        _listPostState.value = Result.success(ListPostState.Loading)
+        _listBestPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-           // _listPostState.value = postSdk.getTrendingPost()
+            _listBestPostState.value = postSdk.getTrendingPost()
         }
     }
 
     fun getPostByIdUser(id: String) {
-        _listPostState.value = Result.success(ListPostState.Loading)
+        _listMyPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-           // _listPostState.value = postSdk.getPostByIdUser(id)
-        }
-    }
-
-    fun getPostByTag(tag: String) {
-        _listPostState.value = Result.success(ListPostState.Loading)
-        CoroutineScope(Dispatchers.IO).launch {
-            println("ListPostTag")
-            _listPostState.value = postSdk.getPostByTag(tag)
+            _listMyPostState.value = postSdk.getPostByIdUser(id)
         }
     }
 
@@ -67,9 +69,9 @@ class PostViewModel : ViewModel() {
     }
 
     fun deletePost(id: String) {
-      //  _postState.value = Result.success(PostState.Loading)
+        //  _postState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-             postSdk.deletePost(id)
+            postSdk.deletePost(id)
         }
     }
 
@@ -85,5 +87,9 @@ class PostViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             _postState.value = postSdk.changePrivatePost(privatePostRequest, idPost)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 }

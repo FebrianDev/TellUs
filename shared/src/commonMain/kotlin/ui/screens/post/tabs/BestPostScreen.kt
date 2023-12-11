@@ -42,7 +42,7 @@ fun BestPostScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        postViewModel.listPostState.collectAsState().value.onSuccess {
+        postViewModel.listBestPostState.collectAsState().value.onSuccess {
             when (it) {
                 is ListPostState.Loading -> {
                     ProgressBarLoading()

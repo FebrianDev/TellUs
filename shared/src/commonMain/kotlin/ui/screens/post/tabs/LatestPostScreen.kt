@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.post.state.ListPostState
@@ -63,7 +64,7 @@ fun LatestPostScreen(
                         postViewModel.getAllPost()
                     } else {
                         selectedItem = it
-                        postViewModel.getPostByTag(listTag[selectedItem])
+                        postViewModel.getAllPost(listTag[selectedItem])
                     }
                 }
             }
@@ -81,20 +82,12 @@ fun LatestPostScreen(
                 }
 
                 is ListPostState.Success -> {
-
-                    val list = it.data.data
-
-                    if (list?.isEmpty() == true) {
-                        LazyColumn {
-
-                        }
-                    } else {
-                        val listPost by remember { mutableStateOf(it.data.data as ArrayList) }
+                        val listPost by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
                         LazyColumn(modifier = Modifier.padding(bottom = 64.dp, top = 8.dp)) {
-                            items(listPost.toList() ?: listOf()) { data ->
+                            items(listPost?.toList() ?: listOf()) { data ->
                                 event.onDeletePost = { post ->
                                     postViewModel.deletePost(post.id.toString())
-                                    listPost.remove(post)
+                                    listPost?.remove(post)
                                     showSnackBar(
                                         "Success delete post",
                                         coroutineScope,
@@ -105,8 +98,6 @@ fun LatestPostScreen(
                             }
                         }
                     }
-                }
-
                 else -> {}
             }
         }.onFailure {
