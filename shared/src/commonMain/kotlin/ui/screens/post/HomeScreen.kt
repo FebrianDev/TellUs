@@ -92,7 +92,7 @@ class HomeScreen : Screen {
                 }
 
                 "Chat" -> {
-                    ChatScreen(uidState, scaffoldState, coroutineScope)
+                    ChatScreen()
                 }
 
                 "Post" -> {

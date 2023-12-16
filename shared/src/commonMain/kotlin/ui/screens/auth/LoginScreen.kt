@@ -145,7 +145,6 @@ class LoginScreen : Screen {
                     },
                     singleLine = true,
                     isError = isEmailError,
-                    textStyle = TextStyle(colorPrimary)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
