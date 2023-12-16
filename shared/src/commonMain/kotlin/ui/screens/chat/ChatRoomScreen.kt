@@ -27,6 +27,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,29 +39,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import data.chat.ChatEntity
 import data.chat.ChatState
 import data.chat.Message
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import ui.components.AlertDialogComposable
 import ui.components.ProgressBarLoading
 import ui.components.TextBodyBold
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.getDateNow
 import utils.getUid
 import utils.showSnackBar
 
 
-class ChatRoomScreen(private val idChat: String) : Screen {
+class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
 
     @Composable
     override fun Content() {
 
         val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
-
-        chatViewModel.getChat(idChat)
+        LaunchedEffect(false) {
+            chatViewModel.getChat(chatEntity.id_chat)
+            chatViewModel.readChat(chatEntity.id_chat, "")
+        }
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
@@ -70,6 +79,7 @@ class ChatRoomScreen(private val idChat: String) : Screen {
         var textName by remember { mutableStateOf("") }
         var textPostMessage by remember { mutableStateOf("") }
         var listMessages by remember { mutableStateOf(listOf<Message>()) }
+        var showPostMessage by remember { mutableStateOf(false) }
 
         val uid = getUid()
 
@@ -138,8 +148,9 @@ class ChatRoomScreen(private val idChat: String) : Screen {
                 color = colorPrimary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
                     BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
-                ).fillMaxWidth()
-                    .padding(8.dp)
+                ).fillMaxWidth().padding(8.dp).clickable {
+                            showPostMessage = true
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -152,20 +163,45 @@ class ChatRoomScreen(private val idChat: String) : Screen {
                 println("ListMessage" + listMessages.toList())
                 items(listMessages) {
                     if (it.sender == uidState)
-                        ItemSendChat()
-                    else ItemReceiveChat()
+                        ItemSendChat(it)
+                    else ItemReceiveChat(it)
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            SendChat(chatViewModel)
+            val message = Message(
+                sender = uidState,
+                prev_reply = "",
+                img = "",
+                read = false,
+                date =  getDateNow()
+            )
+
+            SendChat(chatViewModel, message)
+
+//            if(showPostMessage){
+//                Dialog(
+//                    onDismissRequest = { showPostMessage = false },
+//                ) {
+//                    Text(
+//                        textPostMessage,
+//                        color = colorPrimary,
+//                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
+//                            BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
+//                        ).fillMaxWidth().padding(8.dp).clickable {
+//                            showPostMessage = true
+//                        }
+//                    )
+//                }
+//            }
         }
     }
 
     @Composable
     fun SendChat(
         chatViewModel: ChatViewModel,
+        message: Message
         //  scaffoldState: SnackbarHostState,
         //  coroutineScope: CoroutineScope,
         //  uid: String
@@ -200,7 +236,9 @@ class ChatRoomScreen(private val idChat: String) : Screen {
                     .align(Alignment.CenterVertically).clickable {
 
                         //Send Chat
-
+                        message.message = textChat.text
+                        chatViewModel.sendChat(chatEntity, message, LocalDate.toString())
+                        chatViewModel.getChat(chatEntity.id_chat)
                         textChat = TextFieldValue("")
                     }
             )
@@ -227,6 +265,7 @@ class ChatRoomScreen(private val idChat: String) : Screen {
 //        }.onFailure {
 //            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
 //        }
+
 
     }
 }

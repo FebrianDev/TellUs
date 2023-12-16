@@ -6,8 +6,12 @@ import data.chat.ChatState
 import data.chat.ListChatState
 import data.chat.Message
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
@@ -19,11 +23,11 @@ class ChatViewModel : ViewModel() {
 
     private var _getListRoomChat =
         MutableStateFlow<Result<ListChatState>>(Result.success(ListChatState.Empty))
-    val getListRoomChat: StateFlow<Result<ListChatState>> get() = _getListRoomChat
+    val getListRoomChat: StateFlow<Result<ListChatState>> get() = _getListRoomChat.asStateFlow()
 
     private var _getChat =
         MutableStateFlow<Result<ChatState>>(Result.success(ChatState.Empty))
-    val getChat: StateFlow<Result<ChatState>> get() = _getChat
+    val getChat: StateFlow<Result<ChatState>> get() = _getChat.asStateFlow()
 
     fun createRoom(
         chatEntity: ChatEntity
@@ -35,14 +39,14 @@ class ChatViewModel : ViewModel() {
 
     fun getListRoomChat() {
         _getListRoomChat.value = Result.success(ListChatState.Loading)
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             _getListRoomChat.value = Result.success(ListChatState.Success(api.getListRoomChat()))
         }
     }
 
     fun getChat(idChat: String) {
         _getChat.value = Result.success(ChatState.Loading)
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch  {
             _getChat.value = api.getChat(idChat)
         }
     }
@@ -56,8 +60,14 @@ class ChatViewModel : ViewModel() {
 //                Message(
 //                    message = "Test123"
 //                ), "rZTjmoVjZFX7DUW3LuMA",
-                message, ""
+                message
             )
+        }
+    }
+
+    fun readChat(idChat: String, idSent: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            api.readChat(idChat, "")
         }
     }
 }

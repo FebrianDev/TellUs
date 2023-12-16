@@ -18,14 +18,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import data.chat.Message
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.getTimeChat
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun ItemSendChat() {
+fun ItemSendChat(
+    message: Message
+) {
     Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
@@ -40,14 +44,15 @@ fun ItemSendChat() {
             ) {
 
                 Text(
-                    "Hello",
+                    message.message,
                     color = colorPrimary,
                     fontSize = 14.sp,
                 )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "14.35",
+                        if (message.date.isEmpty()) "" else
+                            message.date.getTimeChat(),
                         color = Color.Black,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light,

@@ -39,17 +39,21 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import data.bookmark.model.BookmarkRequest
+import data.chat.ChatEntity
 import data.like.model.LikeRequest
 import data.post.model.PostResponse
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import ui.screens.bookmark.BookmarkViewModel
+import ui.screens.chat.ChatViewModel
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.LikeViewModel
 import ui.screens.post.OptionPostEvent
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.generatedFakeName
+import utils.getDateNow
 import utils.getTime
 import utils.showSnackBar
 
@@ -66,6 +70,7 @@ fun ItemPost(
 
     val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
     val bookmarkViewModel = getViewModel(Unit, viewModelFactory { BookmarkViewModel() })
+    val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
 
     val likeIcon = remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
     var like by remember { mutableStateOf(postResponse.like) }
@@ -80,6 +85,24 @@ fun ItemPost(
             "The text has been copied successfully",
             coroutineScope,
             scaffoldState
+        )
+    }
+
+    event.onSendPrivateChat = {
+        chatViewModel.createRoom(
+            ChatEntity(
+                id_chat = "",
+                id_sent = "idUser",
+                id_receiver = postResponse.id_user.toString(),
+                id_post = postResponse.id.toString(),
+                post_message = postResponse.message,
+                name = generatedFakeName(),
+                message = ArrayList(),
+                countReadSent = 0,
+                countReadReceiver = 0,
+                date = getDateNow(),
+                token = "token"
+            )
         )
     }
 
@@ -167,8 +190,9 @@ fun ItemPost(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+
                     Row {
-                        //LikePost(postResponse, likeViewModel)
+
                         Icon(
                             modifier = Modifier
                                 .padding(top = 4.dp, start = 4.dp)
@@ -177,7 +201,7 @@ fun ItemPost(
                                     likeViewModel.insertLike(LikeRequest(postResponse.id ?: 0, uid))
                                     if (likeIcon.value == Icons.Filled.Favorite) {
                                         likeIcon.value = Icons.Filled.FavoriteBorder
-                                        like = like?.minus(1)
+                                        like = like.minus(1)
                                         showSnackBar(
                                             "Cancel Add Like Post",
                                             coroutineScope,
@@ -185,7 +209,7 @@ fun ItemPost(
                                         )
                                     } else {
                                         likeIcon.value = Icons.Filled.Favorite
-                                        like = like?.plus(1)
+                                        like = like.plus(1)
                                         showSnackBar(
                                             "Success Add Like Post",
                                             coroutineScope,

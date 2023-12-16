@@ -64,7 +64,7 @@ import ui.components.TextFieldComment
 import ui.components.TitleHeader
 import ui.screens.comment.option.MyOptionComment
 import ui.screens.post.OptionPostEvent
-import ui.screens.post.items.OptionComment
+import ui.screens.comment.option.OptionComment
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getTime

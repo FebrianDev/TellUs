@@ -52,7 +52,7 @@ kotlin {
 
                 //firebase
                 implementation("dev.gitlive:firebase-auth:1.10.0")
-                implementation("dev.gitlive:firebase-common:1.10.0")
+                implementation("dev.gitlive:firebase-common:1.10.4")
                 implementation("dev.gitlive:firebase-firestore:1.10.4")
 
                 implementation("com.squareup.sqldelight:runtime:1.5.5")
@@ -70,6 +70,8 @@ kotlin {
                 // #3 - For observing values as flows
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                 implementation("com.russhwolf:multiplatform-settings-coroutines:$multiplatformSettings")
+
+
             }
         }
         val androidMain by getting {

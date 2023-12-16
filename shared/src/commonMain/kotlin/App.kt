@@ -2,7 +2,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,6 +11,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import ui.screens.auth.RegisterScreen
 import ui.screens.post.HomeScreen
 import ui.themes.bgColor
@@ -19,7 +22,6 @@ import utils.KeyValueStorage
 import utils.KeyValueStorageImpl
 import utils.getUid
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun App() {
     MaterialTheme {
@@ -51,6 +53,23 @@ fun App() {
                     RegisterScreen()
                 )
             }
+
+            val date = Clock.System.now().toString()
+            val convert = Instant.parse(date)
+            val toLocalDate = convert.toLocalDateTime(TimeZone.currentSystemDefault())
+            val getTime = toLocalDate.time.toString().substring(0, 5)
+            val getDate = toLocalDate.date
+            println("Date2 " + date)
+            println("Date2 " + convert)
+            println("Date2 " + toLocalDate)
+            println("Date2 " + getTime)
+            println("Date2 " + getDate)
+
+//            NotifierManager.addListener(object : NotifierManager.Listener {
+//                override fun onNewToken(token: String) {
+//                    println("onNewToken: $token") //Update user token in the server if needed
+//                }
+//            })
 
         }
     }

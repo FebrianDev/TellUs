@@ -241,7 +241,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                             if (likeIcon == Icons.Filled.Favorite) {
                                                                 likeIcon =
                                                                     Icons.Filled.FavoriteBorder
-                                                                like = like?.minus(1)
+                                                                like = like.minus(1)
                                                                 showSnackBar(
                                                                     "Cancel Add Like Post",
                                                                     coroutineScope,
@@ -249,7 +249,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                                 )
                                                             } else {
                                                                 likeIcon = Icons.Filled.Favorite
-                                                                like = like?.plus(1)
+                                                                like = like.plus(1)
                                                                 showSnackBar(
                                                                     "Success Add Like Post",
                                                                     coroutineScope,

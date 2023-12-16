@@ -200,7 +200,7 @@ fun ItemMyPost(
                                     likeViewModel.insertLike(LikeRequest(postResponse.id ?: 0, uid))
                                     if (likeIcon.value == Icons.Filled.Favorite) {
                                         likeIcon.value = Icons.Filled.FavoriteBorder
-                                        like = like?.minus(1)
+                                        like = like.minus(1)
                                         showSnackBar(
                                             "Cancel Add Like Post",
                                             coroutineScope,
@@ -208,7 +208,7 @@ fun ItemMyPost(
                                         )
                                     } else {
                                         likeIcon.value = Icons.Filled.Favorite
-                                        like = like?.plus(1)
+                                        like = like.plus(1)
                                         showSnackBar(
                                             "Success Add Like Post",
                                             coroutineScope,

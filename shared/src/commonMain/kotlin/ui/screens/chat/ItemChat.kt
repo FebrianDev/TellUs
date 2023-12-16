@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import data.chat.ChatEntity
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.components.SpacerH
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -66,8 +67,9 @@ fun ItemChat(
 
                 Spacer(modifier = Modifier.height(4.dp))
             }
-
         }
+
+        SpacerH(4.dp)
 
         Divider()
     }

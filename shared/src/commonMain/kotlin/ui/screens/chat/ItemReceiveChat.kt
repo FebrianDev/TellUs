@@ -16,13 +16,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import data.chat.Message
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun ItemReceiveChat() {
+fun ItemReceiveChat(
+    message: Message
+) {
     Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
@@ -37,7 +40,7 @@ fun ItemReceiveChat() {
             ) {
 
                 Text(
-                    "Hello World",
+                    message.message,
                     color = colorPrimary,
                     fontSize = 14.sp
                 )

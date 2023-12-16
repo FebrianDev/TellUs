@@ -10,5 +10,6 @@ data class OptionPostEvent(
     var onChangePrivatePost: (isPrivate: Boolean) -> Unit = {},
     var onDeletePost: (post: PostResponse) -> Unit = {},
     var onDeleteComment:(comment:CommentResponse) -> Unit = {},
-    var onDeleteReplyComment:(comment: ReplyCommentResponse) -> Unit = {}
+    var onDeleteReplyComment:(comment: ReplyCommentResponse) -> Unit = {},
+    var onSendPrivateChat:() -> Unit = {}
 )

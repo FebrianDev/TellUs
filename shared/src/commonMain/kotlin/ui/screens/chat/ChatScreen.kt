@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +27,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import data.chat.ListChatState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
+import kotlinx.coroutines.CoroutineScope
 import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.TopBar
@@ -33,20 +36,28 @@ import utils.getUid
 import utils.showSnackBar
 
 @Composable
-fun ChatScreen() {
+fun ChatScreen(
+    uid:String,
+    scaffoldState: SnackbarHostState,
+    coroutineScope: CoroutineScope
+) {
 
     val navigator = LocalNavigator.currentOrThrow
 
-    val scaffoldState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+//    val scaffoldState = remember { SnackbarHostState() }
+//    val coroutineScope = rememberCoroutineScope()
 
-    val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
-    chatViewModel.getListRoomChat()
+     val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
+    LaunchedEffect(false) {
+        chatViewModel.getListRoomChat()
+    }
 
-    val uid = getUid()
+//    val uid = getUid()
+//
+//    var uidState by remember { mutableStateOf("") }
+//    uidState = uid
 
-    var uidState by remember { mutableStateOf("") }
-    uidState = uid
+  //  println("UidState5"+uidState)
 
     Scaffold(
         containerColor = bgColor
@@ -58,7 +69,6 @@ fun ChatScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             chatViewModel.getListRoomChat.collectAsState().value.onSuccess {
-
                 when (it) {
                     is ListChatState.Loading -> {
                         ProgressBarLoading()
@@ -69,19 +79,18 @@ fun ChatScreen() {
                     }
 
                     is ListChatState.Success -> {
-                        if (uidState.isEmpty()) return@onSuccess
-
+                        if (uid.isEmpty()) return@onSuccess
                         val listChat =
-                            it.data.filter { it.id_sent == uidState || it.id_receiver == uidState }
+                            it.data.filter { it.id_sent == uid || it.id_receiver == uid }
                                 .toMutableStateList()
 
                         if (listChat.isEmpty()) {
                             EmptyState("drawable/ic_no_comment.png", "No Chat")
                         } else {
                             LazyColumn(modifier = Modifier.fillMaxHeight(0.9f)) {
-                                items(listChat ?: listOf()) { item ->
+                                items(listChat) { item ->
                                     ItemChat(item) {
-                                        navigator.push(ChatRoomScreen(item.id_chat))
+                                         navigator.push(ChatRoomScreen(item))
                                     }
                                 }
                             }

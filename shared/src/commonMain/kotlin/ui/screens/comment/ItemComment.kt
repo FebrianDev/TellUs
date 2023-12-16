@@ -33,7 +33,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.screens.post.OptionPostEvent
 import ui.screens.comment.option.MyOptionComment
-import ui.screens.post.items.OptionComment
+import ui.screens.comment.option.OptionComment
 import ui.themes.colorPrimary
 import utils.getTime
 

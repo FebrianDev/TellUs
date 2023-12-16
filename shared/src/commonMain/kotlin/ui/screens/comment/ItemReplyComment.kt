@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,11 +37,10 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.screens.comment.option.MyOptionReplyComment
 import ui.screens.post.OptionPostEvent
-import ui.screens.post.items.OptionComment
+import ui.screens.comment.option.OptionComment
 import ui.themes.colorPrimary
 import ui.themes.colorThird
 import utils.getTime
-import utils.showSnackBar
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

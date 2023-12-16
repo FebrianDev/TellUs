@@ -70,7 +70,7 @@ fun OptionPost(
 
                     }
                     TextOption("Send Private Message"){
-
+                        event.onSendPrivateChat.invoke()
                     }
                 }
             },
