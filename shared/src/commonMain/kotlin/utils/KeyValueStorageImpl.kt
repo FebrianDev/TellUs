@@ -12,14 +12,14 @@ class KeyValueStorageImpl : KeyValueStorage {
 
     private val settings: Settings by lazy { Settings() }
     private val observableSettings: ObservableSettings by lazy { settings as ObservableSettings }
-    override var uid: String?
-        get() = settings[StorageKeys.UID.key]
+    override var apiToken: String?
+        get() = settings[StorageKeys.API_TOKEN.key]
         set(value) {
-            settings[StorageKeys.UID.key] = value
+            settings[StorageKeys.API_TOKEN.key] = value
         }
     @OptIn(ExperimentalSettingsApi::class)
-    override val observableUid: Flow<String>
-        get() = observableSettings.getStringFlow(StorageKeys.UID.key, "")
+    override val observableApiToken: Flow<String>
+        get() = observableSettings.getStringFlow(StorageKeys.API_TOKEN.key, "")
 
     override fun cleanStorage() {
         settings.clear()

@@ -34,13 +34,13 @@ class PostApi {
         install(HttpTimeout)
     }
 
-    suspend fun getAllPost(): ListPostState {
+    suspend fun getAllPost(apiToken: String): ListPostState {
         val data = client.get("${Constant.BASE_URL}/api/post") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -63,13 +63,13 @@ class PostApi {
         return listPostState
     }
 
-    suspend fun getTrendingPost(): ListPostState {
+    suspend fun getTrendingPost(apiToken: String): ListPostState {
         val data = client.get("${Constant.BASE_URL}/api/post/all/trending") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -91,13 +91,13 @@ class PostApi {
         return listPostState
     }
 
-    suspend fun getPostByIdUser(id: String): ListPostState {
+    suspend fun getPostByIdUser(id: String, apiToken: String): ListPostState {
         val data = client.get("${Constant.BASE_URL}/api/post/user/$id") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -119,13 +119,13 @@ class PostApi {
         return listPostState
     }
 
-    suspend fun getPostByTag(tag: String): ListPostState {
+    suspend fun getPostByTag(tag: String, apiToken: String): ListPostState {
         val data = client.get("${Constant.BASE_URL}/api/post/tag/$tag") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -147,13 +147,13 @@ class PostApi {
         return listPostState
     }
 
-    suspend fun getPostById(id: String): PostState {
+    suspend fun getPostById(id: String, apiToken: String): PostState {
         val data = client.get("${Constant.BASE_URL}/api/post/$id") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -175,13 +175,13 @@ class PostApi {
         return postState
     }
 
-    suspend fun deletePost(id: String): PostState {
+    suspend fun deletePost(id: String, apiToken: String): PostState {
         val data = client.delete("${Constant.BASE_URL}/api/post/$id") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -203,14 +203,14 @@ class PostApi {
         return postState
     }
 
-    suspend fun insertPost(postRequest: PostRequest): PostState {
+    suspend fun insertPost(postRequest: PostRequest, apiToken: String): PostState {
         val data = client.post("${Constant.BASE_URL}/api/post") {
             contentType(ContentType.Application.Json)
             setBody(postRequest)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -232,14 +232,14 @@ class PostApi {
         return postState
     }
 
-    suspend fun insertLike(postRequest: PostRequest): PostState {
+    suspend fun insertLike(postRequest: PostRequest, apiToken: String): PostState {
         val data = client.post("${Constant.BASE_URL}/api/like") {
             contentType(ContentType.Application.Json)
             setBody(postRequest)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -260,14 +260,18 @@ class PostApi {
         return postState
     }
 
-    suspend fun changePrivatePost(privatePostRequest: PrivatePostRequest, idPost:String): PostState {
+    suspend fun changePrivatePost(
+        privatePostRequest: PrivatePostRequest,
+        idPost: String,
+        apiToken: String
+    ): PostState {
         val data = client.put("${Constant.BASE_URL}/api/post/${idPost}") {
             contentType(ContentType.Application.Json)
             setBody(privatePostRequest)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {

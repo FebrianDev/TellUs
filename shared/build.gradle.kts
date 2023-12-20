@@ -45,10 +45,9 @@ kotlin {
 
                 implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
-                // BottomSheetNavigator
                 implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
-                // Android ViewModel integration
                 implementation("cafe.adriel.voyager:voyager-androidx:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
 
                 //firebase
                 implementation("dev.gitlive:firebase-auth:1.10.0")

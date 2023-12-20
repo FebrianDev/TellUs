@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -22,9 +23,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -50,12 +49,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import data.auth.AuthState
-import utils.KeyValueStorage
-import utils.KeyValueStorageImpl
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
@@ -63,6 +59,8 @@ import ui.components.ProgressBarLoading
 import ui.screens.post.HomeScreen
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.KeyValueStorage
+import utils.KeyValueStorageImpl
 import utils.showSnackBar
 
 class LoginScreen : Screen {
@@ -112,7 +110,7 @@ class LoginScreen : Screen {
                 //Image
                 Image(
                     painter = painterResource("drawable/icon_app.png"),
-                    contentDescription ="Icon App"
+                    contentDescription = "Icon App"
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -203,7 +201,8 @@ class LoginScreen : Screen {
                 ) {
                     Text(
                         text = "Forgot Password? ",
-                        color = colorPrimary,)
+                        color = colorPrimary,
+                    )
 
                     Text(
                         text = "Click Here",
@@ -251,6 +250,8 @@ class LoginScreen : Screen {
 
                         authViewModel.login(textEmail.text, textPassword.text)
                     }
+
+                    authViewModel.login("febrian26022001@gmail.com", "psjk1234")
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -278,29 +279,30 @@ class LoginScreen : Screen {
 
         val authState = authViewModel.authState.collectAsState()
 
-        when (authState.value) {
-            is AuthState.Loading -> {
-               ProgressBarLoading()
-            }
+        authState.value.onSuccess {
+            when (it) {
+                is AuthState.Loading -> {
+                    ProgressBarLoading()
+                }
 
-            is AuthState.Error -> {
-                coroutineScope.launch {
-                    scaffoldState.showSnackbar(
-                        message = (authState.value as AuthState.Error).message,
-                        duration = SnackbarDuration.Short
-                    )
+                is AuthState.Error -> {
+                    showSnackBar(it.message, coroutineScope, scaffoldState)
+                }
+
+                is AuthState.Success -> {
+                    val token = it.data.data?.token
+                    println("AuthData "+it.data.data.toString())
+                    keyValueStorage.apiToken = token
+                    navigator.push(HomeScreen())
+                }
+
+                else -> {
+
                 }
             }
-
-            is AuthState.Success -> {
-                val data = (authState.value as AuthState.Success).data.user
-                keyValueStorage.uid = data?.uid.toString()
-                navigator.push(HomeScreen())
-            }
-
-            else -> {
-
-            }
+        }.onFailure {
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
+
     }
 }

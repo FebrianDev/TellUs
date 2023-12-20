@@ -17,23 +17,22 @@ class AuthViewModel() : ViewModel() {
 
     private val sdk: AuthSdk = AuthSdk()
 
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Empty)
-    val authState: StateFlow<AuthState> get() = _authState.asStateFlow()
+    private val _authState = MutableStateFlow<Result<AuthState>>(Result.success(AuthState.Empty))
+    val authState: StateFlow<Result<AuthState>> get() = _authState.asStateFlow()
 
     val auth = Firebase.auth
 
     fun register(email: String, password: String) {
-        _authState.value = AuthState.Loading
-        viewModelScope.launch {
-            _authState.value =
-                AuthState.Success(auth.createUserWithEmailAndPassword(email, password))
+        _authState.value = Result.success(AuthState.Loading)
+        CoroutineScope(Dispatchers.IO).launch {
+            _authState.value = sdk.register(email, password)
         }
     }
 
     fun login(email: String, password: String) {
-         _authState.value = AuthState.Loading
+        _authState.value = Result.success(AuthState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _authState.value = AuthState.Success(auth.signInWithEmailAndPassword(email, password))
+            _authState.value = sdk.login(email, password)
         }
     }
 }

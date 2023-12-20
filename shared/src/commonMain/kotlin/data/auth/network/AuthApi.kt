@@ -51,8 +51,10 @@ class AuthApi {
         }
 
         var authState: AuthState = AuthState.Empty
+
         when (data.status.value) {
             200, 201 -> {
+                println("AuthData1"+data.body())
                 authState = AuthState.Success(data.body())
             }
 

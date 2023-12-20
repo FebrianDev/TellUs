@@ -1,19 +1,18 @@
 package utils
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
 
 interface KeyValueStorage {
 
-    var uid: String?
+    var apiToken: String?
 
-    val observableUid: Flow<String>?
+    val observableApiToken: Flow<String>?
 
     fun cleanStorage()
 }
 
 enum class StorageKeys {
-    UID;
+    API_TOKEN;
 
     val key get() = this.name
 }

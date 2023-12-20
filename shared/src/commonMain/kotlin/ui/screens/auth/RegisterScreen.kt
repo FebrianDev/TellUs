@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -54,7 +53,6 @@ import data.auth.AuthState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
@@ -112,7 +110,7 @@ class RegisterScreen : Screen {
                 //Image
                 Image(
                     painter = painterResource("drawable/icon_app.png"),
-                    contentDescription ="I"
+                    contentDescription = "I"
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -259,31 +257,30 @@ class RegisterScreen : Screen {
 
         val authState = authViewModel.authState.collectAsState()
 
-        when (authState.value) {
-            is AuthState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        color = colorPrimary
-                    )
+        authState.value.onSuccess {
+            when (it) {
+                is AuthState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            color = colorPrimary
+                        )
+                    }
                 }
-            }
 
-            is AuthState.Error -> {
-                coroutineScope.launch {
-                    scaffoldState.showSnackbar(
-                        message = "Something was wrong!",
-                        duration = SnackbarDuration.Short
-                    )
+                is AuthState.Error -> {
+                    showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
                 }
-            }
 
-            is AuthState.Success -> {
-                val data = (authState.value as AuthState.Success).data.user
-                keyValueStorage.uid = data?.uid.toString()
-                navigator.push(VerificationScreen())
-            }
+                is AuthState.Success -> {
+//                    val data = it.data.token
+//                    keyValueStorage.uid = data
+//                    navigator.push(VerificationScreen())
+                }
 
-            else -> {}
+                else -> {}
+            }
+        }.onFailure {
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
     }
 

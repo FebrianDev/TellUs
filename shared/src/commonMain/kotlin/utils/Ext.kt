@@ -12,7 +12,7 @@ import kotlin.time.Duration
 @Composable
 fun getUid(): String {
     val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
-    return keyValueStorage.observableUid?.collectAsState("")?.value.toString()
+    return keyValueStorage.observableApiToken?.collectAsState("")?.value.toString()
 }
 
 fun getTime(date: String): String {
