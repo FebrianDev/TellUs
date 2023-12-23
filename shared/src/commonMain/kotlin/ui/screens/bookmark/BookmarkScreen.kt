@@ -5,15 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,8 +47,12 @@ fun BookmarkScreen(
     var uidState by remember { mutableStateOf("") }
     uidState = uid
 
-    if (uidState.isNotEmpty()) {
-        bookmarkViewModel.getAllBookmark(uidState)
+    val listEmptyBookmark by remember { mutableStateOf(arrayListOf<Boolean>()) }
+
+    LaunchedEffect(uidState) {
+        if (uidState.isNotEmpty()) {
+            bookmarkViewModel.getAllBookmark(uidState)
+        }
     }
 
     val event = OptionPostEvent()
@@ -58,11 +61,12 @@ fun BookmarkScreen(
         containerColor = bgColor
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().wrapContentSize()
+            modifier = Modifier.fillMaxWidth()
         ) {
 
             TopBar("Bookmark")
 
+            //handle network
             bookmarkViewModel.listBookmarkState.collectAsState().value.onSuccess {
                 when (it) {
                     is ListBookmarkState.Loading -> {
@@ -75,37 +79,43 @@ fun BookmarkScreen(
 
                     is ListBookmarkState.Success -> {
                         val listPost by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
-
-                        if(listPost?.isEmpty() == true){
-                          //  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                EmptyState("drawable/ic_no_bookmark.png", "No Bookmark")
-                          //  }
+                        listPost?.toList()?.forEach { post ->
+                            val empty =
+                                post.Bookmarks.filter { bookmark -> bookmark.id_user == uid }
+                            listEmptyBookmark.add(empty.isEmpty())
                         }
 
-                        LazyColumn(modifier = Modifier.padding(bottom = 64.dp, top = 8.dp)) {
-                            items(listPost?: listOf()) { data ->
-                                if (data.Bookmarks?.isNotEmpty() == true) {
-                                    if (data.Bookmarks.filter { it.id_user == uid }.isNotEmpty())
+                        if (!listEmptyBookmark.contains(false) || listEmptyBookmark.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize().padding(bottom = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                EmptyState("drawable/ic_no_bookmark.png", "No Bookmark")
+                            }
+                        } else {
+                            LazyColumn(modifier = Modifier.padding(bottom = 64.dp, top = 8.dp)) {
+                                items(listPost ?: listOf()) { data ->
+                                    if (data.Bookmarks.isNotEmpty()) {
+                                        if (data.Bookmarks.any { bookmark -> bookmark.id_user == uid })
+                                            ItemPostBookmark(
+                                                data,
+                                                uid,
+                                                coroutineScope,
+                                                scaffoldState,
+                                                event,
+                                                onBookmarkPost = {
+                                                    listPost?.remove(data)
+                                                    bookmarkViewModel.insertBookmark(
+                                                        BookmarkRequest(data.id, uidState)
+                                                    )
 
-                                        ItemPostBookmark(
-                                            data,
-                                            uid,
-                                            coroutineScope,
-                                            scaffoldState,
-                                            event,
-                                            onBookmarkPost = {
-                                                listPost?.remove(data)
-                                                bookmarkViewModel.insertBookmark(
-                                                    BookmarkRequest(data.id ?: 0, uidState)
-                                                )
-
-                                                showSnackBar(
-                                                    "Cancel Add to Bookmark",
-                                                    coroutineScope,
-                                                    scaffoldState
-                                                )
-
-                                            })
+                                                    showSnackBar(
+                                                        "Cancel Add to Bookmark",
+                                                        coroutineScope,
+                                                        scaffoldState
+                                                    )
+                                                })
+                                    }
                                 }
                             }
                         }
@@ -116,6 +126,7 @@ fun BookmarkScreen(
             }.onFailure {
                 showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
             }
+
         }
     }
 }

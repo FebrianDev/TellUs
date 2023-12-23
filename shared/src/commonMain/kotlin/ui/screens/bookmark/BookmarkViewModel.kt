@@ -11,12 +11,16 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import utils.KeyValueStorage
+import utils.KeyValueStorageImpl
 
 class BookmarkViewModel : ViewModel() {
 
 
     private val sdk: BookmarkSdk = BookmarkSdk()
+    private val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
 
     private val _bookmarkState =
         MutableStateFlow<Result<BookmarkState>>(Result.success(BookmarkState.Empty))
@@ -29,21 +33,28 @@ class BookmarkViewModel : ViewModel() {
     fun insertBookmark(bookmarkRequest: BookmarkRequest) {
         _bookmarkState.value = Result.success(BookmarkState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _bookmarkState.value = sdk.insertBookmark(bookmarkRequest)
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                _bookmarkState.value = sdk.insertBookmark(bookmarkRequest, apiToken)
+            }
         }
     }
 
     fun getBookmarkById(idUser: String, bookmarkRequest: BookmarkRequest) {
         _bookmarkState.value = Result.success(BookmarkState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _bookmarkState.value = sdk.getBookmarkById(idUser, bookmarkRequest)
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                _bookmarkState.value = sdk.getBookmarkById(idUser, bookmarkRequest, apiToken)
+            }
         }
     }
 
     fun getAllBookmark(idUser: String) {
         _listBookmarkState.value = Result.success(ListBookmarkState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _listBookmarkState.value = sdk.getAllBookmark(idUser)
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                _listBookmarkState.value = sdk.getAllBookmark(idUser, apiToken)
+            }
+
         }
     }
 }

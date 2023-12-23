@@ -14,11 +14,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import utils.KeyValueStorage
+import utils.KeyValueStorageImpl
 
 class CommentViewModel : ViewModel() {
 
     private val sdk = CommentSdk()
+    private val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
 
     private val _commentState =
         MutableStateFlow<Result<CommentState>>(Result.success(CommentState.Empty))
@@ -35,41 +39,52 @@ class CommentViewModel : ViewModel() {
     fun insertComment(commentRequest: CommentRequest) {
         _insertCommentState.value = Result.success(InsertCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            //_insertCommentState.value =
-            sdk.insertComment(commentRequest)
-            delay(300)
-            getCommentById(commentRequest.id_post.toString())
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                sdk.insertComment(commentRequest, apiToken)
+                delay(300)
+                getCommentById(commentRequest.id_post.toString())
+            }
         }
     }
 
     fun insertReplyComment(commentRequest: CommentReplyRequest) {
         _insertCommentState.value = Result.success(InsertCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            sdk.insertReplyComment(commentRequest)
-            delay(300)
-            getReplyComment(commentRequest.id_post.toString(), commentRequest.id_reply.toString())
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                sdk.insertReplyComment(commentRequest, apiToken)
+                delay(300)
+                getReplyComment(
+                    commentRequest.id_post.toString(),
+                    commentRequest.id_reply.toString()
+                )
+            }
         }
     }
 
     fun getCommentById(idPost: String) {
         _commentState.value = Result.success(CommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _commentState.value = sdk.getCommentById(idPost)
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                _commentState.value = sdk.getCommentById(idPost, apiToken)
+            }
         }
     }
 
     fun getReplyComment(idPost: String, idComment: String) {
         _replyCommentState.value = Result.success(ReplyCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            _replyCommentState.value = sdk.getReplyComment(idPost, idComment)
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                _replyCommentState.value = sdk.getReplyComment(idPost, idComment, apiToken)
+            }
         }
     }
 
     fun deleteComment(idPost: String, idComment: String) {
         //_commentState.value = Result.success(CommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            //_commentState.value =
-            sdk.deleteComment(idPost, idComment)
+            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+                sdk.deleteComment(idPost, idComment, apiToken)
+            }
         }
 
     }

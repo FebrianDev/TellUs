@@ -1,5 +1,11 @@
 package ui.screens.post
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
@@ -37,6 +43,7 @@ import ui.screens.setting.SettingScreen
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import ui.themes.colorSecondary
+import utils.ScrollDirection
 import utils.getUid
 
 class HomeScreen : Screen {
@@ -58,41 +65,51 @@ class HomeScreen : Screen {
         val screens = listOf("Home", "Chat", "Post", "Bookmark", "Setting")
         var selectedScreen by remember { mutableStateOf(screens.first()) }
 
+        var shouldHideBottomBar by remember { mutableStateOf(ScrollDirection.Down) }
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = scaffoldState)
             },
             containerColor = bgColor,
             bottomBar = {
-                BottomNavigation {
-                    screens.forEach { screen ->
-                        BottomNavigationItem(
-                            icon = {
-                                Icon(
-                                    getIconForScreen(screen),
-                                    contentDescription = screen,
-                                    tint = if (screen == selectedScreen) colorPrimary else colorSecondary
-                                )
-                            },
-                            label = { Text("") },
-                            selected = screen == selectedScreen,
-                            onClick = { selectedScreen = screen },
-                            modifier = Modifier.background(Color.White).padding(8.dp),
-                            unselectedContentColor = colorSecondary,
-                            selectedContentColor = colorPrimary
-                        )
+
+                AnimatedVisibility(
+                    visible = shouldHideBottomBar == ScrollDirection.Up,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically(),
+                ) {
+                    BottomNavigation {
+                        screens.forEach { screen ->
+                            BottomNavigationItem(
+                                icon = {
+                                    Icon(
+                                        getIconForScreen(screen),
+                                        contentDescription = screen,
+                                        tint = if (screen == selectedScreen) colorPrimary else colorSecondary
+                                    )
+                                },
+                                label = { Text("") },
+                                selected = screen == selectedScreen,
+                                onClick = { selectedScreen = screen },
+                                modifier = Modifier.background(Color.White).padding(12.dp),
+                                unselectedContentColor = colorSecondary,
+                                selectedContentColor = colorPrimary
+                            )
+                        }
                     }
                 }
             }
-
         ) {
             when (selectedScreen) {
                 "Home" -> {
-                    MainScreen()
+                    MainScreen(){
+                        shouldHideBottomBar = it
+                    }
                 }
 
                 "Chat" -> {
-                    ChatScreen()
+                    ChatScreen(uid, scaffoldState, coroutineScope)
                 }
 
                 "Post" -> {

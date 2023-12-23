@@ -34,14 +34,17 @@ class CommentApi {
         install(HttpTimeout)
     }
 
-    suspend fun insertComment(commentRequest: CommentRequest): InsertCommentState {
+    suspend fun insertComment(
+        commentRequest: CommentRequest,
+        apiToken: String
+    ): InsertCommentState {
         val data = client.post("${Constant.BASE_URL}/api/comment") {
             contentType(ContentType.Application.Json)
             setBody(commentRequest)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -66,14 +69,17 @@ class CommentApi {
 
     }
 
-    suspend fun insertReplyComment(commentRequest: CommentReplyRequest): InsertCommentState {
+    suspend fun insertReplyComment(
+        commentRequest: CommentReplyRequest,
+        apiToken: String
+    ): InsertCommentState {
         val data = client.post("${Constant.BASE_URL}/api/comment/reply") {
             contentType(ContentType.Application.Json)
             setBody(commentRequest)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -94,13 +100,13 @@ class CommentApi {
         return commentState
     }
 
-    suspend fun getCommentById(idPost: String): CommentState {
+    suspend fun getCommentById(idPost: String, apiToken: String): CommentState {
         val data = client.get("${Constant.BASE_URL}/api/comment/$idPost") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -122,13 +128,17 @@ class CommentApi {
         return commentState
     }
 
-    suspend fun getReplyComment(idPost: String, idComment: String): ReplyCommentState {
+    suspend fun getReplyComment(
+        idPost: String,
+        idComment: String,
+        apiToken: String
+    ): ReplyCommentState {
         val data = client.get("${Constant.BASE_URL}/api/comment/reply/$idPost/$idComment") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -151,13 +161,17 @@ class CommentApi {
         return replyCommentState
     }
 
-    suspend fun deleteReplyComment(idPost: String, idComment: String): CommentState {
+    suspend fun deleteReplyComment(
+        idPost: String,
+        idComment: String,
+        apiToken: String
+    ): CommentState {
         val data = client.delete("${Constant.BASE_URL}/api/comment/$idPost/$idComment") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {
@@ -179,13 +193,13 @@ class CommentApi {
         return commentState
     }
 
-    suspend fun deleteComment(idPost: String, idComment: String): CommentState {
+    suspend fun deleteComment(idPost: String, idComment: String, apiToken: String): CommentState {
         val data = client.delete("${Constant.BASE_URL}/api/comment/$idPost/$idComment") {
             contentType(ContentType.Application.Json)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {

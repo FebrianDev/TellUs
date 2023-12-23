@@ -27,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +63,7 @@ fun ItemMyPost(
     postResponse: PostResponse,
     coroutineScope: CoroutineScope,
     scaffoldState: SnackbarHostState,
+    uid:String,
     event: OptionPostEvent
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -74,26 +76,26 @@ fun ItemMyPost(
 
     var bookmarkIcon by remember { mutableStateOf(Icons.Filled.BookmarkBorder) }
 
-    val uid = getUid()
-
-    if (postResponse.Likes?.isEmpty() == true) {
-        likeIcon.value = Icons.Filled.FavoriteBorder
-    } else {
-        postResponse.Likes?.forEach {
-            likeIcon.value = if (it.id_post == postResponse.id && it.id_user == uid) {
-                Icons.Filled.Favorite
-            } else {
-                Icons.Filled.FavoriteBorder
+    LaunchedEffect(false) {
+        if (postResponse.Likes.isEmpty()) {
+            likeIcon.value = Icons.Filled.FavoriteBorder
+        } else {
+            postResponse.Likes.forEach {
+                likeIcon.value = if (it.id_post == postResponse.id && it.id_user == uid) {
+                    Icons.Filled.Favorite
+                } else {
+                    Icons.Filled.FavoriteBorder
+                }
             }
         }
-    }
 
-    if (postResponse.Bookmarks?.isEmpty() == true) {
-        bookmarkIcon = Icons.Filled.BookmarkBorder
-    } else {
-        postResponse.Bookmarks?.forEach {
-            bookmarkIcon =
-                if (it.id_post == postResponse.id && it.id_user == uid) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder
+        if (postResponse.Bookmarks.isEmpty()) {
+            bookmarkIcon = Icons.Filled.BookmarkBorder
+        } else {
+            postResponse.Bookmarks.forEach {
+                bookmarkIcon =
+                    if (it.id_post == postResponse.id && it.id_user == uid) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder
+            }
         }
     }
 
@@ -129,7 +131,7 @@ fun ItemMyPost(
                 .fillMaxWidth()
                 .heightIn(min = 96.dp, max = 256.dp)
                 .clickable {
-                    navigator.push(DetailPostScreen(postResponse.id ?: 0))
+                    navigator.push(DetailPostScreen(postResponse.id))
                 },
             shape = RoundedCornerShape(24.dp, 0.dp, 0.dp, 24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -143,20 +145,18 @@ fun ItemMyPost(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    postResponse.message?.let {
-                        Text(
-                            it,
-                            color = colorPrimary,
-                            fontSize = 14.sp,
-                            modifier = Modifier.fillMaxWidth(0.9f)
-                        )
-                    }
+                    Text(
+                        postResponse.message,
+                        color = colorPrimary,
+                        fontSize = 14.sp,
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    )
 
                     MineOptionPost(
                         postResponse,
                         scaffoldState,
                         coroutineScope,
-                        isPrivateState == true,
+                        isPrivateState,
                         event
                     )
 
@@ -173,7 +173,7 @@ fun ItemMyPost(
                         )
                 ) {
                     Text(
-                        text = if (isPrivateState == true) "Private" else "Public",
+                        text = if (isPrivateState) "Private" else "Public",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             .wrapContentSize(),
                         color = bgColor
@@ -197,7 +197,7 @@ fun ItemMyPost(
                                 .padding(top = 4.dp, start = 4.dp)
                                 .width(24.dp)
                                 .height(24.dp).clickable {
-                                    likeViewModel.insertLike(LikeRequest(postResponse.id ?: 0, uid))
+                                    likeViewModel.insertLike(LikeRequest(postResponse.id, uid))
                                     if (likeIcon.value == Icons.Filled.Favorite) {
                                         likeIcon.value = Icons.Filled.FavoriteBorder
                                         like = like.minus(1)
@@ -232,7 +232,7 @@ fun ItemMyPost(
                         )
 
                         Spacer(Modifier.width(4.dp))
-                        postResponse.comment?.let { CommentPost(it) }
+                        CommentPost(postResponse.comment)
                     }
 
                     Icon(
@@ -241,7 +241,7 @@ fun ItemMyPost(
                             .width(24.dp)
                             .height(24.dp).clickable {
                                 bookmarkViewModel.insertBookmark(
-                                    BookmarkRequest(postResponse.id ?: 0, uid)
+                                    BookmarkRequest(postResponse.id, uid)
                                 )
                                 if (bookmarkIcon == Icons.Filled.Bookmark) {
                                     bookmarkIcon = Icons.Filled.BookmarkBorder

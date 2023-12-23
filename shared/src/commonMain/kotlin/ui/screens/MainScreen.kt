@@ -33,13 +33,17 @@ import ui.components.TopBar
 import ui.screens.post.PostViewModel
 import ui.screens.post.tabs.BestPostScreen
 import ui.screens.post.tabs.LatestPostScreen
+import ui.screens.post.tabs.LatestPostScreen2
 import ui.screens.post.tabs.MyPostScreen
 import ui.screens.post.tabs.TabRowItem
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.ScrollDirection
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    onShowHideBottomBar: (shouldHideBottomBar: ScrollDirection) -> Unit
+) {
 
     val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
 
@@ -50,7 +54,7 @@ fun MainScreen() {
         modifier = Modifier.fillMaxWidth().wrapContentSize()
     ) {
         TopBar("Home")
-        TabLayout(postViewModel, scaffoldState, coroutineScope)
+        TabLayout(postViewModel, scaffoldState, coroutineScope, onShowHideBottomBar)
     }
 }
 
@@ -59,17 +63,20 @@ fun MainScreen() {
 fun TabLayout(
     postViewModel: PostViewModel,
     scaffoldState: SnackbarHostState,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    onShowHideBottomBar: (shouldHideBottomBar: ScrollDirection) -> Unit
 ) {
 
     val tabRowItems = listOf(
         TabRowItem(
             title = "Latest",
             screen = {
-                LatestPostScreen(
+                LatestPostScreen2(
                     postViewModel, scaffoldState,
                     coroutineScope
-                )
+                ) {
+                    onShowHideBottomBar.invoke(it)
+                }
             }
         ),
         TabRowItem(
@@ -77,7 +84,7 @@ fun TabLayout(
             screen = {
                 BestPostScreen(
                     postViewModel, scaffoldState,
-                    coroutineScope
+                    coroutineScope, onShowHideBottomBar
                 )
             }
         ),
@@ -86,7 +93,7 @@ fun TabLayout(
             screen = {
                 MyPostScreen(
                     postViewModel, scaffoldState,
-                    coroutineScope
+                    coroutineScope, onShowHideBottomBar
                 )
             }
         ))

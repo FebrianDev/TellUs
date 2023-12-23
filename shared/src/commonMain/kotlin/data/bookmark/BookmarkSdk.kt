@@ -10,11 +10,10 @@ class BookmarkSdk {
     private val api = BookmarkApi()
 
     @Throws(Exception::class)
-    suspend fun getAllBookmark(idUser: String): Result<ListBookmarkState> {
+    suspend fun getAllBookmark(idUser: String, apiToken: String): Result<ListBookmarkState> {
         return try {
-            Result.success(api.getAllBookmark(idUser))
+            Result.success(api.getAllBookmark(idUser, apiToken))
         } catch (e: Exception) {
-            println("ERRCode2"+e.message.toString())
             Result.failure(e)
         }
     }
@@ -22,19 +21,23 @@ class BookmarkSdk {
     @Throws(Exception::class)
     suspend fun getBookmarkById(
         idUser: String,
-        bookmarkRequest: BookmarkRequest
+        bookmarkRequest: BookmarkRequest,
+        apiToken: String
     ): Result<BookmarkState> {
         return try {
-            Result.success(api.getBookmarkById(idUser, bookmarkRequest))
+            Result.success(api.getBookmarkById(idUser, bookmarkRequest, apiToken))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
     @Throws(Exception::class)
-    suspend fun insertBookmark(bookmarkRequest: BookmarkRequest): Result<BookmarkState> {
+    suspend fun insertBookmark(
+        bookmarkRequest: BookmarkRequest,
+        apiToken: String
+    ): Result<BookmarkState> {
         return try {
-            Result.success(api.insertBookmark(bookmarkRequest))
+            Result.success(api.insertBookmark(bookmarkRequest, apiToken))
         } catch (e: Exception) {
             Result.failure(e)
         }

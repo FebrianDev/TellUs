@@ -29,14 +29,14 @@ class LikeApi {
         install(HttpTimeout)
     }
 
-    suspend fun insertLike(likeRequest: LikeRequest): LikeState {
+    suspend fun insertLike(likeRequest: LikeRequest, apiToken: String): LikeState {
         val data = client.post("${Constant.BASE_URL}/api/like") {
             contentType(ContentType.Application.Json)
             setBody(likeRequest)
             headers {
                 append(
                     "api-token",
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlYnJpYW4yNjAyMjAwMUBnbWFpbC5jb20iLCJpYXQiOjE2OTg0MTIyMTksImV4cCI6MTcyOTk0ODIxOX0.ml0Vq86onfWUJnMUKdxeQCMIiP_uIpv7JbHXThp3r_U"
+                    apiToken
                 )
             }
             timeout {

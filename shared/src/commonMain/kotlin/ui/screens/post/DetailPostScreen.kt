@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,18 +86,24 @@ class DetailPostScreen(private val id: Int) : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
-        postViewModel.getPostById(id.toString())
+
 
         val commentViewModel = getViewModel(Unit, viewModelFactory { CommentViewModel() })
-        commentViewModel.getCommentById(id.toString())
+
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
         val uid = getUid()
+        var uidState by remember { mutableStateOf("") }
+        uidState = uid
+
+        LaunchedEffect(uidState){
+            postViewModel.getPostById(id.toString())
+            commentViewModel.getCommentById(id.toString())
+        }
 
         val cp = LocalClipboardManager.current
-
         val event = OptionPostEvent()
 
         event.onCopyText = {

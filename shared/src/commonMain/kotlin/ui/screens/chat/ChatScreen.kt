@@ -8,17 +8,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,22 +26,18 @@ import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.TopBar
 import ui.themes.bgColor
-import utils.getUid
 import utils.showSnackBar
 
 @Composable
 fun ChatScreen(
-    uid:String,
+    uid: String,
     scaffoldState: SnackbarHostState,
     coroutineScope: CoroutineScope
 ) {
 
     val navigator = LocalNavigator.currentOrThrow
 
-//    val scaffoldState = remember { SnackbarHostState() }
-//    val coroutineScope = rememberCoroutineScope()
-
-     val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
+    val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
     LaunchedEffect(false) {
         chatViewModel.getListRoomChat()
     }
@@ -57,7 +47,7 @@ fun ChatScreen(
 //    var uidState by remember { mutableStateOf("") }
 //    uidState = uid
 
-  //  println("UidState5"+uidState)
+    //  println("UidState5"+uidState)
 
     Scaffold(
         containerColor = bgColor
@@ -81,7 +71,7 @@ fun ChatScreen(
                     is ListChatState.Success -> {
                         if (uid.isEmpty()) return@onSuccess
                         val listChat =
-                            it.data.filter { it.id_sent == uid || it.id_receiver == uid }
+                            it.data.filter { chat -> chat.id_sent == uid || chat.id_receiver == uid }
                                 .toMutableStateList()
 
                         if (listChat.isEmpty()) {
@@ -90,7 +80,7 @@ fun ChatScreen(
                             LazyColumn(modifier = Modifier.fillMaxHeight(0.9f)) {
                                 items(listChat) { item ->
                                     ItemChat(item) {
-                                         navigator.push(ChatRoomScreen(item))
+                                        navigator.push(ChatRoomScreen(item))
                                     }
                                 }
                             }

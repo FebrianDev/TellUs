@@ -70,7 +70,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                 implementation("com.russhwolf:multiplatform-settings-coroutines:$multiplatformSettings")
 
-
+               // api("io.github.mirzemehdi:kmpnotifier:0.1.9")
             }
         }
         val androidMain by getting {

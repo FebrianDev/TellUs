@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,40 +67,22 @@ fun ItemPostBookmark(
     val navigator = LocalNavigator.currentOrThrow
 
     val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
-    val bookmarkViewModel = getViewModel(Unit, viewModelFactory { BookmarkViewModel() })
 
-    val likeIcon = remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
-    var like by remember { mutableStateOf(postResponse.like) }
-
-    var bookmarkIcon by remember { mutableStateOf(Icons.Filled.BookmarkBorder) }
-
-    if (postResponse.Likes?.isEmpty() == true) {
-        likeIcon.value = Icons.Filled.FavoriteBorder
-    } else {
-
-        val likedPosts = postResponse.Likes?.filter {
-            it.id_post == postResponse.id && it.id_user == uid
-        }
-
-        likeIcon.value = if (!likedPosts.isNullOrEmpty()) {
-            Icons.Filled.Favorite
+    var like by rememberSaveable { mutableStateOf(postResponse.like) }
+    var likeState by rememberSaveable {
+        mutableStateOf(if (postResponse.Likes.isEmpty()) {
+            false
         } else {
-            Icons.Filled.FavoriteBorder
-        }
-    }
-
-    if (postResponse.Bookmarks?.isEmpty() == true) {
-        bookmarkIcon = Icons.Filled.BookmarkBorder
-    } else {
-        postResponse.Bookmarks?.forEach {
-            bookmarkIcon =
-                if (it.id_post == postResponse.id && it.id_user == uid) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder
-        }
+            val likedPosts = postResponse.Likes.filter {
+                it.id_post == postResponse.id && it.id_user == uid
+            }
+            likedPosts.isNotEmpty()
+        })
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(
-            text = getTime(postResponse.createdAt.toString()),
+            text = getTime(postResponse.createdAt),
             color = colorPrimary,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
@@ -112,7 +95,7 @@ fun ItemPostBookmark(
                 .fillMaxWidth()
                 .heightIn(min = 96.dp, max = 256.dp)
                 .clickable {
-                    navigator.push(DetailPostScreen(postResponse.id ?: 0))
+                    navigator.push(DetailPostScreen(postResponse.id))
                 },
             shape = RoundedCornerShape(24.dp, 0.dp, 0.dp, 24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -126,14 +109,12 @@ fun ItemPostBookmark(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    postResponse.message?.let {
-                        Text(
-                            it,
-                            color = colorPrimary,
-                            fontSize = 14.sp,
-                            modifier = Modifier.fillMaxWidth(0.9f)
-                        )
-                    }
+                    Text(
+                        postResponse.message,
+                        color = colorPrimary,
+                        fontSize = 14.sp,
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    )
 
                     if (uid == postResponse.id_user) {
                         MyOptionPost(postResponse, scaffoldState, coroutineScope, event)
@@ -153,32 +134,19 @@ fun ItemPostBookmark(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row {
-                        //LikePost(postResponse, likeViewModel)
+
+                        //Like Icon
                         Icon(
                             modifier = Modifier
                                 .padding(top = 4.dp, start = 4.dp)
                                 .width(24.dp)
                                 .height(24.dp).clickable {
-                                    likeViewModel.insertLike(LikeRequest(postResponse.id ?: 0, uid))
-                                    if (likeIcon.value == Icons.Filled.Favorite) {
-                                        likeIcon.value = Icons.Filled.FavoriteBorder
-                                        like = like.minus(1)
-                                        showSnackBar(
-                                            "Cancel Add Like Post",
-                                            coroutineScope,
-                                            scaffoldState
-                                        )
-                                    } else {
-                                        likeIcon.value = Icons.Filled.Favorite
-                                        like = like.plus(1)
-                                        showSnackBar(
-                                            "Success Add Like Post",
-                                            coroutineScope,
-                                            scaffoldState
-                                        )
-                                    }
+                                    likeViewModel.insertLike(LikeRequest(postResponse.id, uid))
+                                    likeState = !likeState
+                                    like = if (likeState) like.plus(1)
+                                    else like.minus(1)
                                 },
-                            imageVector = likeIcon.value,
+                            imageVector = if (likeState) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Btn Like",
                             tint = colorPrimary
                         )
@@ -194,16 +162,17 @@ fun ItemPostBookmark(
                         )
 
                         Spacer(Modifier.width(4.dp))
-                        postResponse.comment?.let { CommentPost(it) }
+                        CommentPost(postResponse.comment)
                     }
 
+                    //Bookmark
                     Icon(
                         modifier = Modifier
                             .padding(top = 4.dp, start = 4.dp)
                             .width(24.dp)
                             .height(24.dp).clickable (onClick = onBookmarkPost),
 
-                        imageVector = bookmarkIcon,
+                        imageVector = Icons.Filled.Bookmark,
                         contentDescription = "Btn Bookmark",
                         tint = colorPrimary
                     )
