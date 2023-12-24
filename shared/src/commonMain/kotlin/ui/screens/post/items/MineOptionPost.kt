@@ -23,6 +23,7 @@ import data.post.state.PostState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.AlertDialogComposable
 import ui.components.ProgressBarLoading
 import ui.components.TextSubtitleMedium
 import ui.screens.post.OptionPostEvent
@@ -42,6 +43,8 @@ fun MineOptionPost(
 
     val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
     var isDialogOpen by remember { mutableStateOf(false) }
+
+    var isDialogDelete by remember { mutableStateOf(false) }
 
     Icon(
         modifier = Modifier
@@ -71,9 +74,7 @@ fun MineOptionPost(
                         isDialogOpen = false
                         event.onCopyText.invoke(postResponse.message.toString())
                     }
-                    TextOption("Share Post") {
 
-                    }
                     TextOption("Change to ${if (isPrivate) "Public" else "Private"}") {
 
                         val privatePostRequest = PrivatePostRequest(!isPrivate)
@@ -90,11 +91,23 @@ fun MineOptionPost(
                         isDialogOpen = false
                     }
                     TextOption("Delete Post") {
-                        event.onDeletePost.invoke(postResponse)
                         isDialogOpen = false
+                        isDialogDelete = true
                     }
                 }
             },
+        )
+    }
+
+    if (isDialogDelete) {
+        AlertDialogComposable(
+            onDismissRequest = {isDialogDelete = false},
+            onConfirmation = {
+                event.onDeletePost.invoke(postResponse)
+                isDialogDelete = false
+            },
+            "Delete Post",
+            "Are you sure delete this post?"
         )
     }
 

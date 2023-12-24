@@ -14,5 +14,5 @@ data class ChatEntity(
     var countReadSent: Int = 0,
     var countReadReceiver: Int = 0,
     var date: String = "",
-    var token: String = ""
+    var fcm_token: String = ""
 )

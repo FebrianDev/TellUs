@@ -18,8 +18,6 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +31,6 @@ import ui.components.TopBar
 import ui.screens.post.PostViewModel
 import ui.screens.post.tabs.BestPostScreen
 import ui.screens.post.tabs.LatestPostScreen
-import ui.screens.post.tabs.LatestPostScreen2
 import ui.screens.post.tabs.MyPostScreen
 import ui.screens.post.tabs.TabRowItem
 import ui.themes.bgColor
@@ -42,13 +39,12 @@ import utils.ScrollDirection
 
 @Composable
 fun MainScreen(
+    scaffoldState: SnackbarHostState,
+    coroutineScope: CoroutineScope,
     onShowHideBottomBar: (shouldHideBottomBar: ScrollDirection) -> Unit
 ) {
 
     val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
-
-    val scaffoldState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.fillMaxWidth().wrapContentSize()
@@ -56,6 +52,7 @@ fun MainScreen(
         TopBar("Home")
         TabLayout(postViewModel, scaffoldState, coroutineScope, onShowHideBottomBar)
     }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -71,7 +68,7 @@ fun TabLayout(
         TabRowItem(
             title = "Latest",
             screen = {
-                LatestPostScreen2(
+                LatestPostScreen(
                     postViewModel, scaffoldState,
                     coroutineScope
                 ) {

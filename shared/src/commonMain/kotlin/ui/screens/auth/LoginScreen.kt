@@ -290,9 +290,9 @@ class LoginScreen : Screen {
                 }
 
                 is AuthState.Success -> {
-                    val token = it.data.data?.token
-                    println("AuthData "+it.data.data.toString())
-                    keyValueStorage.apiToken = token
+                    val data = it.data.data
+                    keyValueStorage.idUser = data?.id.toString()
+                    keyValueStorage.apiToken = data?.token.toString()
                     navigator.push(HomeScreen())
                 }
 

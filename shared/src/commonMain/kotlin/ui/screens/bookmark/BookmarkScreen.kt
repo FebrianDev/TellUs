@@ -15,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,15 +43,10 @@ fun BookmarkScreen(
 
     val uid = getUid()
 
-    var uidState by remember { mutableStateOf("") }
-    uidState = uid
-
     val listEmptyBookmark by remember { mutableStateOf(arrayListOf<Boolean>()) }
 
-    LaunchedEffect(uidState) {
-        if (uidState.isNotEmpty()) {
-            bookmarkViewModel.getAllBookmark(uidState)
-        }
+    LaunchedEffect(uid) {
+        bookmarkViewModel.getAllBookmark(uid)
     }
 
     val event = OptionPostEvent()
@@ -87,7 +81,7 @@ fun BookmarkScreen(
 
                         if (!listEmptyBookmark.contains(false) || listEmptyBookmark.isEmpty()) {
                             Box(
-                                modifier = Modifier.fillMaxSize().padding(bottom = 48.dp),
+                                modifier = Modifier.fillMaxSize().padding(bottom = 128.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 EmptyState("drawable/ic_no_bookmark.png", "No Bookmark")
@@ -106,7 +100,7 @@ fun BookmarkScreen(
                                                 onBookmarkPost = {
                                                     listPost?.remove(data)
                                                     bookmarkViewModel.insertBookmark(
-                                                        BookmarkRequest(data.id, uidState)
+                                                        BookmarkRequest(data.id, uid)
                                                     )
 
                                                     showSnackBar(

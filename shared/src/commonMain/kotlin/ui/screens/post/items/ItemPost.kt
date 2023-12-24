@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -86,10 +85,6 @@ fun ItemPost(
         })
     }
 
-    var likeIcon by remember { mutableStateOf(
-        if(likeState) Icons.Default.Favorite else Icons.Default.FavoriteBorder
-    ) }
-
     var bookmarkState by rememberSaveable {
         mutableStateOf(if (postResponse.Bookmarks.isEmpty()) {
             false
@@ -116,7 +111,7 @@ fun ItemPost(
             ChatEntity(
                 id_chat = "",
                 id_sent = "idUser",
-                id_receiver = postResponse.id_user.toString(),
+                id_receiver = postResponse.id_user,
                 id_post = postResponse.id.toString(),
                 post_message = postResponse.message,
                 name = generatedFakeName(),
@@ -124,14 +119,14 @@ fun ItemPost(
                 countReadSent = 0,
                 countReadReceiver = 0,
                 date = getDateNow(),
-                token = "token"
+                fcm_token = "token"
             )
         )
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(
-            text = getTime(postResponse.createdAt.toString()),
+            text = getTime(postResponse.createdAt),
             color = colorPrimary,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
@@ -199,7 +194,19 @@ fun ItemPost(
                                     likeState = !likeState
                                     like = if (likeState) like.plus(1)
                                     else like.minus(1)
-                                   // if(likeState) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+
+                                    if (likeState)
+                                        showSnackBar(
+                                            "Success Add Like Post",
+                                            coroutineScope,
+                                            scaffoldState
+                                        )
+                                    else
+                                        showSnackBar(
+                                            "Cancel Add Like Post",
+                                            coroutineScope,
+                                            scaffoldState
+                                        )
                                 },
                             imageVector = if (likeState) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Btn Like",
@@ -225,11 +232,26 @@ fun ItemPost(
                             .padding(top = 4.dp, start = 4.dp)
                             .width(24.dp)
                             .height(24.dp).clickable {
+
                                 bookmarkViewModel.insertBookmark(
                                     BookmarkRequest(postResponse.id, uid)
                                 )
 
                                 bookmarkState = !bookmarkState
+
+                                if (bookmarkState) {
+                                    showSnackBar(
+                                        "Success Add to Bookmark",
+                                        coroutineScope,
+                                        scaffoldState
+                                    )
+                                } else {
+                                    showSnackBar(
+                                        "Cancel Add to Bookmark",
+                                        coroutineScope,
+                                        scaffoldState
+                                    )
+                                }
 
                             },
 

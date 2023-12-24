@@ -32,7 +32,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import ui.screens.MainScreen
@@ -51,13 +53,9 @@ class HomeScreen : Screen {
     @Composable
     override fun Content() {
 
-        val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
-        val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
-
         val uid = getUid()
 
-        var uidState by remember { mutableStateOf("") }
-        uidState = uid
+        val navigator = LocalNavigator.currentOrThrow
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
@@ -103,7 +101,7 @@ class HomeScreen : Screen {
         ) {
             when (selectedScreen) {
                 "Home" -> {
-                    MainScreen(){
+                    MainScreen(scaffoldState, coroutineScope){
                         shouldHideBottomBar = it
                     }
                 }
@@ -113,7 +111,7 @@ class HomeScreen : Screen {
                 }
 
                 "Post" -> {
-                    Navigator(InsertPostScreen())
+                    navigator.push(InsertPostScreen())
                 }
 
                 "Bookmark" -> {

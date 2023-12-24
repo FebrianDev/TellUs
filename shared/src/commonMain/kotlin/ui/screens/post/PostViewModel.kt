@@ -45,7 +45,7 @@ class PostViewModel : ViewModel() {
     fun getAllPost(tag: String = "") {
         _listPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 delay(100)
                 _listPostState.value = if (tag.isEmpty()) postSdk.getAllPost(apiToken)
                 else postSdk.getPostByTag(tag, apiToken)
@@ -56,7 +56,7 @@ class PostViewModel : ViewModel() {
     fun getTrending() {
         _listBestPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 _listBestPostState.value = postSdk.getTrendingPost(apiToken)
             }
         }
@@ -65,7 +65,7 @@ class PostViewModel : ViewModel() {
     fun getPostByIdUser(id: String) {
         _listMyPostState.value = Result.success(ListPostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 _listMyPostState.value = postSdk.getPostByIdUser(id, apiToken)
             }
         }
@@ -74,7 +74,7 @@ class PostViewModel : ViewModel() {
     fun getPostById(id: String) {
         _postState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 _postState.value = postSdk.getPostById(id, apiToken)
             }
         }
@@ -83,7 +83,7 @@ class PostViewModel : ViewModel() {
     fun deletePost(id: String) {
         //  _postState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 postSdk.deletePost(id, apiToken)
             }
         }
@@ -92,7 +92,7 @@ class PostViewModel : ViewModel() {
     fun insertPost(postRequest: PostRequest) {
         _insertPostState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 _insertPostState.value = postSdk.insertPost(postRequest, apiToken)
             }
         }
@@ -101,7 +101,7 @@ class PostViewModel : ViewModel() {
     fun changePrivatePost(privatePostRequest: PrivatePostRequest, idPost: String) {
         _postState.value = Result.success(PostState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 _postState.value = postSdk.changePrivatePost(privatePostRequest, idPost, apiToken)
             }
         }

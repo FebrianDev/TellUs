@@ -20,7 +20,9 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
+import ui.components.AlertDialogComposable
 import ui.components.TextSubtitleMedium
+import ui.screens.post.OptionPostEvent
 import ui.screens.post.items.TextOption
 import ui.themes.bgColor
 import ui.themes.colorPrimary
@@ -30,9 +32,12 @@ import utils.showSnackBar
 fun OptionComment(
     scaffoldState: SnackbarHostState,
     coroutineScope: CoroutineScope,
-    copyText: String
+    copyText: String,
+    event: OptionPostEvent
 ) {
+
     var isDialogOpen by remember { mutableStateOf(false) }
+    var isDialogPrivateChat by remember { mutableStateOf(false) }
 
     Icon(
         modifier = Modifier
@@ -62,6 +67,7 @@ fun OptionComment(
             text = {
                 Column {
                     TextOption("Copy Text to Clipboard") {
+                        //event.onCopyText.invoke(copyText)
                         isDialogOpen = false
                         cp.setText(AnnotatedString(copyText))
                         showSnackBar(
@@ -71,10 +77,23 @@ fun OptionComment(
                         )
                     }
                     TextOption("Send Private Message") {
-
+                        isDialogOpen = false
+                        isDialogPrivateChat = true
                     }
                 }
             },
+        )
+    }
+
+    if (isDialogPrivateChat) {
+        AlertDialogComposable(
+            onDismissRequest = { isDialogPrivateChat = false },
+            onConfirmation = {
+                event.onSendPrivateChat.invoke()
+                isDialogPrivateChat = false
+            },
+            "Send Private Chat",
+            "Are you sure send private chat?"
         )
     }
 }

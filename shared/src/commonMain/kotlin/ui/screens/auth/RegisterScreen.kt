@@ -56,6 +56,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
+import ui.screens.post.HomeScreen
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.KeyValueStorage
@@ -272,9 +273,10 @@ class RegisterScreen : Screen {
                 }
 
                 is AuthState.Success -> {
-//                    val data = it.data.token
-//                    keyValueStorage.uid = data
-//                    navigator.push(VerificationScreen())
+                    val data = it.data.data
+                    keyValueStorage.idUser = data?.id.toString()
+                    keyValueStorage.apiToken = data?.token.toString()
+                    navigator.push(HomeScreen())
                 }
 
                 else -> {}

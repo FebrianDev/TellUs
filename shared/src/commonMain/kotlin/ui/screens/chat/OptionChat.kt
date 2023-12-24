@@ -63,9 +63,6 @@ fun OptionChat(
                         isDialogOpen = false
                         event.onCopyText.invoke(postResponse.message.toString())
                     }
-                    TextOption("Share Post"){
-
-                    }
                     TextOption("Send Private Message"){
 
                     }

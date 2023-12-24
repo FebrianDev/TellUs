@@ -16,6 +16,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
+            //export(project("io.github.mirzemehdi:kmpnotifier:0.1.9"))
             baseName = "shared"
             isStatic = true
         }
@@ -24,6 +25,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+
+               // api("io.github.mirzemehdi:kmpnotifier:0.1.9")
+
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -41,16 +45,14 @@ kotlin {
                 api("dev.icerock.moko:mvvm-core:0.16.1") // only ViewModel, EventsDispatcher, Dispatchers.UI
                 api("dev.icerock.moko:mvvm-compose:0.16.1")
 
-                val voyagerVersion = "1.0.0-rc07"
+                val voyagerVersion = "1.0.0"
 
                 implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
-                implementation("cafe.adriel.voyager:voyager-androidx:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
 
                 //firebase
-                implementation("dev.gitlive:firebase-auth:1.10.0")
                 implementation("dev.gitlive:firebase-common:1.10.4")
                 implementation("dev.gitlive:firebase-firestore:1.10.4")
 
@@ -69,15 +71,13 @@ kotlin {
                 // #3 - For observing values as flows
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                 implementation("com.russhwolf:multiplatform-settings-coroutines:$multiplatformSettings")
-
-               // api("io.github.mirzemehdi:kmpnotifier:0.1.9")
             }
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.activity:activity-compose:1.7.2")
+                api("androidx.activity:activity-compose:1.8.2")
                 api("androidx.appcompat:appcompat:1.6.1")
-                api("androidx.core:core-ktx:1.10.1")
+                api("androidx.core:core-ktx:1.12.0")
                 implementation("io.ktor:ktor-client-android:2.3.1")
             }
         }
@@ -121,7 +121,7 @@ sqldelight {
 }
 
 dependencies {
-    implementation("androidx.core:core:1.10.1")
+    implementation("androidx.core:core:1.12.0")
     commonMainApi("dev.icerock.moko:mvvm-core:0.16.1")
     commonMainApi("dev.icerock.moko:mvvm-compose:0.16.1")
     commonMainApi("dev.icerock.moko:mvvm-flow:0.16.1")

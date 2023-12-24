@@ -16,26 +16,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import data.post.model.PostResponse
 import kotlinx.coroutines.CoroutineScope
-import ui.components.BottomSheetComposable
+import ui.components.AlertDialogComposable
 import ui.components.TextSubtitleMedium
 import ui.screens.post.OptionPostEvent
 import ui.themes.bgColor
 import ui.themes.colorPrimary
-import utils.showSnackBar
 
 @Composable
 fun OptionPost(
-    postResponse:PostResponse,
+    postResponse: PostResponse,
     scaffoldState: SnackbarHostState,
     coroutineScope: CoroutineScope,
     event: OptionPostEvent,
 ) {
+
     var isDialogOpen by remember { mutableStateOf(false) }
+    var isDialogPrivateChat by remember { mutableStateOf(false) }
 
     Icon(
         modifier = Modifier
@@ -64,16 +63,27 @@ fun OptionPost(
                 Column {
                     TextOption("Copy Text to Clipboard") {
                         isDialogOpen = false
-                        event.onCopyText.invoke(postResponse.message.toString())
+                        event.onCopyText.invoke(postResponse.message)
                     }
-                    TextOption("Share Post"){
 
-                    }
-                    TextOption("Send Private Message"){
-                        event.onSendPrivateChat.invoke()
+                    TextOption("Send Private Message") {
+                        isDialogOpen = false
+                        isDialogPrivateChat = true
                     }
                 }
             },
+        )
+    }
+
+    if (isDialogPrivateChat) {
+        AlertDialogComposable(
+            onDismissRequest = { isDialogPrivateChat = false },
+            onConfirmation = {
+                event.onSendPrivateChat.invoke()
+                isDialogPrivateChat = false
+            },
+            "Send Private Chat",
+            "Are you sure send private chat?"
         )
     }
 }

@@ -27,10 +27,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +55,6 @@ import ui.screens.post.OptionPostEvent
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getTime
-import utils.getUid
 import utils.showSnackBar
 
 @Composable
@@ -63,7 +62,7 @@ fun ItemMyPost(
     postResponse: PostResponse,
     coroutineScope: CoroutineScope,
     scaffoldState: SnackbarHostState,
-    uid:String,
+    uid: String,
     event: OptionPostEvent
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -71,33 +70,29 @@ fun ItemMyPost(
     val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
     val bookmarkViewModel = getViewModel(Unit, viewModelFactory { BookmarkViewModel() })
 
-    val likeIcon = remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
-    var like by remember { mutableStateOf(postResponse.like) }
+    var like by rememberSaveable { mutableStateOf(postResponse.like) }
 
-    var bookmarkIcon by remember { mutableStateOf(Icons.Filled.BookmarkBorder) }
-
-    LaunchedEffect(false) {
-        if (postResponse.Likes.isEmpty()) {
-            likeIcon.value = Icons.Filled.FavoriteBorder
+    var likeState by rememberSaveable {
+        mutableStateOf(if (postResponse.Likes.isEmpty()) {
+            false
         } else {
-            postResponse.Likes.forEach {
-                likeIcon.value = if (it.id_post == postResponse.id && it.id_user == uid) {
-                    Icons.Filled.Favorite
-                } else {
-                    Icons.Filled.FavoriteBorder
-                }
+            val likedPosts = postResponse.Likes.filter {
+                it.id_post == postResponse.id && it.id_user == uid
             }
-        }
-
-        if (postResponse.Bookmarks.isEmpty()) {
-            bookmarkIcon = Icons.Filled.BookmarkBorder
-        } else {
-            postResponse.Bookmarks.forEach {
-                bookmarkIcon =
-                    if (it.id_post == postResponse.id && it.id_user == uid) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder
-            }
-        }
+            likedPosts.isNotEmpty()
+        })
     }
+
+    var bookmarkState by rememberSaveable {
+        mutableStateOf(if (postResponse.Bookmarks.isEmpty()) {
+            false
+        } else {
+            val listBookmark =
+                postResponse.Bookmarks.filter { it.id_post == postResponse.id && it.id_user == uid }
+            listBookmark.isNotEmpty()
+        })
+    }
+
 
     var isPrivateState by remember { mutableStateOf(postResponse.is_private) }
 
@@ -191,32 +186,30 @@ fun ItemMyPost(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row {
-                        //LikePost(postResponse, likeViewModel)
                         Icon(
                             modifier = Modifier
                                 .padding(top = 4.dp, start = 4.dp)
                                 .width(24.dp)
                                 .height(24.dp).clickable {
                                     likeViewModel.insertLike(LikeRequest(postResponse.id, uid))
-                                    if (likeIcon.value == Icons.Filled.Favorite) {
-                                        likeIcon.value = Icons.Filled.FavoriteBorder
-                                        like = like.minus(1)
-                                        showSnackBar(
-                                            "Cancel Add Like Post",
-                                            coroutineScope,
-                                            scaffoldState
-                                        )
-                                    } else {
-                                        likeIcon.value = Icons.Filled.Favorite
-                                        like = like.plus(1)
+                                    likeState = !likeState
+                                    like = if (likeState) like.plus(1)
+                                    else like.minus(1)
+
+                                    if (likeState)
                                         showSnackBar(
                                             "Success Add Like Post",
                                             coroutineScope,
                                             scaffoldState
                                         )
-                                    }
+                                    else
+                                        showSnackBar(
+                                            "Cancel Add Like Post",
+                                            coroutineScope,
+                                            scaffoldState
+                                        )
                                 },
-                            imageVector = likeIcon.value,
+                            imageVector = if (likeState) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Btn Like",
                             tint = colorPrimary
                         )
@@ -243,24 +236,25 @@ fun ItemMyPost(
                                 bookmarkViewModel.insertBookmark(
                                     BookmarkRequest(postResponse.id, uid)
                                 )
-                                if (bookmarkIcon == Icons.Filled.Bookmark) {
-                                    bookmarkIcon = Icons.Filled.BookmarkBorder
+
+                                bookmarkState = !bookmarkState
+
+                                if (bookmarkState) {
                                     showSnackBar(
-                                        "Cancel Add to Bookmark",
+                                        "Success Add to Bookmark",
                                         coroutineScope,
                                         scaffoldState
                                     )
                                 } else {
-                                    bookmarkIcon = Icons.Filled.Bookmark
                                     showSnackBar(
-                                        "Success Add to Bookmark",
+                                        "Cancel Add to Bookmark",
                                         coroutineScope,
                                         scaffoldState
                                     )
                                 }
                             },
 
-                        imageVector = bookmarkIcon,
+                        imageVector = if (bookmarkState) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
                         contentDescription = "Btn Bookmark",
                         tint = colorPrimary
                     )

@@ -25,10 +25,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,9 +37,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -63,14 +65,15 @@ import ui.components.TextBodyBold
 import ui.components.TextFieldComment
 import ui.components.TitleHeader
 import ui.screens.comment.option.MyOptionComment
-import ui.screens.post.OptionPostEvent
 import ui.screens.comment.option.OptionComment
+import ui.screens.post.OptionPostEvent
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getTime
 import utils.getUid
 import utils.showSnackBar
 
+@ExperimentalComposeUiApi
 class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen {
 
     @Composable
@@ -86,6 +89,9 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val focusManager = LocalFocusManager.current
 
         val cp = LocalClipboardManager.current
 
@@ -107,13 +113,17 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
         var isRoot by remember { mutableStateOf(true) }
 
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = scaffoldState)
+            },
             containerColor = bgColor
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
+
                 TitleHeader("Detail Comment")
+
                 Spacer(modifier = Modifier.height(24.dp))
 
-                //ItemComment(commentResponse)
                 ShowDetailComment(
                     scaffoldState,
                     coroutineScope,
@@ -126,8 +136,6 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                //ShowComment(commentViewModel, coroutineScope, scaffoldState, replyMessage)
 
                 commentViewModel.replyCommentState.collectAsState().value.onSuccess {
                     when (it) {
@@ -217,11 +225,8 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                             tint = colorPrimary
                         )
                     }
-
                 }
 
-                // SendComment(commentViewModel, uid, isRoot)
-                //Send Comment
                 Row(
                     modifier = Modifier.fillMaxWidth().background(bgColor),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -232,23 +237,6 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                     TextFieldComment(textComment) {
                         textComment = it
                     }
-
-//                    TextField(
-//                        value = textComment,
-//                        onValueChange = {
-//                            textComment = it
-//                        },
-//                        placeholder = { Text(text = "Type your message") },
-//                        modifier = Modifier.fillMaxWidth(0.8f).background(bgColor),
-//                        colors = TextFieldDefaults.colors(
-//                            focusedContainerColor = bgColor,
-//                            unfocusedContainerColor = bgColor,
-//                            disabledContainerColor = bgColor,
-//                            disabledIndicatorColor = Color.Transparent,
-//                            focusedIndicatorColor = Color.Transparent,
-//                            unfocusedIndicatorColor = Color.Transparent
-//                        ),
-//                    )
 
                     TextBodyBold(
                         text = "Send",
@@ -269,68 +257,16 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                 showReplyMessage = false
                                 isRoot = true
 
+                                keyboardController?.hide()
+                                focusManager.clearFocus(true)
+
                                 textComment = TextFieldValue("")
                             }
                     )
                 }
-
-//                commentViewModel.insertCommentState.collectAsState().value.onSuccess {
-//                    when (it) {
-//                        is InsertCommentState.Loading -> ProgressBarLoading()
-//                        is InsertCommentState.Error -> showSnackBar(
-//                            "Something was wrong",
-//                            coroutineScope,
-//                            scaffoldState
-//                        )
-//
-//                        is InsertCommentState.Success -> {
-//                            commentViewModel.getReplyComment(
-//                                commentResponse.id_post.toString(),
-//                                commentResponse.id.toString()
-//                            )
-//                        }
-//
-//                        else -> {}
-//                    }
-//                }.onFailure {
-//                    showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
-//                }
-
-
             }
 
         }
-    }
-
-    @Composable
-    fun ReplyComment(
-        replyMessage: String
-    ) {
-//        Row(
-//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//                .border(1.dp, colorPrimary, CircleShape).fillMaxWidth()
-//                .padding(8.dp),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            Text(
-//                replyMessage,
-//                color = colorPrimary,
-//                fontSize = 14.sp,
-//                modifier = Modifier.fillMaxWidth(0.9f)
-//            )
-//
-//            Icon(
-//                modifier = Modifier
-//                    .width(24.dp)
-//                    .height(24.dp).clickable {
-//show
-//                    },
-//                imageVector = Icons.Filled.Close,
-//                contentDescription = "Close",
-//                tint = colorPrimary
-//            )
-//        }
     }
 
     @OptIn(ExperimentalResourceApi::class)
@@ -395,7 +331,8 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                     OptionComment(
                                         scaffoldState,
                                         coroutineScope,
-                                        commentResponse.message.toString()
+                                        commentResponse.message.toString(),
+                                        event
                                     )
                                 }
                             }
@@ -417,104 +354,4 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
         }
     }
 
-    @OptIn(ExperimentalResourceApi::class)
-    @Composable
-    fun ShowComment(
-        commentViewModel: CommentViewModel,
-        coroutineScope: CoroutineScope,
-        scaffoldState: SnackbarHostState,
-        replyMessage: String
-    ) {
-//        when (val replyCommentState = commentViewModel.replyCommentState.collectAsState().value) {
-//            is ReplyCommentState.Loading -> {
-//                ProgressBarLoading()
-//            }
-//
-//            is ReplyCommentState.Error -> {
-//                showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
-//            }
-//
-//            is ReplyCommentState.Success -> {
-//                replyCommentState.data.data?.let { comment ->
-//                    if (comment.isEmpty()) {
-//                        EmptyState("drawable/ic_no_comment.png", "No Comment")
-//                    } else {
-//                        LazyColumn {
-////                            items(comment) {
-////                                ItemReplyComment(it) { message ->
-////                                  // replyMessage = message
-////                                }
-////                            }
-//                        }
-//                    }
-//                }
-//            }
-//
-//            else -> {}
-
-        // }
-    }
-
-    @Composable
-    fun SendComment(commentViewModel: CommentViewModel, uid: String, isRoot: Boolean) {
-        Row(
-            modifier = Modifier.fillMaxWidth().background(bgColor),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-
-            var textComment by remember { mutableStateOf(TextFieldValue("")) }
-
-            TextField(
-                value = textComment,
-                onValueChange = {
-                    textComment = it
-                },
-                placeholder = { Text(text = "Type your message") },
-                modifier = Modifier.fillMaxWidth(0.8f).background(bgColor),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = bgColor,
-                    unfocusedContainerColor = bgColor,
-                    disabledContainerColor = bgColor,
-                    disabledIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-            )
-
-            TextBodyBold(
-                text = "Send",
-                modifier = Modifier.padding(start = 4.dp, end = 16.dp).wrapContentSize()
-                    .align(Alignment.CenterVertically).clickable {
-                        commentViewModel.insertReplyComment(
-                            CommentReplyRequest(
-                                id_post = commentResponse.id_post,
-                                id_user = uid,
-                                prev_message = commentResponse.message,
-                                id_reply = commentResponse.id,
-                                message = textComment.text,
-                                is_root = isRoot,
-                                token = "token"
-                            )
-                        )
-
-                        textComment = TextFieldValue("")
-                    }
-            )
-        }
-
-//        when (val insertCommentState = commentViewModel.insertCommentState.collectAsState().value) {
-//            is InsertCommentState.Loading -> {}
-//            is InsertCommentState.Error -> {}
-//            is InsertCommentState.Success -> {
-//                commentViewModel.getReplyComment(
-//                    commentResponse.id_post.toString(),
-//                    commentResponse.id.toString()
-//                )
-//            }
-//
-//            else -> {
-//
-//            }
-//        }
-    }
 }

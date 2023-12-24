@@ -18,7 +18,10 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.post.state.ListPostState
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import ui.components.ProgressBarLoading
 import ui.components.rememberDirectionalLazyListState
 import ui.screens.post.OptionPostEvent
@@ -38,20 +41,17 @@ fun BestPostScreen(
 
     val uid = getUid()
 
-    var uidState by remember { mutableStateOf("") }
-    uidState = uid
-
-    LaunchedEffect(false) {
+    LaunchedEffect(uid) {
         postViewModel.getTrending()
     }
 
     val event = OptionPostEvent()
 
     Column(modifier = Modifier.fillMaxSize()) {
-
         postViewModel.listBestPostState.collectAsState().value.onSuccess {
             when (it) {
                 is ListPostState.Loading -> {
+                    println("Loading2")
                     ProgressBarLoading()
                 }
 
@@ -60,6 +60,7 @@ fun BestPostScreen(
                 }
 
                 is ListPostState.Success -> {
+                    println("Loading21")
                     val listPost by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
 
                     val listState = rememberLazyListState()
@@ -77,7 +78,7 @@ fun BestPostScreen(
                                 listPost?.remove(post)
                                 showSnackBar("Success delete post", coroutineScope, scaffoldState)
                             }
-                            ItemPost(data, uidState, coroutineScope, scaffoldState, event)
+                            ItemPost(data, uid, coroutineScope, scaffoldState, event)
                         }
                     }
 

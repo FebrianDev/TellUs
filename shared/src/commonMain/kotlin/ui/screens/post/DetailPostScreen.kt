@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
@@ -37,11 +38,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -80,25 +85,24 @@ import utils.showSnackBar
 
 class DetailPostScreen(private val id: Int) : Screen {
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
 
         val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
-
-
         val commentViewModel = getViewModel(Unit, viewModelFactory { CommentViewModel() })
-
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
-        val uid = getUid()
-        var uidState by remember { mutableStateOf("") }
-        uidState = uid
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val focusManager = LocalFocusManager.current
 
-        LaunchedEffect(uidState){
+        val uid = getUid()
+
+        LaunchedEffect(uid) {
             postViewModel.getPostById(id.toString())
             commentViewModel.getCommentById(id.toString())
         }
@@ -123,9 +127,7 @@ class DetailPostScreen(private val id: Int) : Screen {
         val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
         val bookmarkViewModel = getViewModel(Unit, viewModelFactory { BookmarkViewModel() })
 
-        var bookmarkIcon by remember { mutableStateOf(Icons.Filled.BookmarkBorder) }
-
-        var commentCountState by remember { mutableStateOf(0) }
+        var commentCountState by rememberSaveable { mutableStateOf(0) }
 
         Scaffold(
             snackbarHost = {
@@ -135,10 +137,9 @@ class DetailPostScreen(private val id: Int) : Screen {
             contentColor = bgColor
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                TitleHeader("Detail Post")
-                Spacer(modifier = Modifier.height(24.dp))
 
-                // ShowDetailPost(postViewModel, scaffoldState, coroutineScope, uid, event)
+                TitleHeader("Detail Post", navigator)
+                Spacer(modifier = Modifier.height(24.dp))
 
                 postViewModel.postState.collectAsState().value.onSuccess {
                     when (it) {
@@ -153,31 +154,28 @@ class DetailPostScreen(private val id: Int) : Screen {
 
                             val postResponse = it.data.data ?: PostResponse()
 
-                            commentCountState = postResponse.comment ?: 0
+                            commentCountState = postResponse.comment
 
-                            var likeIcon by remember { mutableStateOf(Icons.Filled.FavoriteBorder) }
-                            var like by remember { mutableStateOf(postResponse.like) }
+                            var like by rememberSaveable { mutableStateOf(postResponse.like) }
 
-                            if (postResponse.Likes?.isEmpty() == true) {
-                                likeIcon = Icons.Filled.FavoriteBorder
-                            } else {
-                                postResponse.Likes?.forEach {
-                                    likeIcon =
-                                        if (it.id_post == postResponse.id && it.id_user == uid) {
-                                            Icons.Filled.Favorite
-                                        } else {
-                                            Icons.Filled.FavoriteBorder
-                                        }
-                                }
+                            var likeState by rememberSaveable {
+                                mutableStateOf(if (postResponse.Likes.isEmpty()) {
+                                    false
+                                } else {
+                                    val likedPosts = postResponse.Likes.filter { like ->
+                                        like.id_post == postResponse.id && like.id_user == uid
+                                    }
+                                    likedPosts.isNotEmpty()
+                                })
                             }
-
-                            if (postResponse.Bookmarks?.isEmpty() == true) {
-                                bookmarkIcon = Icons.Filled.BookmarkBorder
-                            } else {
-                                postResponse.Bookmarks?.forEach {
-                                    bookmarkIcon =
-                                        if (it.id_post == postResponse.id && it.id_user == uid) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder
-                                }
+                            var bookmarkState by rememberSaveable {
+                                mutableStateOf(if (postResponse.Bookmarks.isEmpty()) {
+                                    false
+                                } else {
+                                    val listBookmark =
+                                        postResponse.Bookmarks.filter { bookmark -> bookmark.id_post == postResponse.id && bookmark.id_user == uid }
+                                    listBookmark.isNotEmpty()
+                                })
                             }
 
                             Row(
@@ -201,14 +199,14 @@ class DetailPostScreen(private val id: Int) : Screen {
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
-                                            postResponse.message?.let {
-                                                androidx.compose.material.Text(
-                                                    it,
-                                                    color = colorPrimary,
-                                                    fontSize = 14.sp,
-                                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                                )
-                                            }
+
+                                            androidx.compose.material.Text(
+                                                postResponse.message,
+                                                color = colorPrimary,
+                                                fontSize = 14.sp,
+                                                modifier = Modifier.fillMaxWidth(0.9f)
+                                            )
+
                                             if (uid == postResponse.id_user) {
                                                 MyOptionPost(
                                                     postResponse,
@@ -232,43 +230,39 @@ class DetailPostScreen(private val id: Int) : Screen {
                                             modifier = Modifier.fillMaxWidth()
                                         ) {
                                             Row {
-                                                //postResponse.let { LikePost(it) }
-
-                                                androidx.compose.material.Icon(
+                                                Icon(
                                                     modifier = Modifier
                                                         .padding(top = 4.dp, start = 4.dp)
                                                         .width(24.dp)
                                                         .height(24.dp).clickable {
                                                             likeViewModel.insertLike(
                                                                 LikeRequest(
-                                                                    postResponse.id ?: 0,
+                                                                    postResponse.id,
                                                                     uid
                                                                 )
                                                             )
-                                                            if (likeIcon == Icons.Filled.Favorite) {
-                                                                likeIcon =
-                                                                    Icons.Filled.FavoriteBorder
-                                                                like = like.minus(1)
-                                                                showSnackBar(
-                                                                    "Cancel Add Like Post",
-                                                                    coroutineScope,
-                                                                    scaffoldState
-                                                                )
-                                                            } else {
-                                                                likeIcon = Icons.Filled.Favorite
-                                                                like = like.plus(1)
+                                                            likeState = !likeState
+                                                            like = if (likeState) like.plus(1)
+                                                            else like.minus(1)
+
+                                                            if (likeState)
                                                                 showSnackBar(
                                                                     "Success Add Like Post",
                                                                     coroutineScope,
                                                                     scaffoldState
                                                                 )
-                                                            }
+                                                            else
+                                                                showSnackBar(
+                                                                    "Cancel Add Like Post",
+                                                                    coroutineScope,
+                                                                    scaffoldState
+                                                                )
                                                         },
-
-                                                    imageVector = likeIcon,
+                                                    imageVector = if (likeState) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                                     contentDescription = "Btn Like",
                                                     tint = colorPrimary
                                                 )
+
 
                                                 // Text Like Count
                                                 androidx.compose.material.Text(
@@ -282,7 +276,7 @@ class DetailPostScreen(private val id: Int) : Screen {
 
                                                 Spacer(Modifier.width(4.dp))
 
-                                                androidx.compose.material.Icon(
+                                                Icon(
                                                     modifier = Modifier
                                                         .padding(top = 4.dp, start = 4.dp)
                                                         .width(24.dp)
@@ -293,7 +287,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                     tint = colorPrimary
                                                 )
 
-                                                // Text Like Count
+                                                // Text Comment Count
                                                 androidx.compose.material.Text(
                                                     text = commentCountState.toString(),
                                                     color = colorPrimary,
@@ -302,39 +296,36 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                     fontSize = 16.sp,
                                                     fontWeight = FontWeight.Bold
                                                 )
-
-                                                //CommentPost(commentCountState)
                                             }
 
-                                            androidx.compose.material.Icon(
+                                            Icon(
                                                 modifier = Modifier
                                                     .padding(top = 4.dp, start = 4.dp)
                                                     .width(24.dp)
                                                     .height(24.dp).clickable {
                                                         bookmarkViewModel.insertBookmark(
-                                                            BookmarkRequest(
-                                                                postResponse.id ?: 0,
-                                                                uid
-                                                            )
+                                                            BookmarkRequest(postResponse.id, uid)
                                                         )
-                                                        if (bookmarkIcon == Icons.Filled.Bookmark) {
-                                                            bookmarkIcon =
-                                                                Icons.Filled.BookmarkBorder
-                                                            showSnackBar(
-                                                                "Cancel Add to Bookmark",
-                                                                coroutineScope,
-                                                                scaffoldState
-                                                            )
-                                                        } else {
-                                                            bookmarkIcon = Icons.Filled.Bookmark
+
+                                                        bookmarkState = !bookmarkState
+
+                                                        if (bookmarkState) {
                                                             showSnackBar(
                                                                 "Success Add to Bookmark",
                                                                 coroutineScope,
                                                                 scaffoldState
                                                             )
+                                                        } else {
+                                                            showSnackBar(
+                                                                "Cancel Add to Bookmark",
+                                                                coroutineScope,
+                                                                scaffoldState
+                                                            )
                                                         }
+
                                                     },
-                                                imageVector = bookmarkIcon,
+
+                                                imageVector = if (bookmarkState) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
                                                 contentDescription = "Btn Bookmark",
                                                 tint = colorPrimary
                                             )
@@ -343,7 +334,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                                 }
 
                                 androidx.compose.material.Text(
-                                    text = getTime(postResponse.createdAt.toString()),
+                                    text = getTime(postResponse.createdAt),
                                     color = colorPrimary,
                                     fontSize = 12.sp,
                                     textAlign = TextAlign.Center,
@@ -387,7 +378,9 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                 commentResponse.id_post.toString(),
                                                 commentResponse.id.toString()
                                             )
-                                            commentCountState.minus(1)
+
+                                            commentCountState = commentCountState.minus(1)
+
                                             showSnackBar(
                                                 "Success delete comment",
                                                 coroutineScope,
@@ -441,6 +434,9 @@ class DetailPostScreen(private val id: Int) : Screen {
                                     )
                                 )
 
+                                commentCountState = commentCountState.plus(1)
+                                keyboardController?.hide()
+                                focusManager.clearFocus(true)
                                 textComment = TextFieldValue("")
                             }
                     )
@@ -448,32 +444,4 @@ class DetailPostScreen(private val id: Int) : Screen {
             }
         }
     }
-
-
-    @Composable
-    fun CommentPost(comment: Int) {
-        androidx.compose.material.Icon(
-            modifier = Modifier
-                .padding(top = 4.dp, start = 4.dp)
-                .width(24.dp)
-                .height(24.dp),
-
-            imageVector = Icons.Filled.Comment,
-            contentDescription = "Btn Comment",
-            tint = colorPrimary
-        )
-
-        // Text Like Count
-        androidx.compose.material.Text(
-            text = comment.toString(),
-            color = colorPrimary,
-            modifier = Modifier
-                .padding(top = 4.dp, start = 6.dp),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-    }
 }
-
-

@@ -1,7 +1,5 @@
 package utils
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -9,10 +7,9 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 
 
-@Composable
 fun getUid(): String {
     val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
-    return keyValueStorage.observableApiToken?.collectAsState("")?.value.toString()
+    return keyValueStorage.observableIdUser
 }
 
 fun getTime(date: String): String {

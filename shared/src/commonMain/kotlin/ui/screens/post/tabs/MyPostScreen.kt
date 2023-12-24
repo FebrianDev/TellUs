@@ -20,7 +20,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -52,12 +51,8 @@ fun MyPostScreen(
 
     val uid = getUid()
 
-    var uidState by remember { mutableStateOf("") }
-    uidState = uid
-
-    LaunchedEffect(uidState) {
-        if (uidState.isNotEmpty())
-            postViewModel.getPostByIdUser(uid)
+    LaunchedEffect(uid) {
+        postViewModel.getPostByIdUser(uid)
     }
 
     val event = OptionPostEvent()
@@ -101,7 +96,7 @@ fun MyPostScreen(
                         ) {
                             items(listPost ?: listOf()) { data ->
                                 event.onDeletePost = { post ->
-                                    postViewModel.deletePost(post.toString())
+                                    postViewModel.deletePost(post.id.toString())
                                     listPost?.remove(post)
                                     showSnackBar(
                                         "Success delete post",
@@ -110,7 +105,7 @@ fun MyPostScreen(
                                     )
                                 }
 
-                                ItemMyPost(data, coroutineScope, scaffoldState, uidState, event)
+                                ItemMyPost(data, coroutineScope, scaffoldState, uid, event)
                             }
                         }
 
