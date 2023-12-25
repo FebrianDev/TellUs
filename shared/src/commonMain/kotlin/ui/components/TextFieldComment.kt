@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import ui.themes.bgColor
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextFieldComment(
     textComment: TextFieldValue,

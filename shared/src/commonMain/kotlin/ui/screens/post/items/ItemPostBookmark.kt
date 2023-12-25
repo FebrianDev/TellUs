@@ -31,6 +31,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,18 +40,22 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import data.bookmark.model.BookmarkRequest
+import data.chat.ChatEntity
 import data.like.model.LikeRequest
 import data.post.model.PostResponse
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import ui.screens.bookmark.BookmarkViewModel
+import ui.screens.chat.ChatViewModel
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.LikeViewModel
 import ui.screens.post.OptionPostEvent
 import ui.screens.post.PostViewModel
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.generatedFakeName
+import utils.getDateNow
 import utils.getTime
 import utils.getUid
 import utils.showSnackBar
@@ -67,6 +73,7 @@ fun ItemPostBookmark(
     val navigator = LocalNavigator.currentOrThrow
 
     val likeViewModel = getViewModel(Unit, viewModelFactory { LikeViewModel() })
+    val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
 
     var like by rememberSaveable { mutableStateOf(postResponse.like) }
     var likeState by rememberSaveable {
@@ -78,6 +85,35 @@ fun ItemPostBookmark(
             }
             likedPosts.isNotEmpty()
         })
+    }
+
+    val cp = LocalClipboardManager.current
+
+    event.onCopyText = {
+        cp.setText(AnnotatedString(it))
+        showSnackBar(
+            "The text has been copied successfully",
+            coroutineScope,
+            scaffoldState
+        )
+    }
+
+    event.onSendPrivateChat = {
+        chatViewModel.createRoom(
+            ChatEntity(
+                id_chat = "",
+                id_sent = "idUser",
+                id_receiver = postResponse.id_user,
+                id_post = postResponse.id.toString(),
+                post_message = postResponse.message,
+                name = generatedFakeName(),
+                message = ArrayList(),
+                countReadSent = 0,
+                countReadReceiver = 0,
+                date = getDateNow(),
+                fcm_token = "token"
+            )
+        )
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

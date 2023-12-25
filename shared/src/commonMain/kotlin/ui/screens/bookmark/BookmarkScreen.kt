@@ -28,6 +28,7 @@ import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.TopBar
 import ui.screens.post.OptionPostEvent
+import ui.screens.post.PostViewModel
 import ui.screens.post.items.ItemPostBookmark
 import ui.themes.bgColor
 import utils.getUid
@@ -40,6 +41,7 @@ fun BookmarkScreen(
 ) {
 
     val bookmarkViewModel = getViewModel(Unit, viewModelFactory { BookmarkViewModel() })
+    val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
 
     val uid = getUid()
 
@@ -90,6 +92,16 @@ fun BookmarkScreen(
                             LazyColumn(modifier = Modifier.padding(bottom = 64.dp, top = 8.dp)) {
                                 items(listPost ?: listOf()) { data ->
                                     if (data.Bookmarks.isNotEmpty()) {
+                                        event.onDeletePost = { post ->
+                                            postViewModel.deletePost(post.id.toString())
+                                            listPost?.remove(post)
+                                            showSnackBar(
+                                                "Success delete post",
+                                                coroutineScope,
+                                                scaffoldState
+                                            )
+                                        }
+
                                         if (data.Bookmarks.any { bookmark -> bookmark.id_user == uid })
                                             ItemPostBookmark(
                                                 data,
@@ -109,6 +121,8 @@ fun BookmarkScreen(
                                                         scaffoldState
                                                     )
                                                 })
+                                    } else {
+                                        listEmptyBookmark.clear()
                                     }
                                 }
                             }

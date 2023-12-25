@@ -62,8 +62,6 @@ fun LatestPostScreen(
 
     val uid = getUid()
 
-    //var keyGetAllPost by remember { mutableStateOf() }
-
     LaunchedEffect(false) {
         postViewModel.getAllPost()
     }
