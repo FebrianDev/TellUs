@@ -17,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -37,7 +38,7 @@ import ui.screens.post.OptionPostEvent
 import ui.themes.colorPrimary
 import utils.getTime
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ItemComment(
     commentResponse: CommentResponse,
