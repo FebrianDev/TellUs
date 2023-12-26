@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:112575158930:android:6ee81a7efe5c07a800e44b",
+        "mobilesdk_app_id": "1:112575158930:android:b78630db41e70ee600e44b",
         "android_client_info": {
-          "package_name": "com.febriandev.MyApplication"
+          "package_name": "com.febriandev.tellus"
         }
       },
       "oauth_client": [],
@@ -28,7 +28,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:112575158930:android:481052e4dadcd59b00e44b",
         "android_client_info": {
-          "package_name": "com.febriandev.MyApplication"
+          "package_name": "com.febriandev.tellus"
         }
       },
       "oauth_client": [],

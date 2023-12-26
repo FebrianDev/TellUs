@@ -1,12 +1,8 @@
 package com.febriandev
 
 import MainView
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
@@ -20,6 +16,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         Firebase.initialize(this)
+
+//        NotifierManager.initialize(
+//            configuration = NotificationPlatformConfiguration.Android(
+//                notificationIconResId = R.drawable.ic_launcher_foreground,
+//            )
+//        )
 
         setContent {
             MainView()

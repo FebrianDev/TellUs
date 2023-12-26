@@ -16,7 +16,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-           // export(project("io.github.mirzemehdi:kmpnotifier:0.1.9"))
+         //   export(project("io.github.mirzemehdi:kmpnotifier:0.2.0"))
             baseName = "shared"
             isStatic = true
         }
@@ -26,7 +26,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
 
-                api("io.github.mirzemehdi:kmpnotifier:0.1.9")
+               // api("io.github.mirzemehdi:kmpnotifier:0.2.0")
 
                 implementation(compose.runtime)
                 implementation(compose.foundation)
@@ -78,7 +78,6 @@ kotlin {
                 api("androidx.activity:activity-compose:1.8.2")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.12.0")
-                api("io.github.mirzemehdi:kmpnotifier:0.1.9")
                 implementation("io.ktor:ktor-client-android:2.3.1")
             }
         }
@@ -96,7 +95,7 @@ kotlin {
 
 android {
     compileSdk = (findProperty("android.compileSdk") as String).toInt()
-    namespace = "com.myapplication.common"
+    namespace = "com.febriandev.common"
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -105,6 +104,13 @@ android {
     defaultConfig {
         minSdk = (findProperty("android.minSdk") as String).toInt()
     }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -116,7 +122,7 @@ android {
 
 sqldelight {
     database("PostDatabase") {
-        packageName = "com.myapplication.database"
+        packageName = "com.febriandev.database"
         sourceFolders = listOf("sqldelight")
     }
 }
