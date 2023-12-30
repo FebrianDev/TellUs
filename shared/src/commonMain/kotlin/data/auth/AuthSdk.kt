@@ -23,4 +23,20 @@ class AuthSdk {
             Result.failure(e)
         }
     }
+
+    suspend fun sendEmail(email: String): Result<CodeResetState> {
+        return try {
+            Result.success(api.sendEmail(email))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun resetPassword(email: String, code: String, password: String): Result<AuthState> {
+        return try {
+            Result.success(api.resetPassword(email, code, password))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

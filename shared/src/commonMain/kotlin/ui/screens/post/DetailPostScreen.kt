@@ -137,7 +137,6 @@ class DetailPostScreen(private val id: Int) : Screen {
             contentColor = bgColor
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-
                 TitleHeader("Detail Post", navigator)
                 Spacer(modifier = Modifier.height(24.dp))
 

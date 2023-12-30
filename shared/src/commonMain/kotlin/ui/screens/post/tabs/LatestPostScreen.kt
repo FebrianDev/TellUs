@@ -117,7 +117,6 @@ fun LatestPostScreen(
                             state = listState
                         ) {
                             items(listPost.toList()) { postResponse ->
-
                                 event.onDeletePost = { post ->
                                     postViewModel.deletePost(post.id.toString())
                                     listPost.remove(post)

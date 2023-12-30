@@ -46,7 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ui.components.AlertDialogComposable
@@ -73,7 +74,8 @@ fun SettingScreen() {
     var openAboutState by remember { mutableStateOf(false) }
 
     var openAlertDialog by remember { mutableStateOf(false) }
-    var logoutState by remember { mutableStateOf(false) }
+
+    val navigator = LocalNavigator.currentOrThrow
 
     Column(
         modifier = Modifier.fillMaxWidth().wrapContentSize()
@@ -242,16 +244,12 @@ fun SettingScreen() {
 
                     //Logout Action
                     keyValueStorage.cleanStorage()
-                    logoutState = true
+                    navigator.push(RegisterScreen())
                 },
                 "Logout",
                 "Are you sure want to logout?"
             )
 
-        if (logoutState)
-            Navigator(
-                RegisterScreen()
-            )
         Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
     }
 }
