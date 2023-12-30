@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.myapplication.myapplication</string>
+	<string>com.febriandev.tellus</string>
 	<key>PROJECT_ID</key>
 	<string>sharekmp</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:112575158930:ios:98bc69fd113d453000e44b</string>
+	<string>1:112575158930:ios:78897bfa5f9bb7a200e44b</string>
 </dict>
 </plist>

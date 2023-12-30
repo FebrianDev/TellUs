@@ -16,7 +16,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-         //   export(project("io.github.mirzemehdi:kmpnotifier:0.2.0"))
+            export("io.github.mirzemehdi:kmpnotifier:0.2.0")
             baseName = "shared"
             isStatic = true
         }
@@ -26,7 +26,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
 
-               // api("io.github.mirzemehdi:kmpnotifier:0.2.0")
+                api("io.github.mirzemehdi:kmpnotifier:0.2.0")
 
                 implementation(compose.runtime)
                 implementation(compose.foundation)
