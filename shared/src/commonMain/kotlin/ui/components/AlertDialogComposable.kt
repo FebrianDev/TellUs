@@ -7,7 +7,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import ui.themes.bgColor
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialogComposable(
     onDismissRequest: () -> Unit,

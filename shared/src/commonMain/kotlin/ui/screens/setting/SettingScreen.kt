@@ -51,6 +51,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ui.components.AlertDialogComposable
+import ui.components.SpacerH
 import ui.components.SpacerW
 import ui.components.TextBodyMedium
 import ui.components.TopBar
@@ -82,7 +83,7 @@ fun SettingScreen() {
     ) {
         TopBar("Setting")
 
-        Spacer(modifier = Modifier.height(16.dp))
+        SpacerH(16.dp)
 
         ItemSetting(
             Icons.Filled.Person,

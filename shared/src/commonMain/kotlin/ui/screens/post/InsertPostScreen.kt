@@ -8,21 +8,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
@@ -50,10 +46,11 @@ import data.post.state.PostState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
+import ui.components.SpacerH
+import ui.components.SpacerW
 import ui.components.TextBodyMedium
 import ui.components.TextSubtitleMedium
 import ui.components.TitleHeader
@@ -96,7 +93,7 @@ class InsertPostScreen : Screen {
             Column {
                 TitleHeader("Create New Post", navigator)
 
-                Spacer(modifier = Modifier.height(24.dp))
+                SpacerH(24.dp)
 
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
@@ -110,7 +107,7 @@ class InsertPostScreen : Screen {
                     Text("${textMessage.text.length}/320")
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                SpacerH(16.dp)
 
                 TextField(
                     value = textMessage,
@@ -136,7 +133,8 @@ class InsertPostScreen : Screen {
                     minLines = 4,
                     maxLines = 8
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+
+                SpacerH(16.dp)
 
                 FlowRow(
                     modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
@@ -148,7 +146,8 @@ class InsertPostScreen : Screen {
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
+
+                SpacerH(16.dp)
 
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
@@ -171,8 +170,9 @@ class InsertPostScreen : Screen {
                                 uncheckedTrackColor = bgColor
                             )
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        // Display the switch state
+
+                        SpacerW(8.dp)
+
                         TextBodyMedium(
                             text = "Private Post",
                             modifier = Modifier.wrapContentWidth()
@@ -224,10 +224,7 @@ class InsertPostScreen : Screen {
                         AlertDialog(
                             containerColor = bgColor,
                             onDismissRequest = { },
-                            confirmButton = {
-
-                            },
-
+                            confirmButton = {},
                             title = {
                                 TextSubtitleMedium("Success Insert Post")
                             },

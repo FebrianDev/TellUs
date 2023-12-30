@@ -45,6 +45,7 @@ import data.post.model.PostResponse
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.SpacerW
 import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.chat.ChatViewModel
 import ui.screens.post.DetailPostScreen
@@ -223,7 +224,8 @@ fun ItemPost(
                             fontWeight = FontWeight.Bold
                         )
 
-                        Spacer(Modifier.width(4.dp))
+                        SpacerW(4.dp)
+
                         CommentPost(postResponse.comment)
                     }
 

@@ -48,6 +48,8 @@ import data.post.model.PostResponse
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.SpacerH
+import ui.components.SpacerW
 import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.LikeViewModel
@@ -157,7 +159,7 @@ fun ItemMyPost(
 
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                SpacerH(4.dp)
 
                 Box(
                     modifier = Modifier
@@ -224,7 +226,7 @@ fun ItemMyPost(
                             fontWeight = FontWeight.Bold
                         )
 
-                        Spacer(Modifier.width(4.dp))
+                        SpacerW(4.dp)
                         CommentPost(postResponse.comment)
                     }
 

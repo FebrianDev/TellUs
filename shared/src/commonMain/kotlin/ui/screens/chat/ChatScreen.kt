@@ -28,6 +28,7 @@ import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import ui.components.EmptyState
 import ui.components.ProgressBarLoading
+import ui.components.SpacerH
 import ui.components.TopBar
 import ui.themes.bgColor
 import utils.showSnackBar
@@ -54,7 +55,7 @@ fun ChatScreen(
         ) {
             TopBar("Chat")
 
-            Spacer(modifier = Modifier.height(16.dp))
+            SpacerH(16.dp)
 
             chatViewModel.getListRoomChat.collectAsState().value.onSuccess {
                 when (it) {

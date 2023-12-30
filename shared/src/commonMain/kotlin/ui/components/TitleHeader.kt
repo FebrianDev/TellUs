@@ -2,9 +2,7 @@ package ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Icon
@@ -23,7 +21,10 @@ import ui.themes.colorPrimary
 @Composable
 fun TitleHeader(title: String = "", navigator: Navigator = LocalNavigator.currentOrThrow) {
 
-    Row(modifier = Modifier.padding(start = 12.dp, top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.padding(start = 12.dp, top = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Icon(
             imageVector = Icons.Default.ArrowBackIosNew,
             contentDescription = "Back",
@@ -33,7 +34,7 @@ fun TitleHeader(title: String = "", navigator: Navigator = LocalNavigator.curren
             tint = colorPrimary
         )
 
-        Spacer(Modifier.width(4.dp))
+        SpacerW(4.dp)
 
         Text(
             text = title,

@@ -83,7 +83,8 @@ class LoginScreen : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Spacer(modifier = Modifier.height(32.dp))
+                SpacerH(32.dp)
+
                 Text(
                     text = "Login",
                     fontWeight = FontWeight.Bold,

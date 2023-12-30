@@ -32,6 +32,8 @@ import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.components.SpacerH
+import ui.components.SpacerW
 import ui.screens.comment.option.MyOptionComment
 import ui.screens.comment.option.OptionComment
 import ui.screens.post.OptionPostEvent
@@ -87,7 +89,7 @@ fun ItemComment(
                         contentDescription = ""
                     )
 
-                    Spacer(modifier = Modifier.width(4.dp))
+                    SpacerW(4.dp)
 
                     Column(
                         modifier = Modifier.fillMaxWidth()
@@ -129,7 +131,7 @@ fun ItemComment(
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            SpacerH(4.dp)
 
 
             if (commentResponse.ReplyComments?.isEmpty() == false) {

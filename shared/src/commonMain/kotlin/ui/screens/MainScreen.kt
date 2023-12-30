@@ -27,6 +27,7 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import ui.components.SpacerH
 import ui.components.TopBar
 import ui.screens.post.PostViewModel
 import ui.screens.post.tabs.BestPostScreen
@@ -131,7 +132,8 @@ fun TabLayout(
         }
     }
 
-    Spacer(modifier = Modifier.height(8.dp))
+    SpacerH(8.dp)
+
     HorizontalPager(
         beyondBoundsPageCount = tabRowItems.size,
         state = pagerState

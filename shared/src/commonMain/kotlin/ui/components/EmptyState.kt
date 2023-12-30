@@ -1,7 +1,6 @@
 package ui.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,7 +23,7 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Spacer(Modifier.height(16.dp))
+        SpacerH(16.dp)
 
         Icon(
             modifier = Modifier
@@ -35,7 +34,8 @@ fun EmptyState(
             contentDescription = "Options",
             tint = colorPrimary
         )
-        Spacer(Modifier.height(16.dp))
+
+        SpacerH(16.dp)
 
         TextSubtitleMedium(text, color = colorPrimary)
     }

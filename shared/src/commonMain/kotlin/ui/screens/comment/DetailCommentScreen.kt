@@ -60,6 +60,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.EmptyState
 import ui.components.ProgressBarLoading
+import ui.components.SpacerH
 import ui.components.SpacerW
 import ui.components.TextBodyBold
 import ui.components.TextFieldComment
@@ -122,7 +123,7 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
 
                 TitleHeader("Detail Comment")
 
-                Spacer(modifier = Modifier.height(24.dp))
+                SpacerH(24.dp)
 
                 ShowDetailComment(
                     scaffoldState,
@@ -135,7 +136,7 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                     isRoot = true
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                SpacerH(16.dp)
 
                 commentViewModel.replyCommentState.collectAsState().value.onSuccess {
                     when (it) {
@@ -194,7 +195,6 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                 }.onFailure {
                     showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
                 }
-
 
                 Spacer(modifier = Modifier.weight(1f))
 

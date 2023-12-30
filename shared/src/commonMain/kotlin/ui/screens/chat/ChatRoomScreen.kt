@@ -52,6 +52,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import ui.components.AlertDialogComposable
 import ui.components.ProgressBarLoading
+import ui.components.SpacerH
+import ui.components.SpacerW
 import ui.components.TextBodyBold
 import ui.themes.bgColor
 import ui.themes.colorPrimary
@@ -126,7 +128,7 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
                         contentDescription = "Back"
                     )
 
-                    Spacer(Modifier.width(4.dp))
+                    SpacerW(4.dp)
 
                     TextBodyBold(textName, modifier = Modifier.wrapContentSize(), bgColor)
                 }
@@ -153,7 +155,7 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
                 }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            SpacerH(8.dp)
 
             LazyColumn(
                 modifier = Modifier.fillMaxHeight(0.9f).fillMaxWidth(),

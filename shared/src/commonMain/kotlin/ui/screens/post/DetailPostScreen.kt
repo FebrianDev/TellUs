@@ -69,6 +69,7 @@ import ui.components.DividerComposable
 import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.SpacerH
+import ui.components.SpacerW
 import ui.components.TextBodyBold
 import ui.components.TextFieldComment
 import ui.components.TitleHeader
@@ -137,8 +138,10 @@ class DetailPostScreen(private val id: Int) : Screen {
             contentColor = bgColor
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
+
                 TitleHeader("Detail Post", navigator)
-                Spacer(modifier = Modifier.height(24.dp))
+
+                SpacerH(24.dp)
 
                 postViewModel.postState.collectAsState().value.onSuccess {
                     when (it) {
@@ -273,7 +276,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                     fontWeight = FontWeight.Bold
                                                 )
 
-                                                Spacer(Modifier.width(4.dp))
+                                                SpacerW(4.dp)
 
                                                 Icon(
                                                     modifier = Modifier
