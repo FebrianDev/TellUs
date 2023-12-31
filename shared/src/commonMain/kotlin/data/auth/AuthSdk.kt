@@ -39,4 +39,5 @@ class AuthSdk {
             Result.failure(e)
         }
     }
+
 }

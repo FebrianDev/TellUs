@@ -58,7 +58,8 @@ import ui.screens.post.items.ItemTag
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import ui.themes.colorSecondary
-import utils.getUid
+import utils.UserPreference.getFcmToken
+import utils.getIdUser
 import utils.showSnackBar
 
 class InsertPostScreen : Screen {
@@ -66,7 +67,7 @@ class InsertPostScreen : Screen {
     @Composable
     override fun Content() {
 
-        val uid = getUid()
+        val uid = getIdUser()
 
         val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
 
@@ -195,7 +196,7 @@ class InsertPostScreen : Screen {
                                 is_private = isPrivate,
                                 message = textMessage.text,
                                 tag = selectedTag,
-                                token = "klfngklf"
+                                token = getFcmToken()
                             )
                         )
                     }

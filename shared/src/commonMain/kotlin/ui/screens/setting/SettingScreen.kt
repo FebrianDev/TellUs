@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.mmk.kmpnotifier.notification.NotifierManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ui.components.AlertDialogComposable
@@ -70,7 +70,7 @@ fun SettingScreen() {
 
     var isExpandProfile by remember { mutableStateOf(false) }
 
-    var isActive by remember { mutableStateOf(false) }
+    var isActive by remember { mutableStateOf(keyValueStorage.isNotification) }
 
     var openAboutState by remember { mutableStateOf(false) }
 
@@ -137,6 +137,7 @@ fun SettingScreen() {
                     checked = isActive,
                     onCheckedChange = {
                         isActive = it
+                        keyValueStorage.isNotification = it
                     },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = colorPrimary,
@@ -245,6 +246,9 @@ fun SettingScreen() {
 
                     //Logout Action
                     keyValueStorage.cleanStorage()
+                    coroutineScope.launch {
+                        NotifierManager.getPushNotifier().deleteMyToken()
+                    }
                     navigator.push(RegisterScreen())
                 },
                 "Logout",

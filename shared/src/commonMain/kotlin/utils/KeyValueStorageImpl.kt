@@ -3,6 +3,7 @@ package utils
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.Settings
+import com.russhwolf.settings.coroutines.getBooleanFlow
 import com.russhwolf.settings.coroutines.getStringFlow
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
@@ -20,6 +21,13 @@ class KeyValueStorageImpl : KeyValueStorage {
 
     override val observableIdUser: String
         get() = observableSettings.getString(StorageKeys.ID_USER.key, "")
+    override var fcmToken: String
+        get() = settings[StorageKeys.FCM_TOKEN.key] ?: ""
+        set(value) {
+            settings[StorageKeys.FCM_TOKEN.key] = value
+        }
+    override val observableFCMToken: String
+        get() = settings.getString(StorageKeys.FCM_TOKEN.key, "")
 
 
     override var apiToken: String
@@ -31,6 +39,12 @@ class KeyValueStorageImpl : KeyValueStorage {
     @OptIn(ExperimentalSettingsApi::class)
     override val observableApiToken: Flow<String>
         get() = observableSettings.getStringFlow(StorageKeys.API_TOKEN.key, "")
+
+    override var isNotification: Boolean
+        get() = settings[StorageKeys.IS_NOTIFICATION.key] ?: true
+        set(value) {
+            settings[StorageKeys.IS_NOTIFICATION.key] = value
+        }
 
     override fun cleanStorage() {
         settings.clear()

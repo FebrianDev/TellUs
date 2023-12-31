@@ -6,9 +6,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 
+val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
 
-fun getUid(): String {
-    val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
+fun getIdUser(): String {
     return keyValueStorage.observableIdUser
 }
 

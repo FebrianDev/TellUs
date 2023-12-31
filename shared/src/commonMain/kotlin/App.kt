@@ -1,9 +1,17 @@
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.navigator.Navigator
 import com.mmk.kmpnotifier.notification.NotifierManager
-import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
+import com.mmk.kmpnotifier.notification.PayloadData
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
+import ui.screens.NotificationViewModel
 import ui.screens.auth.RegisterScreen
 import ui.screens.post.HomeScreen
 import ui.themes.bgColor
@@ -18,9 +26,6 @@ fun App() {
             color = MaterialTheme.colors.primary
         ) {
 
-            val notifier = NotifierManager.getLocalNotifier()
-            notifier.notify("Title", "Body")
-
             val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
 
             if (keyValueStorage.observableIdUser.isEmpty()) {
@@ -32,7 +37,6 @@ fun App() {
                     HomeScreen()
                 )
             }
-
 
 
         }

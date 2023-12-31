@@ -31,7 +31,7 @@ import ui.screens.post.OptionPostEvent
 import ui.screens.post.PostViewModel
 import ui.screens.post.items.ItemPostBookmark
 import ui.themes.bgColor
-import utils.getUid
+import utils.getIdUser
 import utils.showSnackBar
 
 @Composable
@@ -43,7 +43,7 @@ fun BookmarkScreen(
     val bookmarkViewModel = getViewModel(Unit, viewModelFactory { BookmarkViewModel() })
     val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
 
-    val uid = getUid()
+    val uid = getIdUser()
 
     val listEmptyBookmark by remember { mutableStateOf(arrayListOf<Boolean>()) }
 

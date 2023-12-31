@@ -36,7 +36,7 @@ import ui.screens.post.items.ItemMyPost
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.ScrollDirection
-import utils.getUid
+import utils.getIdUser
 import utils.showSnackBar
 
 @Composable
@@ -49,7 +49,7 @@ fun MyPostScreen(
 
     val navigator = LocalNavigator.currentOrThrow
 
-    val uid = getUid()
+    val uid = getIdUser()
 
     LaunchedEffect(uid) {
         postViewModel.getPostByIdUser(uid)

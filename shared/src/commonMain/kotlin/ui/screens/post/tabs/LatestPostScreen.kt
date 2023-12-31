@@ -46,7 +46,7 @@ import ui.screens.post.items.ItemTag
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.ScrollDirection
-import utils.getUid
+import utils.getIdUser
 import utils.rememberForeverLazyListState
 import utils.showSnackBar
 
@@ -60,7 +60,7 @@ fun LatestPostScreen(
 
     var selectedItem by remember { mutableStateOf(-1) }
 
-    val uid = getUid()
+    val uid = getIdUser()
 
     LaunchedEffect(false) {
         postViewModel.getAllPost()

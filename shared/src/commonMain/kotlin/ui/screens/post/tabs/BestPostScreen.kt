@@ -13,22 +13,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.post.state.ListPostState
-import dev.icerock.moko.mvvm.compose.getViewModel
-import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import ui.components.ProgressBarLoading
 import ui.components.rememberDirectionalLazyListState
 import ui.screens.post.OptionPostEvent
 import ui.screens.post.PostViewModel
 import ui.screens.post.items.ItemPost
 import utils.ScrollDirection
-import utils.getUid
+import utils.getIdUser
 import utils.showSnackBar
 
 @Composable
@@ -39,7 +35,7 @@ fun BestPostScreen(
     onShowHideBottomBar: (shouldHideBottomBar: ScrollDirection) -> Unit
 ) {
 
-    val uid = getUid()
+    val uid = getIdUser()
 
     LaunchedEffect(uid) {
         postViewModel.getTrending()

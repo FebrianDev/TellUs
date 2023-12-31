@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     kotlin("multiplatform")
     id("com.android.application")
@@ -17,6 +19,7 @@ kotlin {
 }
 
 android {
+
     compileSdk = (findProperty("android.compileSdk") as String).toInt()
     namespace = "com.febriandev.common"
 
@@ -33,6 +36,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
         }
     }
 
@@ -47,5 +51,4 @@ android {
 dependencies {
     implementation("com.google.firebase:firebase-common-ktx:20.4.2")
     implementation("com.google.firebase:firebase-auth:22.3.0")
-    implementation("com.google.firebase:firebase-messaging:23.4.0")
 }

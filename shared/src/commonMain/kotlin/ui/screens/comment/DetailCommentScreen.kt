@@ -50,6 +50,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import data.bookmark.network.NotificationData
+import data.bookmark.network.NotificationRequest
 import data.comment.model.CommentReplyRequest
 import data.comment.model.CommentResponse
 import data.comment.state.ReplyCommentState
@@ -65,13 +67,15 @@ import ui.components.SpacerW
 import ui.components.TextBodyBold
 import ui.components.TextFieldComment
 import ui.components.TitleHeader
+import ui.screens.NotificationViewModel
 import ui.screens.comment.option.MyOptionComment
 import ui.screens.comment.option.OptionComment
 import ui.screens.post.OptionPostEvent
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.KeyValueStorageImpl
+import utils.getIdUser
 import utils.getTime
-import utils.getUid
 import utils.showSnackBar
 
 @ExperimentalComposeUiApi
@@ -80,9 +84,13 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
     @Composable
     override fun Content() {
 
-        val uid = getUid()
+        val uid = getIdUser()
 
         val commentViewModel = getViewModel(Unit, viewModelFactory { CommentViewModel() })
+        val notificationViewModel = getViewModel(Unit, viewModelFactory { NotificationViewModel() })
+
+        val keyValueStorage = KeyValueStorageImpl()
+
         commentViewModel.getReplyComment(
             commentResponse.id_post.toString(),
             commentResponse.id.toString()
@@ -250,9 +258,21 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                         id_reply = commentResponse.id,
                                         message = textComment.text,
                                         is_root = isRoot,
-                                        token = "token"
+                                        token = keyValueStorage.fcmToken
                                     )
                                 )
+
+                                if (commentResponse.token != keyValueStorage.fcmToken) {
+                                    notificationViewModel.sendNotification(
+                                        NotificationRequest(
+                                            NotificationData(
+                                                "Someone Replied Your Comment",
+                                                textComment.text
+                                            ),
+                                            commentResponse.token
+                                        )
+                                    )
+                                }
 
                                 showReplyMessage = false
                                 isRoot = true

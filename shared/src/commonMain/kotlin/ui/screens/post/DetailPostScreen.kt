@@ -57,6 +57,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import data.bookmark.model.BookmarkRequest
+import data.bookmark.network.NotificationData
+import data.bookmark.network.NotificationRequest
 import data.comment.model.CommentRequest
 import data.comment.state.CommentState
 import data.like.model.LikeRequest
@@ -73,6 +75,7 @@ import ui.components.SpacerW
 import ui.components.TextBodyBold
 import ui.components.TextFieldComment
 import ui.components.TitleHeader
+import ui.screens.NotificationViewModel
 import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.comment.CommentViewModel
 import ui.screens.comment.ItemComment
@@ -80,8 +83,9 @@ import ui.screens.post.items.MyOptionPost
 import ui.screens.post.items.OptionPost
 import ui.themes.bgColor
 import ui.themes.colorPrimary
+import utils.KeyValueStorageImpl
+import utils.getIdUser
 import utils.getTime
-import utils.getUid
 import utils.showSnackBar
 
 class DetailPostScreen(private val id: Int) : Screen {
@@ -94,6 +98,9 @@ class DetailPostScreen(private val id: Int) : Screen {
 
         val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
         val commentViewModel = getViewModel(Unit, viewModelFactory { CommentViewModel() })
+        val notificationViewModel = getViewModel(Unit, viewModelFactory { NotificationViewModel() })
+
+        val keyValueStorage = KeyValueStorageImpl()
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope: CoroutineScope = rememberCoroutineScope()
@@ -101,7 +108,7 @@ class DetailPostScreen(private val id: Int) : Screen {
         val keyboardController = LocalSoftwareKeyboardController.current
         val focusManager = LocalFocusManager.current
 
-        val uid = getUid()
+        val uid = getIdUser()
 
         LaunchedEffect(uid) {
             postViewModel.getPostById(id.toString())
@@ -130,6 +137,8 @@ class DetailPostScreen(private val id: Int) : Screen {
 
         var commentCountState by rememberSaveable { mutableStateOf(0) }
 
+        var postData by remember { mutableStateOf(PostResponse()) }
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = scaffoldState)
@@ -155,6 +164,8 @@ class DetailPostScreen(private val id: Int) : Screen {
                         is PostState.Success -> {
 
                             val postResponse = it.data.data ?: PostResponse()
+
+                            postData = postResponse
 
                             commentCountState = postResponse.comment
 
@@ -432,9 +443,21 @@ class DetailPostScreen(private val id: Int) : Screen {
                                         id_post = id,
                                         id_user = uid,
                                         message = textComment.text,
-                                        token = "token"
+                                        token = keyValueStorage.observableFCMToken
                                     )
                                 )
+
+                                if (postData.token != keyValueStorage.fcmToken) {
+                                    notificationViewModel.sendNotification(
+                                        NotificationRequest(
+                                            NotificationData(
+                                                "Someone Commented On Your Post",
+                                                textComment.text
+                                            ),
+                                            postData.token
+                                        )
+                                    )
+                                }
 
                                 commentCountState = commentCountState.plus(1)
                                 keyboardController?.hide()

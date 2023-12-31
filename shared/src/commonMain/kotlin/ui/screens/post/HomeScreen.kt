@@ -1,7 +1,6 @@
 package ui.screens.post
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -22,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,27 +33,30 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.mmk.kmpnotifier.notification.NotifierManager
+import com.mmk.kmpnotifier.notification.PayloadData
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import ui.screens.MainScreen
+import ui.screens.NotificationViewModel
 import ui.screens.bookmark.BookmarkScreen
 import ui.screens.chat.ChatScreen
-import ui.screens.chat.ChatViewModel
 import ui.screens.setting.SettingScreen
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import ui.themes.colorSecondary
+import utils.KeyValueStorage
+import utils.KeyValueStorageImpl
 import utils.ScrollDirection
-import utils.getUid
+import utils.getIdUser
 
 class HomeScreen : Screen {
 
     @Composable
     override fun Content() {
 
-        val uid = getUid()
+        val uid = getIdUser()
 
         val navigator = LocalNavigator.currentOrThrow
 
@@ -64,6 +67,43 @@ class HomeScreen : Screen {
         var selectedScreen by remember { mutableStateOf(screens.first()) }
 
         var shouldHideBottomBar by remember { mutableStateOf(ScrollDirection.Down) }
+
+        val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
+        val notificationViewModel =
+            getViewModel(Unit, viewModelFactory { NotificationViewModel() })
+
+        var tokenFcm by remember { mutableStateOf("") }
+
+        LaunchedEffect(true) {
+            NotifierManager.addListener(object : NotifierManager.Listener {
+                override fun onNewToken(token: String) {
+                    tokenFcm = token
+                    notificationViewModel.updateToken(keyValueStorage.idUser, token)
+                    println("onNewToken: $token")
+                }
+
+                override fun onPayloadData(data: PayloadData) {
+                    super.onPayloadData(data)
+                    println("onNewData $data")
+
+                    val notifier = NotifierManager.getLocalNotifier()
+                    notifier.notify("Title", "Body")
+                }
+
+            })
+
+            tokenFcm = NotifierManager.getPushNotifier().getToken() ?: ""
+
+            if (keyValueStorage.fcmToken != tokenFcm && keyValueStorage.idUser.isNotEmpty()) {
+                keyValueStorage.fcmToken = tokenFcm
+                notificationViewModel.updateToken(keyValueStorage.idUser, tokenFcm)
+
+                println("onNewToken3: " + keyValueStorage.fcmToken)
+            }
+            println("onNewToken4: " + keyValueStorage.fcmToken)
+            println("onNewToken2: $tokenFcm")
+
+        }
 
         Scaffold(
             snackbarHost = {
@@ -101,7 +141,7 @@ class HomeScreen : Screen {
         ) {
             when (selectedScreen) {
                 "Home" -> {
-                    MainScreen(scaffoldState, coroutineScope){
+                    MainScreen(scaffoldState, coroutineScope) {
                         shouldHideBottomBar = it
                     }
                 }

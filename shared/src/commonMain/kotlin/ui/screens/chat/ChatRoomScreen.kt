@@ -39,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -48,9 +47,7 @@ import data.chat.ChatState
 import data.chat.Message
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
-import ui.components.AlertDialogComposable
 import ui.components.ProgressBarLoading
 import ui.components.SpacerH
 import ui.components.SpacerW
@@ -58,7 +55,7 @@ import ui.components.TextBodyBold
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getDateNow
-import utils.getUid
+import utils.getIdUser
 import utils.showSnackBar
 
 
@@ -83,7 +80,7 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
         var listMessages by remember { mutableStateOf(listOf<Message>()) }
         var showPostMessage by remember { mutableStateOf(false) }
 
-        val uid = getUid()
+        val uid = getIdUser()
 
         var uidState by remember { mutableStateOf("") }
         uidState = uid

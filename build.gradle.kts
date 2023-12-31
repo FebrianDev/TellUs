@@ -21,3 +21,7 @@ plugins {
 
 }
 
+repositories {
+    mavenCentral()
+}
+
