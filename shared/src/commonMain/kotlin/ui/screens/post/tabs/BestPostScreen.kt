@@ -47,7 +47,6 @@ fun BestPostScreen(
         postViewModel.listBestPostState.collectAsState().value.onSuccess {
             when (it) {
                 is ListPostState.Loading -> {
-                    println("Loading2")
                     ProgressBarLoading()
                 }
 
@@ -56,7 +55,6 @@ fun BestPostScreen(
                 }
 
                 is ListPostState.Success -> {
-                    println("Loading21")
                     val listPost by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
 
                     val listState = rememberLazyListState()

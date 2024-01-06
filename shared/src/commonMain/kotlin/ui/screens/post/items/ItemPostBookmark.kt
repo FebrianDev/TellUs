@@ -42,6 +42,7 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import ui.components.SpacerW
+import ui.screens.chat.ChatRoomScreen
 import ui.screens.chat.ChatViewModel
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.LikeViewModel
@@ -51,16 +52,17 @@ import ui.themes.colorPrimary
 import utils.generatedFakeName
 import utils.getDateNow
 import utils.getTime
+import utils.keyValueStorage
 import utils.showSnackBar
 
 @Composable
 fun ItemPostBookmark(
     postResponse: PostResponse,
-    uid:String,
+    uid: String,
     coroutineScope: CoroutineScope,
     scaffoldState: SnackbarHostState,
-    event : OptionPostEvent,
-    onBookmarkPost : () -> Unit = {}
+    event: OptionPostEvent,
+    onBookmarkPost: () -> Unit = {}
 ) {
 
     val navigator = LocalNavigator.currentOrThrow
@@ -92,21 +94,27 @@ fun ItemPostBookmark(
     }
 
     event.onSendPrivateChat = {
-        chatViewModel.createRoom(
-            ChatEntity(
-                id_chat = "",
-                id_sent = "idUser",
-                id_receiver = postResponse.id_user,
-                id_post = postResponse.id.toString(),
-                post_message = postResponse.message,
-                name = generatedFakeName(),
-                message = ArrayList(),
-                countReadSent = 0,
-                countReadReceiver = 0,
-                date = getDateNow(),
-                fcm_token = "token"
-            )
+
+        val chatEntity = ChatEntity(
+            id_chat = "",
+            id_sent = keyValueStorage.idUser,
+            id_receiver = postResponse.id_user,
+            id_post = postResponse.id.toString(),
+            post_message = postResponse.message,
+            name = generatedFakeName(),
+            message = ArrayList(),
+            countReadSent = 0,
+            countReadReceiver = 0,
+            date = getDateNow(),
+            token_sent = keyValueStorage.fcmToken,
+            token_receiver = postResponse.token
         )
+
+        chatViewModel.createRoom(
+            chatEntity
+        )
+
+        navigator.push(ChatRoomScreen(chatEntity))
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -147,8 +155,9 @@ fun ItemPostBookmark(
 
                     if (uid == postResponse.id_user) {
                         MyOptionPost(postResponse, scaffoldState, coroutineScope, event)
-                    } else
-                        OptionPost(postResponse, scaffoldState, coroutineScope, event)
+                    }
+//                    else
+//                        OptionPost(postResponse, scaffoldState, coroutineScope, event)
                 }
 
                 Divider(
@@ -199,7 +208,7 @@ fun ItemPostBookmark(
                         modifier = Modifier
                             .padding(top = 4.dp, start = 4.dp)
                             .width(24.dp)
-                            .height(24.dp).clickable (onClick = onBookmarkPost),
+                            .height(24.dp).clickable(onClick = onBookmarkPost),
 
                         imageVector = Icons.Filled.Bookmark,
                         contentDescription = "Btn Bookmark",

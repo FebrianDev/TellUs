@@ -40,6 +40,7 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import ui.screens.MainScreen
 import ui.screens.NotificationViewModel
+import ui.screens.auth.AuthViewModel
 import ui.screens.bookmark.BookmarkScreen
 import ui.screens.chat.ChatScreen
 import ui.screens.setting.SettingScreen
@@ -69,27 +70,26 @@ class HomeScreen : Screen {
         var shouldHideBottomBar by remember { mutableStateOf(ScrollDirection.Down) }
 
         val keyValueStorage: KeyValueStorage = KeyValueStorageImpl()
+
         val notificationViewModel =
             getViewModel(Unit, viewModelFactory { NotificationViewModel() })
+        val authViewModel = getViewModel(Unit, viewModelFactory { AuthViewModel() })
 
         var tokenFcm by remember { mutableStateOf("") }
 
         LaunchedEffect(true) {
+
+            authViewModel.getApiToken(keyValueStorage.idUser)
+
             NotifierManager.addListener(object : NotifierManager.Listener {
                 override fun onNewToken(token: String) {
                     tokenFcm = token
                     notificationViewModel.updateToken(keyValueStorage.idUser, token)
-                    println("onNewToken: $token")
                 }
 
                 override fun onPayloadData(data: PayloadData) {
                     super.onPayloadData(data)
-                    println("onNewData $data")
-
-                    val notifier = NotifierManager.getLocalNotifier()
-                    notifier.notify("Title", "Body")
                 }
-
             })
 
             tokenFcm = NotifierManager.getPushNotifier().getToken() ?: ""
@@ -97,12 +97,7 @@ class HomeScreen : Screen {
             if (keyValueStorage.fcmToken != tokenFcm && keyValueStorage.idUser.isNotEmpty()) {
                 keyValueStorage.fcmToken = tokenFcm
                 notificationViewModel.updateToken(keyValueStorage.idUser, tokenFcm)
-
-                println("onNewToken3: " + keyValueStorage.fcmToken)
             }
-            println("onNewToken4: " + keyValueStorage.fcmToken)
-            println("onNewToken2: $tokenFcm")
-
         }
 
         Scaffold(

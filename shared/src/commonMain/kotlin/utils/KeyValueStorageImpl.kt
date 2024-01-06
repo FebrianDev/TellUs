@@ -3,7 +3,6 @@ package utils
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.coroutines.getBooleanFlow
 import com.russhwolf.settings.coroutines.getStringFlow
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
@@ -21,6 +20,11 @@ class KeyValueStorageImpl : KeyValueStorage {
 
     override val observableIdUser: String
         get() = observableSettings.getString(StorageKeys.ID_USER.key, "")
+    override var email: String
+        get() = settings[StorageKeys.EMAIL.key] ?: ""
+        set(value) {
+            settings[StorageKeys.EMAIL.key] = value
+        }
     override var fcmToken: String
         get() = settings[StorageKeys.FCM_TOKEN.key] ?: ""
         set(value) {

@@ -9,7 +9,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,20 +16,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import data.post.model.PostResponse
-import kotlinx.coroutines.CoroutineScope
 import ui.components.TextSubtitleMedium
-import ui.screens.post.OptionPostEvent
 import ui.screens.post.items.TextOption
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 
 @Composable
 fun OptionChat(
-    postResponse: PostResponse,
-    scaffoldState: SnackbarHostState,
-    coroutineScope: CoroutineScope,
-    event: OptionPostEvent,
+    onLeaveChat: () -> Unit = {}
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
 
@@ -59,12 +52,9 @@ fun OptionChat(
             },
             text = {
                 Column {
-                    TextOption("Leave Comment") {
+                    TextOption("Leave Chat") {
+                        onLeaveChat.invoke()
                         isDialogOpen = false
-                        event.onCopyText.invoke(postResponse.message.toString())
-                    }
-                    TextOption("Send Private Message"){
-
                     }
                 }
             },

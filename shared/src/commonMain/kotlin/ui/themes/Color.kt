@@ -8,7 +8,7 @@ val colorPrimary = Color(0xFF2D3E50)
 val colorSecondary = Color(0xFF79848F)
 val colorThird = Color(0xFFDFE1E3)
 
-val bgColor = Color(0xFFFFFFFF)
+val bgColor = Color(0xFFF8F8F8)
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)

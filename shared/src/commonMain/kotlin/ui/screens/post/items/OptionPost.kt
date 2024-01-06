@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import data.chat.ChatEntity
 import data.post.model.PostResponse
 import kotlinx.coroutines.CoroutineScope
 import ui.components.AlertDialogComposable
@@ -30,6 +31,7 @@ fun OptionPost(
     postResponse: PostResponse,
     scaffoldState: SnackbarHostState,
     coroutineScope: CoroutineScope,
+    chatEntity: ChatEntity,
     event: OptionPostEvent,
 ) {
 
@@ -79,7 +81,7 @@ fun OptionPost(
         AlertDialogComposable(
             onDismissRequest = { isDialogPrivateChat = false },
             onConfirmation = {
-                event.onSendPrivateChat.invoke()
+                event.onSendPrivateChat.invoke(chatEntity)
                 isDialogPrivateChat = false
             },
             "Send Private Chat",

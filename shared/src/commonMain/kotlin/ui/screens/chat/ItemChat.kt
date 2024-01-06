@@ -1,7 +1,9 @@
 package ui.screens.chat
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +23,7 @@ import org.jetbrains.compose.resources.painterResource
 import ui.components.SpacerH
 import ui.components.SpacerW
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ItemChat(
     chatEntity: ChatEntity,
@@ -29,9 +31,12 @@ fun ItemChat(
 ) {
     Column(
         modifier = Modifier.padding(top = 8.dp).fillMaxWidth().padding(horizontal = 16.dp)
-            .clickable {
-                onClick.invoke()
-            }
+            .combinedClickable(
+                onLongClick = {},
+                onClick = {
+                    onClick.invoke()
+                }
+            )
 
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {

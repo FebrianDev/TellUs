@@ -78,7 +78,7 @@ fun ItemReplyComment(
         modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
+        androidx.compose.material3.Text(
             text = getTime(replyCommentResponse.createdAt.toString()),
             color = Color.Black,
             fontSize = 12.sp,

@@ -1,6 +1,7 @@
 package ui.screens.post
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import data.chat.ChatEntity
 import data.comment.model.CommentResponse
 import data.comment.model.ReplyCommentResponse
 import data.post.model.PostResponse
@@ -12,8 +13,8 @@ data class OptionPostEvent(
     var onDeletePost: (post: PostResponse) -> Unit = {},
     var onDeleteComment: (comment: CommentResponse) -> Unit = {},
     var onDeleteReplyComment: (comment: ReplyCommentResponse) -> Unit = {},
-    var onSendPrivateChat: () -> Unit = {},
+    var onSendPrivateChat: (chat:ChatEntity) -> Unit = {},
 
     var onLikePost: (state:Boolean) -> Unit = {},
-    var onBookmarkPost: () -> Unit = {}
+    var onBookmarkPost: () -> Unit = {},
 )

@@ -10,6 +10,7 @@ import data.utils.Constant
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -97,6 +98,25 @@ class AuthApi {
 
         var authState: AuthState = AuthState.Empty
 
+        when (data.status.value) {
+            200, 201 -> {
+                authState = AuthState.Success(data.body())
+            }
+
+            in 400..404 -> {
+                authState = AuthState.Error((data.body() as ApiErrorResponse).message)
+            }
+        }
+
+        return authState
+    }
+
+    suspend fun getApiToken(idUser: String) : AuthState {
+        val data = client.get("${Constant.BASE_URL}/api/token/${idUser}") {
+            contentType(ContentType.Application.Json)
+        }
+
+        var authState: AuthState = AuthState.Empty
         when (data.status.value) {
             200, 201 -> {
                 authState = AuthState.Success(data.body())

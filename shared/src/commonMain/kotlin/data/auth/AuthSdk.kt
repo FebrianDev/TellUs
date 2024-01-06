@@ -40,4 +40,13 @@ class AuthSdk {
         }
     }
 
+    @Throws(Exception::class)
+    suspend fun getApiToken(idUser: String): Result<AuthState> {
+        return try {
+            Result.success(api.getApiToken(idUser))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

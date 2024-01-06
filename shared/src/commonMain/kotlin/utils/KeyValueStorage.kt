@@ -7,6 +7,8 @@ interface KeyValueStorage {
     var idUser: String
     val observableIdUser: String
 
+    var email:String
+
     var fcmToken: String
     val observableFCMToken: String
 
@@ -19,7 +21,7 @@ interface KeyValueStorage {
 }
 
 enum class StorageKeys {
-    ID_USER, FCM_TOKEN, API_TOKEN, IS_NOTIFICATION;
+    ID_USER, EMAIL, FCM_TOKEN, API_TOKEN, IS_NOTIFICATION;
 
     val key get() = this.name
 }

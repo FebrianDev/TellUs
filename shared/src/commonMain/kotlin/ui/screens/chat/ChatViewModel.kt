@@ -9,6 +9,7 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,13 +27,13 @@ class ChatViewModel : ViewModel() {
     val getListRoomChat: StateFlow<Result<ListChatState>> get() = _getListRoomChat.asStateFlow()
 
     private var _getChat =
-        MutableStateFlow<Result<ChatState>>(Result.success(ChatState.Empty))
-    val getChat: StateFlow<Result<ChatState>> get() = _getChat.asStateFlow()
+        MutableStateFlow<ChatState>(ChatState.Empty)
+    val getChat: StateFlow<ChatState> get() = _getChat.asStateFlow()
 
     fun createRoom(
         chatEntity: ChatEntity
     ) {
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             _createRoom.value = api.createRoom(chatEntity)
         }
     }
@@ -45,21 +46,23 @@ class ChatViewModel : ViewModel() {
     }
 
     fun getChat(idChat: String) {
-        _getChat.value = Result.success(ChatState.Loading)
+       // _getChat.value = Result.success(ChatState.Loading)
         CoroutineScope(Dispatchers.IO).launch  {
             _getChat.value = api.getChat(idChat)
         }
     }
 
-    fun sendChat(chatEntity: ChatEntity, message: Message, date: String) {
-        viewModelScope.launch {
-            // val chat = api.getChat("rZTjmoVjZFX7DUW3LuMA")
+//    fun getChat(idChat: String) {
+//        _getChat.value = Result.success(ChatState.Loading)
+//        CoroutineScope(Dispatchers.IO).launch  {
+//            _getChat.value = api.getChat(idChat)
+//        }
+//    }
 
+    fun sendChat(chatEntity: ChatEntity, message: Message) {
+        CoroutineScope(Dispatchers.IO).launch {
             api.sendChat(
                 chatEntity,
-//                Message(
-//                    message = "Test123"
-//                ), "rZTjmoVjZFX7DUW3LuMA",
                 message
             )
         }

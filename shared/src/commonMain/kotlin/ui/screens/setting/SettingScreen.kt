@@ -1,19 +1,15 @@
 package ui.screens.setting
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -22,11 +18,9 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -38,10 +32,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -104,7 +98,7 @@ fun SettingScreen() {
                     tint = colorPrimary
                 )
                 Text(
-                    text = "febrian26022001@gmail.com", modifier = Modifier
+                    text = keyValueStorage.email, modifier = Modifier
                         .padding(start = 12.dp), fontSize = 16.sp,
                     color = colorPrimary
                 )
@@ -150,49 +144,6 @@ fun SettingScreen() {
             Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
         }
 
-        var isColorSystem by remember { mutableStateOf(false) }
-
-        ItemSetting(
-            Icons.Filled.Palette,
-            "Color System"
-        ) {
-            isColorSystem = !isColorSystem
-        }
-
-        if (isColorSystem) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.background)
-                        .border(
-                            width = 3.dp,
-                            color = //if (addEditViewModel.todoColor.value == colorInt) {
-                            Color.Black,
-                            // } else Color.Transparent,
-                            shape = CircleShape
-                        )
-                        .clickable {
-                            coroutineScope.launch {
-//                                todoBackgroundAnimatable.animateTo(
-//                                    targetValue = Color(colorInt),
-//                                    animationSpec = tween(
-//                                        durationMillis = 500
-//                                    )
-//                                )
-                            }
-                            //addEditViewModel.onEvent(AddEditTodoEvent.ChangeColor(colorInt))
-                        }
-                )
-            }
-        }
-
-        Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
         ItemSetting(
             Icons.Filled.Info,
             "About"
@@ -256,8 +207,17 @@ fun SettingScreen() {
             )
 
         Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Text(
+            "TellUs 1.0.0",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 64.dp).fillMaxWidth()
+        )
     }
 }
+
 
 @Composable
 fun ItemSetting(

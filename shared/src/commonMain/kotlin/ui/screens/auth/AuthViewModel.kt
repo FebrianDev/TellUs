@@ -45,10 +45,17 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun resetPassword(email: String, code:String, password:String){
+    fun resetPassword(email: String, code: String, password: String) {
         _authState.value = Result.success(AuthState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
             _authState.value = sdk.resetPassword(email, code, password)
+        }
+    }
+
+    fun getApiToken(idUser: String) {
+        _authState.value = Result.success(AuthState.Loading)
+        CoroutineScope(Dispatchers.IO).launch {
+            _authState.value = sdk.getApiToken(idUser)
         }
     }
 }

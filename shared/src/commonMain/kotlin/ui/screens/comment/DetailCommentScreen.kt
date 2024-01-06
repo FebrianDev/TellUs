@@ -235,6 +235,8 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                     }
                 }
 
+                /*Send Comment*/
+
                 Row(
                     modifier = Modifier.fillMaxWidth().background(bgColor),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -250,6 +252,9 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                         text = "Send",
                         modifier = Modifier.padding(start = 4.dp, end = 16.dp).wrapContentSize()
                             .align(Alignment.CenterVertically).clickable {
+
+                                if (textComment.text.isEmpty()) return@clickable
+
                                 commentViewModel.insertReplyComment(
                                     CommentReplyRequest(
                                         id_post = commentResponse.id_post,
@@ -302,8 +307,8 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
             modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            androidx.compose.material.Text(
-                text = getTime(commentResponse.createdAt.toString()),
+            androidx.compose.material3.Text(
+                text = getTime(commentResponse.createdAt),
                 color = Color.Black,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,

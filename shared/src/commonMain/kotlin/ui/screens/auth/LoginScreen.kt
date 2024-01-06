@@ -215,6 +215,7 @@ class LoginScreen : Screen {
                 is AuthState.Success -> {
                     val data = it.data.data
                     keyValueStorage.idUser = data?.id.toString()
+                    keyValueStorage.email = textEmail
                     keyValueStorage.apiToken = data?.token.toString()
                     navigator.push(HomeScreen())
                 }

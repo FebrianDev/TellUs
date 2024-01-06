@@ -3,9 +3,8 @@ package data.chat
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.firestore.where
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
 import utils.getDateNow
 
 class ChatApi {
@@ -14,17 +13,17 @@ class ChatApi {
 
     suspend fun createRoom(chatEntity: ChatEntity): Result<String> {
         return try {
-            val isEmpty = db.collection("Chat").where("id_sent", chatEntity.id_sent)
+            val room = db.collection("Chat").where("id_sent", chatEntity.id_sent)
                 .where("id_post", chatEntity.id_post)
-                .where("id_receiver", chatEntity.id_receiver).get().documents.isEmpty()
+                .where("id_receiver", chatEntity.id_receiver).get().documents
 
-            if (isEmpty) {
+            if (room.isEmpty()) {
                 val createRoom = db.collection("Chat").add(chatEntity)
                 chatEntity.id_chat = createRoom.id
                 createRoom.update(chatEntity)
-                Result.success("Success Create Room")
+                Result.success(chatEntity.id_chat)
             } else {
-                Result.success("Failed Create Room")
+                Result.success(room[0].id)
             }
 
         } catch (e: Exception) {
@@ -45,17 +44,18 @@ class ChatApi {
         }
     }
 
-    suspend fun getChat(idChat: String): Result<ChatState> {
-        return try {
-            var chatState: ChatState = ChatState.Empty
-            val chatResponse =
-                db.collection("Chat").where("id_chat", idChat).get()
-            chatState = ChatState.Success(chatResponse.documents[0].data())
-            println("GetChat")
-            Result.success(chatState)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    suspend fun getChat(idChat: String): ChatState {
+
+        var chatState: ChatState = ChatState.Empty
+        val chatResponse =
+            db.collection("Chat").document(idChat).get()
+        chatState = ChatState.Success(chatResponse.reference.snapshots.map {
+
+            it.data() as ChatEntity
+        }.first())
+
+        return chatState
+
     }
 
     suspend fun sendChat(
@@ -90,9 +90,8 @@ class ChatApi {
                 println("Chat3" + (it.data() as ChatEntity).toString())
             }
 
-
-        }catch (e: Exception) {
-            println("Chat3"+e.message)
+        } catch (e: Exception) {
+            println(e.message)
         }
 
 //        if (it.result.get("id_sent").toString() == idSent) {

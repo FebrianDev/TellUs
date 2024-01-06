@@ -25,7 +25,7 @@ fun ItemTag(
         ,
         shape = RoundedCornerShape(8.dp),
         elevation = 4.dp,
-        backgroundColor = if (isHighlight) colorPrimary else bgColor
+        backgroundColor = if (isHighlight) colorPrimary else Color.White
     ) {
         Text(tag, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
     }

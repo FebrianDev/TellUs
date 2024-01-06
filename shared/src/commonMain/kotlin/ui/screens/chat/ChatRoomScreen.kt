@@ -34,41 +34,62 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.mmk.kmpnotifier.notification.NotifierManager
+import com.mmk.kmpnotifier.notification.PayloadData
+import data.bookmark.network.NotificationData
+import data.bookmark.network.NotificationRequest
 import data.chat.ChatEntity
 import data.chat.ChatState
 import data.chat.Message
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
-import kotlinx.datetime.LocalDate
 import ui.components.ProgressBarLoading
 import ui.components.SpacerH
 import ui.components.SpacerW
 import ui.components.TextBodyBold
+import ui.screens.NotificationViewModel
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.getDateNow
 import utils.getIdUser
+import utils.keyValueStorage
 import utils.showSnackBar
 
 
-class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
+class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
 
     @Composable
     override fun Content() {
 
         val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
-        LaunchedEffect(false) {
-            chatViewModel.getChat(chatEntity.id_chat)
+        val notificationViewModel = getViewModel(Unit, viewModelFactory { NotificationViewModel() })
+
+        LaunchedEffect(true) {
+            //   if(chatEntity.id_chat.isNotEmpty())
             chatViewModel.readChat(chatEntity.id_chat, "")
         }
+
+        chatViewModel.getChat(chatEntity.id_chat)
+
+        NotifierManager.addListener(object : NotifierManager.Listener {
+            override fun onPayloadData(data: PayloadData) {
+                chatViewModel.getChat(chatEntity.id_chat)
+                super.onPayloadData(data)
+                chatViewModel.getChat(chatEntity.id_chat)
+            }
+        })
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
@@ -77,38 +98,37 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
 
         var textName by remember { mutableStateOf("") }
         var textPostMessage by remember { mutableStateOf("") }
-        var listMessages by remember { mutableStateOf(listOf<Message>()) }
+        val listMessages by remember { mutableStateOf(listOf<Message>().toMutableStateList()) }
         var showPostMessage by remember { mutableStateOf(false) }
 
+        var showOptionChat by remember { mutableStateOf(false) }
+
         val uid = getIdUser()
-
-        var uidState by remember { mutableStateOf("") }
-        uidState = uid
-
-        chatViewModel.getChat.collectAsState().value.onSuccess {
-            when (it) {
-                is ChatState.Loading -> {
-                    ProgressBarLoading()
-                }
-
-                is ChatState.Error -> {
-                    showSnackBar(it.message, coroutineScope, scaffoldState)
-                }
-
-                is ChatState.Success -> {
-                    val chat = it.data
-                    textName = chat.name
-                    textPostMessage = chat.post_message
-
-                    listMessages = chat.message
-
-                }
-
-                else -> {}
+        when (val it = chatViewModel.getChat.collectAsState().value) {
+            is ChatState.Loading -> {
+                println("List1 Load")
+                ProgressBarLoading()
             }
-        }.onFailure {
-            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
+
+            is ChatState.Error -> {
+                showSnackBar(it.message, coroutineScope, scaffoldState)
+            }
+
+            is ChatState.Success -> {
+                println("List1 " + it.data)
+                chatEntity = it.data
+                textName = chatEntity.name
+                textPostMessage = chatEntity.post_message
+                listMessages.clear()
+                listMessages.addAll(chatEntity.message)
+
+            }
+
+            else -> {
+                println("List1 Emp")
+            }
         }
+
 
         Column(modifier = Modifier.background(bgColor)) {
             Row(
@@ -134,7 +154,8 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
                     modifier = Modifier
                         .width(24.dp)
                         .height(24.dp).clickable {
-
+                            showOptionChat = true
+                            //OptionChat() {}
                         },
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = "Options",
@@ -148,7 +169,7 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
                     BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
                 ).fillMaxWidth().padding(8.dp).clickable {
-                            showPostMessage = true
+                    showPostMessage = true
                 }
             )
 
@@ -157,11 +178,10 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
             LazyColumn(
                 modifier = Modifier.fillMaxHeight(0.9f).fillMaxWidth(),
             ) {
-                if (uidState.isEmpty()) return@LazyColumn
+                if (uid.isEmpty()) return@LazyColumn
 
-                println("ListMessage" + listMessages.toList())
                 items(listMessages) {
-                    if (it.sender == uidState)
+                    if (it.sender == uid)
                         ItemSendChat(it)
                     else ItemReceiveChat(it)
                 }
@@ -170,47 +190,56 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
             Spacer(modifier = Modifier.weight(1f))
 
             val message = Message(
-                sender = uidState,
+                sender = uid,
                 prev_reply = "",
                 img = "",
                 read = false,
-                date =  getDateNow()
+                date = getDateNow()
             )
 
-            SendChat(chatViewModel, message)
+            SendChat(
+                chatViewModel,
+                notificationViewModel,
+                message,
+                if (chatEntity.token_sent == keyValueStorage.fcmToken) chatEntity.token_receiver else chatEntity.token_sent
+            )
 
-//            if(showPostMessage){
-//                Dialog(
-//                    onDismissRequest = { showPostMessage = false },
-//                ) {
-//                    Text(
-//                        textPostMessage,
-//                        color = colorPrimary,
-//                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
-//                            BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
-//                        ).fillMaxWidth().padding(8.dp).clickable {
-//                            showPostMessage = true
-//                        }
-//                    )
-//                }
-//            }
+            if (showPostMessage) {
+                Dialog(
+                    onDismissRequest = { showPostMessage = false },
+                ) {
+                    Text(
+                        textPostMessage,
+                        color = colorPrimary,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
+                            BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
+                        ).fillMaxWidth().padding(8.dp).clickable {
+                            showPostMessage = true
+                        }
+                    )
+                }
+            }
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun SendChat(
         chatViewModel: ChatViewModel,
-        message: Message
-        //  scaffoldState: SnackbarHostState,
-        //  coroutineScope: CoroutineScope,
-        //  uid: String
+        notificationViewModel: NotificationViewModel,
+        message: Message,
+        token: String
     ) {
+
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val focusManager = LocalFocusManager.current
+
         Row(
             modifier = Modifier.fillMaxWidth().background(bgColor),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
 
-            var textChat by remember { mutableStateOf(TextFieldValue("")) }
+            var textChat by remember { mutableStateOf("") }
 
             TextField(
                 value = textChat,
@@ -234,37 +263,27 @@ class ChatRoomScreen(private val chatEntity: ChatEntity) : Screen {
                 modifier = Modifier.padding(start = 4.dp, end = 16.dp).wrapContentSize()
                     .align(Alignment.CenterVertically).clickable {
 
+                        if (textChat.isEmpty()) return@clickable
+
+                        notificationViewModel.sendNotification(
+                            NotificationRequest(
+                                NotificationData(
+                                    "Someone sent you a message",
+                                    textChat
+                                ),
+                                token
+                            )
+                        )
+
                         //Send Chat
-                        message.message = textChat.text
-                        chatViewModel.sendChat(chatEntity, message, LocalDate.toString())
+                        message.message = textChat
+                        chatViewModel.sendChat(chatEntity, message)
                         chatViewModel.getChat(chatEntity.id_chat)
-                        textChat = TextFieldValue("")
+                        textChat = ""
+                        keyboardController?.hide()
+                        focusManager.clearFocus(true)
                     }
             )
         }
-
-//        commentViewModel.insertCommentState.collectAsState().value.onSuccess {
-//            when (it) {
-//                is InsertCommentState.Loading -> {
-//                    ProgressBarLoading()
-//                }
-//
-//                is InsertCommentState.Error -> {
-//                    showSnackBar("Something was wrong!", coroutineScope, scaffoldState)
-//                }
-//
-//                is InsertCommentState.Success -> {
-//                    commentViewModel.getCommentById(id.toString())
-//                }
-//
-//                else -> {
-//
-//                }
-//            }
-//        }.onFailure {
-//            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
-//        }
-
-
     }
 }

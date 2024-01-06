@@ -89,7 +89,7 @@ fun OptionComment(
         AlertDialogComposable(
             onDismissRequest = { isDialogPrivateChat = false },
             onConfirmation = {
-                event.onSendPrivateChat.invoke()
+               // event.onSendPrivateChat.invoke()
                 isDialogPrivateChat = false
             },
             "Send Private Chat",

@@ -12,7 +12,8 @@ class BaseApplication : Application() {
 
         NotifierManager.initialize(
             NotificationPlatformConfiguration.Android(
-            notificationIconResId = R.drawable.icon_app
+            notificationIconResId = R.drawable.icon_app,
+                notificationChannelData = NotificationPlatformConfiguration.Android.NotificationChannelData()
         ))
 
     }

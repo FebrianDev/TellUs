@@ -31,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +45,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -198,11 +200,11 @@ class DetailPostScreen(private val id: Int) : Screen {
 
                                 Card(
                                     modifier = Modifier
-                                        .padding(0.dp, 4.dp, 16.dp, 4.dp)
-                                        .fillMaxWidth(),
+                                        .padding(0.dp, 4.dp, 0.dp, 4.dp)
+                                        .fillMaxWidth(0.85f),
                                     shape = RoundedCornerShape(0.dp, 24.dp, 24.dp, 0.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                                    colors = CardDefaults.cardColors(containerColor = bgColor)
+                                    colors = CardDefaults.cardColors(containerColor = Color.White)
 
                                 ) {
                                     Column(
@@ -227,13 +229,14 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                     coroutineScope,
                                                     event
                                                 )
-                                            } else
-                                                OptionPost(
-                                                    postResponse,
-                                                    scaffoldState,
-                                                    coroutineScope,
-                                                    event
-                                                )
+                                            }
+//                                            else
+//                                                OptionPost(
+//                                                    postResponse,
+//                                                    scaffoldState,
+//                                                    coroutineScope,
+//                                                    event
+//                                                )
                                         }
 
                                         DividerComposable()
@@ -346,13 +349,13 @@ class DetailPostScreen(private val id: Int) : Screen {
                                     }
                                 }
 
-                                androidx.compose.material.Text(
+                                Text(
                                     text = getTime(postResponse.createdAt),
                                     color = colorPrimary,
                                     fontSize = 12.sp,
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(end = 16.dp, start = 16.dp)
-                                        .align(Alignment.CenterVertically)
+                                    modifier = Modifier.padding(end = 16.dp, start = 16.dp).align(Alignment.CenterVertically)
+
                                 )
                             }
                         }
@@ -438,6 +441,9 @@ class DetailPostScreen(private val id: Int) : Screen {
                         text = "Send",
                         modifier = Modifier.padding(start = 4.dp, end = 16.dp).wrapContentSize()
                             .align(Alignment.CenterVertically).clickable {
+
+                                if(textComment.text.isEmpty()) return@clickable
+
                                 commentViewModel.insertComment(
                                     CommentRequest(
                                         id_post = id,
