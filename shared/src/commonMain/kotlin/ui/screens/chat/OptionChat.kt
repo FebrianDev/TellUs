@@ -15,17 +15,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import ui.components.AlertDialogComposable
 import ui.components.TextSubtitleMedium
 import ui.screens.post.items.TextOption
 import ui.themes.bgColor
-import ui.themes.colorPrimary
 
 @Composable
 fun OptionChat(
     onLeaveChat: () -> Unit = {}
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
+    var isDialogDelete by remember { mutableStateOf(false) }
 
     Icon(
         modifier = Modifier
@@ -36,7 +38,7 @@ fun OptionChat(
             },
         imageVector = Icons.Filled.MoreVert,
         contentDescription = "Options",
-        tint = colorPrimary
+        tint = Color.White
     )
 
     if (isDialogOpen) {
@@ -53,11 +55,23 @@ fun OptionChat(
             text = {
                 Column {
                     TextOption("Leave Chat") {
-                        onLeaveChat.invoke()
                         isDialogOpen = false
+                        isDialogDelete = true
                     }
                 }
             },
+        )
+    }
+
+    if (isDialogDelete) {
+        AlertDialogComposable(
+            onDismissRequest = { isDialogDelete = false },
+            onConfirmation = {
+                onLeaveChat.invoke()
+                isDialogOpen = false
+            },
+            "Leave Chat",
+            "Are you sure leave chat?"
         )
     }
 }

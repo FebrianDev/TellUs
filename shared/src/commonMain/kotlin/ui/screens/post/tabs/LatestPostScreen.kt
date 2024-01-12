@@ -37,6 +37,7 @@ import data.post.model.PostResponse
 import data.post.state.ListPostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import sharePost
 import ui.components.ProgressBarLoading
 import ui.components.rememberDirectionalLazyListState
 import ui.screens.post.OptionPostEvent
@@ -78,6 +79,7 @@ fun LatestPostScreen(
         LazyRow(modifier = Modifier.padding(start = 6.dp, top = 4.dp, end = 6.dp, bottom = 4.dp)) {
             items(listTagState.size) {
                 ItemTag(listTag[it], isHighlight = selectedItem == it) {
+                    //sharePost()
                     if (selectedItem == it) {
                         selectedItem = -1
                         postViewModel.getAllPost()
@@ -170,6 +172,7 @@ fun LatestPostScreen(
                 else -> {}
             }
         }.onFailure {
+            println("Err "+it.message.toString())
             showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
 

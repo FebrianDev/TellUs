@@ -1,5 +1,6 @@
 package ui.screens.post.tabs
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,12 +22,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import data.post.state.ListPostState
 import kotlinx.coroutines.CoroutineScope
+import ui.components.EmptyState
 import ui.components.ProgressBarLoading
 import ui.components.rememberDirectionalLazyListState
 import ui.screens.post.InsertPostScreen
@@ -86,30 +89,41 @@ fun MyPostScreen(
 
                     is ListPostState.Success -> {
                         val listPost by remember { mutableStateOf(it.data.data?.toMutableStateList()) }
-                        val listState = rememberLazyListState()
-                        val directionalLazyListState = rememberDirectionalLazyListState(
-                            listState
-                        )
-                        LazyColumn(
-                            contentPadding = PaddingValues(bottom = 32.dp, top = 8.dp),
-                            state = listState
-                        ) {
-                            items(listPost ?: listOf()) { data ->
-                                event.onDeletePost = { post ->
-                                    postViewModel.deletePost(post.id.toString())
-                                    listPost?.remove(post)
-                                    showSnackBar(
-                                        "Success delete post",
-                                        coroutineScope,
-                                        scaffoldState
-                                    )
-                                }
 
-                                ItemMyPost(data, coroutineScope, scaffoldState, uid, event)
+                        if (listPost?.isEmpty() == true) {
+                            Box(
+                                modifier = Modifier.fillMaxSize().padding(bottom = 128.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                EmptyState("drawable/ic_no_post.png", "No Post")
                             }
-                        }
+                        } else {
 
-                        onShowHideBottomBar.invoke(directionalLazyListState.scrollDirection)
+                            val listState = rememberLazyListState()
+                            val directionalLazyListState = rememberDirectionalLazyListState(
+                                listState
+                            )
+                            LazyColumn(
+                                contentPadding = PaddingValues(bottom = 32.dp, top = 8.dp),
+                                state = listState
+                            ) {
+                                items(listPost ?: listOf()) { data ->
+                                    event.onDeletePost = { post ->
+                                        postViewModel.deletePost(post.id.toString())
+                                        listPost?.remove(post)
+                                        showSnackBar(
+                                            "Success delete post",
+                                            coroutineScope,
+                                            scaffoldState
+                                        )
+                                    }
+
+                                    ItemMyPost(data, coroutineScope, scaffoldState, uid, event)
+                                }
+                            }
+
+                            onShowHideBottomBar.invoke(directionalLazyListState.scrollDirection)
+                        }
                     }
 
                     else -> {}

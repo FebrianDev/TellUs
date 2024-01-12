@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -47,7 +46,11 @@ import data.post.model.PostResponse
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.DividerComposable
+import ui.components.SpacerH
 import ui.components.SpacerW
+import ui.components.TextBodyBold
+import ui.components.TextSmallBold
 import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.chat.ChatRoomScreen
 import ui.screens.chat.ChatViewModel
@@ -133,7 +136,7 @@ fun ItemPost(
         sendChat = true
         chat = it
         chatViewModel.createRoom(
-           it
+            it
         )
     }
 
@@ -196,11 +199,11 @@ fun ItemPost(
                         OptionPost(postResponse, scaffoldState, coroutineScope, chatEntity, event)
                 }
 
-                Divider(
-                    color = colorPrimary,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                SpacerH(4.dp)
+
+                TextSmallBold(postResponse.tag)
+
+                DividerComposable()
 
                 // Like
                 Row(

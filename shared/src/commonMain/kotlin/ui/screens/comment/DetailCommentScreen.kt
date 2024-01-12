@@ -57,6 +57,7 @@ import data.comment.model.CommentResponse
 import data.comment.state.ReplyCommentState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
+import getPlatformName
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -267,7 +268,7 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                     )
                                 )
 
-                                if (commentResponse.token != keyValueStorage.fcmToken) {
+                                if (commentResponse.token != keyValueStorage.fcmToken && getPlatformName() == "Android") {
                                     notificationViewModel.sendNotification(
                                         NotificationRequest(
                                             NotificationData(
@@ -356,7 +357,7 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                     OptionComment(
                                         scaffoldState,
                                         coroutineScope,
-                                        commentResponse.message.toString(),
+                                        commentResponse.message,
                                         event
                                     )
                                 }

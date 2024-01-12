@@ -10,25 +10,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -51,11 +48,14 @@ import com.mmk.kmpnotifier.notification.PayloadData
 import data.bookmark.network.NotificationData
 import data.bookmark.network.NotificationRequest
 import data.chat.ChatEntity
-import data.chat.ChatState
 import data.chat.Message
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
-import ui.components.ProgressBarLoading
+import getChat
+import getPlatformName
+import kotlinx.coroutines.launch
+import readChat
+import sendChat
 import ui.components.SpacerH
 import ui.components.SpacerW
 import ui.components.TextBodyBold
@@ -65,34 +65,40 @@ import ui.themes.colorPrimary
 import utils.getDateNow
 import utils.getIdUser
 import utils.keyValueStorage
-import utils.showSnackBar
 
 
 class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
 
         val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
         val notificationViewModel = getViewModel(Unit, viewModelFactory { NotificationViewModel() })
 
+        val uid = getIdUser()
+
         LaunchedEffect(true) {
             //   if(chatEntity.id_chat.isNotEmpty())
-            chatViewModel.readChat(chatEntity.id_chat, "")
+            NotifierManager.getPushNotifier().subscribeToTopic("topic")
+            readChat(chatEntity.id_chat, uid)
+            //chatViewModel.getChat(chatEntity.id_chat)
         }
 
-        chatViewModel.getChat(chatEntity.id_chat)
+        // chatViewModel.getChat(chatEntity.id_chat)
 
         NotifierManager.addListener(object : NotifierManager.Listener {
             override fun onPayloadData(data: PayloadData) {
-                chatViewModel.getChat(chatEntity.id_chat)
+                //  chatViewModel.getChat(chatEntity.id_chat)
                 super.onPayloadData(data)
-                chatViewModel.getChat(chatEntity.id_chat)
+                //  chatViewModel.getChat(chatEntity.id_chat)
             }
         })
 
         val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
+
+        val lazyListState = rememberLazyListState()
 
         val navigator = LocalNavigator.currentOrThrow
 
@@ -101,34 +107,21 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
         val listMessages by remember { mutableStateOf(listOf<Message>().toMutableStateList()) }
         var showPostMessage by remember { mutableStateOf(false) }
 
-        var showOptionChat by remember { mutableStateOf(false) }
+        var chat by remember { mutableStateOf(chatEntity) }
 
-        val uid = getIdUser()
-        when (val it = chatViewModel.getChat.collectAsState().value) {
-            is ChatState.Loading -> {
-                println("List1 Load")
-                ProgressBarLoading()
-            }
+        getChat(chatEntity.id_chat) {
+            chat = it
+            listMessages.clear()
+            listMessages.addAll(chat.message)
 
-            is ChatState.Error -> {
-                showSnackBar(it.message, coroutineScope, scaffoldState)
-            }
-
-            is ChatState.Success -> {
-                println("List1 " + it.data)
-                chatEntity = it.data
-                textName = chatEntity.name
-                textPostMessage = chatEntity.post_message
-                listMessages.clear()
-                listMessages.addAll(chatEntity.message)
-
-            }
-
-            else -> {
-                println("List1 Emp")
+            coroutineScope.launch {
+                if (it.message.size > 0)
+                    lazyListState.scrollToItem(index = it.message.size - 1)
             }
         }
 
+        textName = chatEntity.name
+        textPostMessage = chatEntity.post_message
 
         Column(modifier = Modifier.background(bgColor)) {
             Row(
@@ -150,17 +143,11 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
                     TextBodyBold(textName, modifier = Modifier.wrapContentSize(), bgColor)
                 }
 
-                Icon(
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp).clickable {
-                            showOptionChat = true
-                            //OptionChat() {}
-                        },
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Options",
-                    tint = bgColor
-                )
+
+                OptionChat() {
+                    chatViewModel.deleteChat(chatEntity.id_chat)
+                    navigator.pop()
+                }
             }
 
             Text(
@@ -177,6 +164,7 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
 
             LazyColumn(
                 modifier = Modifier.fillMaxHeight(0.9f).fillMaxWidth(),
+                state = lazyListState
             ) {
                 if (uid.isEmpty()) return@LazyColumn
 
@@ -189,6 +177,8 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
 
             Spacer(modifier = Modifier.weight(1f))
 
+            // Send Chat
+
             val message = Message(
                 sender = uid,
                 prev_reply = "",
@@ -197,93 +187,111 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
                 date = getDateNow()
             )
 
-            SendChat(
-                chatViewModel,
-                notificationViewModel,
-                message,
-                if (chatEntity.token_sent == keyValueStorage.fcmToken) chatEntity.token_receiver else chatEntity.token_sent
-            )
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val focusManager = LocalFocusManager.current
 
-            if (showPostMessage) {
-                Dialog(
-                    onDismissRequest = { showPostMessage = false },
-                ) {
-                    Text(
-                        textPostMessage,
-                        color = colorPrimary,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
-                            BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
-                        ).fillMaxWidth().padding(8.dp).clickable {
-                            showPostMessage = true
+            Row(
+                modifier = Modifier.fillMaxWidth().background(bgColor),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+
+                var textChat by remember { mutableStateOf("") }
+
+                TextField(
+                    value = textChat,
+                    onValueChange = {
+                        textChat = it
+                    },
+                    placeholder = { androidx.compose.material3.Text(text = "Type your message") },
+                    modifier = Modifier.fillMaxWidth(0.8f).background(bgColor),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = bgColor,
+                        unfocusedContainerColor = bgColor,
+                        disabledContainerColor = bgColor,
+                        disabledIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                )
+
+                TextBodyBold(
+                    text = "Send",
+                    modifier = Modifier.padding(start = 4.dp, end = 16.dp).wrapContentSize()
+                        .align(Alignment.CenterVertically).clickable {
+
+                            if (textChat.isEmpty()) return@clickable
+
+                            if (getPlatformName() == "Android") {
+                                notificationViewModel.sendNotification(
+                                    NotificationRequest(
+                                        NotificationData(
+                                            "Someone sent you a message",
+                                            textChat
+                                        ),
+                                        if (chatEntity.token_sent == keyValueStorage.fcmToken) chatEntity.token_receiver else chatEntity.token_sent
+                                    )
+                                )
+                            }
+
+                            coroutineScope.launch {
+                                lazyListState.animateScrollToItem(index = listMessages.size)
+                            }
+
+                            //Send Chat
+                            message.message = textChat
+                            sendChat(
+                                message,
+                                chatEntity.id_sent,
+                                chatEntity.id_receiver,
+                                chatEntity.id_chat
+                            )
+                            textChat = ""
+                            keyboardController?.hide()
+                            focusManager.clearFocus(true)
                         }
+                )
+
+                if (showPostMessage) {
+//                    Dialog(
+//                        onDismissRequest = { showPostMessage = false },
+//                    ) {
+//                        Text(
+//                            textPostMessage,
+//                            color = colorPrimary,
+//                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
+//                                BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
+//                            ).fillMaxWidth().padding(8.dp).clickable {
+//                                showPostMessage = true
+//                            }
+//                        )
+//                    }
+
+                    AlertDialog(
+                        containerColor = bgColor,
+                        onDismissRequest = { showPostMessage = false },
+                        confirmButton = {
+                        },
+
+                        title = {
+                        },
+                        text = {
+
+                            Text(
+                                textPostMessage,
+                                color = colorPrimary,
+                                modifier = Modifier.border(
+                                    BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
+                                ).fillMaxWidth().padding(8.dp).clickable {
+                                    showPostMessage = true
+                                }
+                            )
+
+                        },
                     )
+
                 }
             }
         }
-    }
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Composable
-    fun SendChat(
-        chatViewModel: ChatViewModel,
-        notificationViewModel: NotificationViewModel,
-        message: Message,
-        token: String
-    ) {
-
-        val keyboardController = LocalSoftwareKeyboardController.current
-        val focusManager = LocalFocusManager.current
-
-        Row(
-            modifier = Modifier.fillMaxWidth().background(bgColor),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-
-            var textChat by remember { mutableStateOf("") }
-
-            TextField(
-                value = textChat,
-                onValueChange = {
-                    textChat = it
-                },
-                placeholder = { androidx.compose.material3.Text(text = "Type your message") },
-                modifier = Modifier.fillMaxWidth(0.8f).background(bgColor),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = bgColor,
-                    unfocusedContainerColor = bgColor,
-                    disabledContainerColor = bgColor,
-                    disabledIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-            )
-
-            TextBodyBold(
-                text = "Send",
-                modifier = Modifier.padding(start = 4.dp, end = 16.dp).wrapContentSize()
-                    .align(Alignment.CenterVertically).clickable {
-
-                        if (textChat.isEmpty()) return@clickable
-
-                        notificationViewModel.sendNotification(
-                            NotificationRequest(
-                                NotificationData(
-                                    "Someone sent you a message",
-                                    textChat
-                                ),
-                                token
-                            )
-                        )
-
-                        //Send Chat
-                        message.message = textChat
-                        chatViewModel.sendChat(chatEntity, message)
-                        chatViewModel.getChat(chatEntity.id_chat)
-                        textChat = ""
-                        keyboardController?.hide()
-                        focusManager.clearFocus(true)
-                    }
-            )
-        }
     }
 }

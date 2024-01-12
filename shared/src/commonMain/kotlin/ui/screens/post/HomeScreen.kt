@@ -81,6 +81,8 @@ class HomeScreen : Screen {
 
             authViewModel.getApiToken(keyValueStorage.idUser)
 
+            NotifierManager.getPushNotifier().subscribeToTopic("topic")
+
             NotifierManager.addListener(object : NotifierManager.Listener {
                 override fun onNewToken(token: String) {
                     tokenFcm = token

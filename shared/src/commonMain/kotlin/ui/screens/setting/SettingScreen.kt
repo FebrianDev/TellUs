@@ -1,7 +1,6 @@
 package ui.screens.setting
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,13 +15,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,6 +40,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.mmk.kmpnotifier.notification.NotifierManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import openEmail
+import openUrl
 import ui.components.AlertDialogComposable
 import ui.components.SpacerH
 import ui.components.SpacerW
@@ -52,7 +50,6 @@ import ui.components.TopBar
 import ui.screens.auth.RegisterScreen
 import ui.themes.bgColor
 import ui.themes.colorPrimary
-import ui.themes.colorSecondary
 import utils.KeyValueStorage
 import utils.KeyValueStorageImpl
 
@@ -107,42 +104,42 @@ fun SettingScreen() {
 
         Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
 
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 48.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row {
-                    Icon(
-                        modifier = Modifier
-                            .width(24.dp)
-                            .height(24.dp),
-
-                        imageVector = Icons.Filled.Notifications,
-                        contentDescription = "Btn Bookmark",
-                        tint = colorPrimary
-                    )
-                    SpacerW(8.dp)
-                    TextBodyMedium("Notification")
-                }
-
-                Switch(
-                    checked = isActive,
-                    onCheckedChange = {
-                        isActive = it
-                        keyValueStorage.isNotification = it
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = colorPrimary,
-                        checkedTrackColor = colorSecondary,
-                        uncheckedThumbColor = colorPrimary,
-                        uncheckedTrackColor = bgColor
-                    )
-                )
-            }
-            Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
-        }
+//        Column {
+//            Row(
+//                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 48.dp),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Row {
+//                    Icon(
+//                        modifier = Modifier
+//                            .width(24.dp)
+//                            .height(24.dp),
+//
+//                        imageVector = Icons.Filled.Notifications,
+//                        contentDescription = "Btn Bookmark",
+//                        tint = colorPrimary
+//                    )
+//                    SpacerW(8.dp)
+//                    TextBodyMedium("Notification")
+//                }
+//
+//                Switch(
+//                    checked = isActive,
+//                    onCheckedChange = {
+//                        isActive = it
+//                        keyValueStorage.isNotification = it
+//                    },
+//                    colors = SwitchDefaults.colors(
+//                        checkedThumbColor = colorPrimary,
+//                        checkedTrackColor = colorSecondary,
+//                        uncheckedThumbColor = colorPrimary,
+//                        uncheckedTrackColor = bgColor
+//                    )
+//                )
+//            }
+//            Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
+//        }
 
         ItemSetting(
             Icons.Filled.Info,
@@ -165,13 +162,13 @@ fun SettingScreen() {
                 ) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         Text(
-                            text = "FDev Project",
+                            text = "Tell Us",
                             color = Color.Black,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "FDev Project is a team based in Indonesia that develops (Share - Tell Your Stories) for users can share their stories anonymously",
+                            text = "Tell Us is a social media where users to share and tell their stories to fellow users anonymously",
                             color = colorPrimary
                         )
 
@@ -180,6 +177,25 @@ fun SettingScreen() {
             }
         }
         Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
+
+        ItemSetting(
+            Icons.Filled.Email,
+            "Contact Me"
+        ) {
+            openEmail()
+        }
+
+        Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
+
+        ItemSetting(
+            Icons.Filled.Link,
+            "Developer Profile"
+        ) {
+            openUrl()
+        }
+
+        Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
+
         ItemSetting(
             Icons.Filled.Logout,
             "Logout"

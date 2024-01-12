@@ -46,6 +46,22 @@ fun TextBodyBold(
 }
 
 @Composable
+fun TextSmallBold(
+    text: String = "",
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    color: Color = Color.Black
+) {
+    Text(
+        text = text,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier,
+        color = color
+    )
+}
+
+
+@Composable
 fun TextBodyMedium(
     text: String = "",
     textAlign: TextAlign = TextAlign.Start,

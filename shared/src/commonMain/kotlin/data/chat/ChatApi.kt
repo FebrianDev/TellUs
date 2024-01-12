@@ -3,6 +3,7 @@ package data.chat
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.firestore.where
+import getChat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import utils.getDateNow
@@ -44,15 +45,20 @@ class ChatApi {
         }
     }
 
-    suspend fun getChat(idChat: String): ChatState {
+    fun getChat(idChat: String): ChatState {
 
         var chatState: ChatState = ChatState.Empty
-        val chatResponse =
-            db.collection("Chat").document(idChat).get()
-        chatState = ChatState.Success(chatResponse.reference.snapshots.map {
+//        val chatResponse =
+//            db.collection("Chat").document(idChat).get()
+//        chatState = ChatState.Success(chatResponse.reference.snapshots.map {
+//
+//            it.data() as ChatEntity
+//        }.first())
 
-            it.data() as ChatEntity
-        }.first())
+        getChat(idChat){
+            chatState = ChatState.Success(it)
+            println("GetChat1 "+it)
+        }
 
         return chatState
 
@@ -68,8 +74,25 @@ class ChatApi {
             chatEntity.message = listMessage
             chatEntity.date = getDateNow()
 
-            db.collection("Chat").document(chatEntity.id_chat)
-                .update(chatEntity)
+            val chat = db.collection("Chat").document(chatEntity.id_chat)
+
+            chat.update(chatEntity)
+
+//            chat.get().reference.snapshots.collect() {
+//                val data = it.data() as ChatEntity
+//                if (message.sender == data.id_sent.toString()) {
+//                    it.result.documents[0].reference.update(
+//                        "countReadReceiver",
+//                        it.result.documents[0].get("countReadReceiver").toString().toInt() + 1
+//                    )
+//                } else {
+//                    it.result.documents[0].reference.update(
+//                        "countReadSent",
+//                        it.result.documents[0].get("countReadSent").toString().toInt() + 1
+//                    )
+//                }
+//            }
+
 
             Result.success("")
         } catch (e: Exception) {
@@ -107,5 +130,9 @@ class ChatApi {
 //
 //        it.result.reference.update("message", temp)
 
+    }
+
+    suspend fun deleteChat(idChat: String) {
+        db.collection("Chat").document(idChat).delete()
     }
 }

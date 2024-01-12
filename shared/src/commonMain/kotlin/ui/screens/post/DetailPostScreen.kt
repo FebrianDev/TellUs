@@ -61,6 +61,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import data.bookmark.model.BookmarkRequest
 import data.bookmark.network.NotificationData
 import data.bookmark.network.NotificationRequest
+import data.chat.ChatEntity
 import data.comment.model.CommentRequest
 import data.comment.state.CommentState
 import data.like.model.LikeRequest
@@ -68,6 +69,7 @@ import data.post.model.PostResponse
 import data.post.state.PostState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
+import getPlatformName
 import kotlinx.coroutines.CoroutineScope
 import ui.components.DividerComposable
 import ui.components.EmptyState
@@ -76,9 +78,12 @@ import ui.components.SpacerH
 import ui.components.SpacerW
 import ui.components.TextBodyBold
 import ui.components.TextFieldComment
+import ui.components.TextSmallBold
 import ui.components.TitleHeader
 import ui.screens.NotificationViewModel
 import ui.screens.bookmark.BookmarkViewModel
+import ui.screens.chat.ChatRoomScreen
+import ui.screens.chat.ChatViewModel
 import ui.screens.comment.CommentViewModel
 import ui.screens.comment.ItemComment
 import ui.screens.post.items.MyOptionPost
@@ -86,6 +91,8 @@ import ui.screens.post.items.OptionPost
 import ui.themes.bgColor
 import ui.themes.colorPrimary
 import utils.KeyValueStorageImpl
+import utils.generatedFakeName
+import utils.getDateNow
 import utils.getIdUser
 import utils.getTime
 import utils.showSnackBar
@@ -101,6 +108,7 @@ class DetailPostScreen(private val id: Int) : Screen {
         val postViewModel = getViewModel(Unit, viewModelFactory { PostViewModel() })
         val commentViewModel = getViewModel(Unit, viewModelFactory { CommentViewModel() })
         val notificationViewModel = getViewModel(Unit, viewModelFactory { NotificationViewModel() })
+        val chatViewModel = getViewModel(Unit, viewModelFactory { ChatViewModel() })
 
         val keyValueStorage = KeyValueStorageImpl()
 
@@ -166,10 +174,50 @@ class DetailPostScreen(private val id: Int) : Screen {
                         is PostState.Success -> {
 
                             val postResponse = it.data.data ?: PostResponse()
-
                             postData = postResponse
-
                             commentCountState = postResponse.comment
+
+                            var sendChat by remember { mutableStateOf(false) }
+
+                            var chat by remember { mutableStateOf(ChatEntity()) }
+
+                            val chatEntity = ChatEntity(
+                                id_chat = "",
+                                id_sent = utils.keyValueStorage.idUser,
+                                id_receiver = postResponse.id_user,
+                                id_post = postResponse.id.toString(),
+                                post_message = postResponse.message,
+                                name = generatedFakeName(),
+                                message = ArrayList(),
+                                countReadSent = 0,
+                                countReadReceiver = 0,
+                                date = getDateNow(),
+                                token_sent = utils.keyValueStorage.fcmToken,
+                                token_receiver = postResponse.token
+                            )
+
+                            event.onSendPrivateChat = {
+                                sendChat = true
+                                chat = it
+                                chatViewModel.createRoom(
+                                    it
+                                )
+                            }
+
+                            if (sendChat) {
+                                chatViewModel.createRoom.collectAsState().value.onSuccess {
+                                    if (it.isNotEmpty()) {
+                                        chat.id_chat = it
+                                        navigator.push(ChatRoomScreen(chat))
+                                    }
+                                }.onFailure {
+                                    showSnackBar(
+                                        it.message.toString(),
+                                        coroutineScope,
+                                        scaffoldState
+                                    )
+                                }
+                            }
 
                             var like by rememberSaveable { mutableStateOf(postResponse.like) }
 
@@ -229,15 +277,17 @@ class DetailPostScreen(private val id: Int) : Screen {
                                                     coroutineScope,
                                                     event
                                                 )
-                                            }
-//                                            else
-//                                                OptionPost(
-//                                                    postResponse,
-//                                                    scaffoldState,
-//                                                    coroutineScope,
-//                                                    event
-//                                                )
+                                            } else
+                                                OptionPost(
+                                                    postResponse,
+                                                    scaffoldState,
+                                                    coroutineScope,
+                                                    chatEntity,
+                                                    event
+                                                )
                                         }
+
+                                        TextSmallBold(postResponse.tag)
 
                                         DividerComposable()
 
@@ -354,7 +404,8 @@ class DetailPostScreen(private val id: Int) : Screen {
                                     color = colorPrimary,
                                     fontSize = 12.sp,
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(end = 16.dp, start = 16.dp).align(Alignment.CenterVertically)
+                                    modifier = Modifier.padding(end = 16.dp, start = 16.dp)
+                                        .align(Alignment.CenterVertically)
 
                                 )
                             }
@@ -442,7 +493,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                         modifier = Modifier.padding(start = 4.dp, end = 16.dp).wrapContentSize()
                             .align(Alignment.CenterVertically).clickable {
 
-                                if(textComment.text.isEmpty()) return@clickable
+                                if (textComment.text.isEmpty()) return@clickable
 
                                 commentViewModel.insertComment(
                                     CommentRequest(
@@ -453,7 +504,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                                     )
                                 )
 
-                                if (postData.token != keyValueStorage.fcmToken) {
+                                if (postData.token != keyValueStorage.fcmToken && getPlatformName() == "Android") {
                                     notificationViewModel.sendNotification(
                                         NotificationRequest(
                                             NotificationData(

@@ -96,7 +96,7 @@ class LoginScreen : Screen {
 
                 //Image
                 Image(
-                    painter = painterResource("drawable/icon_app.png"),
+                    painter = painterResource("drawable/icon_apps.png"),
                     contentDescription = "Icon App"
                 )
 
@@ -176,7 +176,6 @@ class LoginScreen : Screen {
                         authViewModel.login(textEmail, textPassword)
                     }
 
-                    authViewModel.login(textEmail, textPassword)
                 }
 
                 SpacerH(12.dp)

@@ -64,9 +64,11 @@ fun ItemSendChat(
                             .padding(top = 4.dp, start = 4.dp)
                             .size(20.dp),
 
-                        painter = painterResource("drawable/ic_tick_black.png"),
-                        contentDescription = "Btn Bookmark",
-                        tint = colorPrimary
+                        painter = if (message.read) painterResource("drawable/ic_tick_blue.png") else painterResource(
+                            "drawable/ic_tick_black.png"
+                        ),
+                        contentDescription = "Icon Tick",
+                        tint = if (message.read) Color(0xFF0299D2) else colorPrimary
                     )
                 }
             }

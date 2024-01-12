@@ -97,7 +97,7 @@ class RegisterScreen : Screen {
 
                 //Image
                 Image(
-                    painter = painterResource("drawable/icon_app.png"),
+                    painter = painterResource("drawable/icon_apps.png"),
                     contentDescription = "I"
                 )
 
@@ -182,11 +182,7 @@ class RegisterScreen : Screen {
         authViewModel.authState.collectAsState().value.onSuccess {
             when (it) {
                 is AuthState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            color = colorPrimary
-                        )
-                    }
+                    CircularProgressIndicator()
                 }
 
                 is AuthState.Error -> {

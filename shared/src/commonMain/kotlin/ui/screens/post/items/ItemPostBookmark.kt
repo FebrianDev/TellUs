@@ -41,7 +41,10 @@ import data.post.model.PostResponse
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.DividerComposable
+import ui.components.SpacerH
 import ui.components.SpacerW
+import ui.components.TextSmallBold
 import ui.screens.chat.ChatRoomScreen
 import ui.screens.chat.ChatViewModel
 import ui.screens.post.DetailPostScreen
@@ -160,11 +163,11 @@ fun ItemPostBookmark(
 //                        OptionPost(postResponse, scaffoldState, coroutineScope, event)
                 }
 
-                Divider(
-                    color = colorPrimary,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                SpacerH(4.dp)
+
+                TextSmallBold(postResponse.tag)
+
+                DividerComposable()
 
                 // Like
                 Row(

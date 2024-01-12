@@ -6,6 +6,7 @@ import data.chat.ChatState
 import data.chat.ListChatState
 import data.chat.Message
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import getChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -47,9 +48,13 @@ class ChatViewModel : ViewModel() {
 
     fun getChat(idChat: String) {
        // _getChat.value = Result.success(ChatState.Loading)
-        CoroutineScope(Dispatchers.IO).launch  {
+      // CoroutineScope(Dispatchers.IO).launch  {
             _getChat.value = api.getChat(idChat)
-        }
+     //   }
+
+//        getChat(idChat){
+//            _getChat.value = it
+//        }
     }
 
 //    fun getChat(idChat: String) {
@@ -71,6 +76,12 @@ class ChatViewModel : ViewModel() {
     fun readChat(idChat: String, idSent: String) {
         CoroutineScope(Dispatchers.IO).launch {
             api.readChat(idChat, "")
+        }
+    }
+
+    fun deleteChat(idChat: String){
+        CoroutineScope(Dispatchers.IO).launch {
+            api.deleteChat(idChat)
         }
     }
 }

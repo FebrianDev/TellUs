@@ -34,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -48,8 +49,10 @@ import data.post.model.PostResponse
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.CoroutineScope
+import ui.components.DividerComposable
 import ui.components.SpacerH
 import ui.components.SpacerW
+import ui.components.TextSmallBold
 import ui.screens.bookmark.BookmarkViewModel
 import ui.screens.post.DetailPostScreen
 import ui.screens.post.LikeViewModel
@@ -115,7 +118,7 @@ fun ItemMyPost(
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(
-            text = getTime(postResponse.createdAt.toString()),
+            text = getTime(postResponse.createdAt),
             color = colorPrimary,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
@@ -132,7 +135,7 @@ fun ItemMyPost(
                 },
             shape = RoundedCornerShape(24.dp, 0.dp, 0.dp, 24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            colors = CardDefaults.cardColors(containerColor = bgColor)
+            colors = CardDefaults.cardColors(containerColor = Color.White)
 
         ) {
             Column(
@@ -156,8 +159,11 @@ fun ItemMyPost(
                         isPrivateState,
                         event
                     )
-
                 }
+
+                SpacerH(4.dp)
+
+                TextSmallBold(postResponse.tag)
 
                 SpacerH(4.dp)
 
@@ -177,11 +183,7 @@ fun ItemMyPost(
                     )
                 }
 
-                Divider(
-                    color = colorPrimary,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                DividerComposable()
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
