@@ -110,7 +110,7 @@ fun ItemPostBookmark(
             countReadReceiver = 0,
             date = getDateNow(),
             token_sent = keyValueStorage.fcmToken,
-            token_receiver = postResponse.token
+            token_receiver = postResponse.token?:""
         )
 
         chatViewModel.createRoom(

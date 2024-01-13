@@ -268,16 +268,18 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
                                     )
                                 )
 
-                                if (commentResponse.token != keyValueStorage.fcmToken && getPlatformName() == "Android") {
-                                    notificationViewModel.sendNotification(
-                                        NotificationRequest(
-                                            NotificationData(
-                                                "Someone Replied Your Comment",
-                                                textComment.text
-                                            ),
-                                            commentResponse.token
+                                if(commentResponse.token != null) {
+                                    if (commentResponse.token != keyValueStorage.fcmToken && getPlatformName() == "Android") {
+                                        notificationViewModel.sendNotification(
+                                            NotificationRequest(
+                                                NotificationData(
+                                                    "Someone Replied Your Comment",
+                                                    textComment.text
+                                                ),
+                                                commentResponse.token
+                                            )
                                         )
-                                    )
+                                    }
                                 }
 
                                 showReplyMessage = false

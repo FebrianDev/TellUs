@@ -112,7 +112,7 @@ fun ItemComment(
                                 OptionComment(
                                     scaffoldState,
                                     coroutineScope,
-                                    commentResponse.message.toString(),
+                                    commentResponse.message,
                                     event
                                 )
                         }

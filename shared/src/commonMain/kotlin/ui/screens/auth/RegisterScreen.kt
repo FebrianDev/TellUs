@@ -39,6 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.components.BtnRounded
+import ui.components.ProgressBarLoading
 import ui.components.SpacerH
 import ui.components.TextFieldPassword
 import ui.components.TextFieldText
@@ -182,7 +183,7 @@ class RegisterScreen : Screen {
         authViewModel.authState.collectAsState().value.onSuccess {
             when (it) {
                 is AuthState.Loading -> {
-                    CircularProgressIndicator()
+                    ProgressBarLoading()
                 }
 
                 is AuthState.Error -> {

@@ -6,20 +6,14 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import data.chat.ChatEntity
 import data.chat.Message
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.firestore
 import utils.getDateNow
 
 actual fun getPlatformName(): String = "Android"
 
 
 private var c: Context? = null
-
-actual fun sharePost() {
-    val intent = Intent(Intent.ACTION_SEND)
-    intent.type = "text/plain"
-    intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/FebrianDev")
-    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    c?.startActivity(Intent.createChooser(intent, "Share link"))
-}
 
 actual fun openEmail() {
     c?.startActivity(Intent(Intent.ACTION_SENDTO).apply {

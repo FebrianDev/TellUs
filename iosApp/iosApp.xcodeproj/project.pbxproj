@@ -39,6 +39,7 @@
 		CA2321D12B2D40DA00610B4D /* FirebaseRemoteConfigSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CA2321D02B2D40DA00610B4D /* FirebaseRemoteConfigSwift */; };
 		CA2321D32B2D40DA00610B4D /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = CA2321D22B2D40DA00610B4D /* FirebaseStorage */; };
 		CA2321D52B2D40DA00610B4D /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = CA2321D42B2D40DA00610B4D /* FirebaseStorageCombine-Community */; };
+		CA37ECE92B5308C000F1A565 /* EmailLinkOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA37ECE82B5308C000F1A565 /* EmailLinkOpener.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		CA23219D2B2D3F7F00610B4D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CA37ECE82B5308C000F1A565 /* EmailLinkOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailLinkOpener.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
+				CA37ECE82B5308C000F1A565 /* EmailLinkOpener.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				CA37ECE92B5308C000F1A565 /* EmailLinkOpener.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

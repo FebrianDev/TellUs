@@ -37,7 +37,6 @@ import data.post.model.PostResponse
 import data.post.state.ListPostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import sharePost
 import ui.components.ProgressBarLoading
 import ui.components.rememberDirectionalLazyListState
 import ui.screens.post.OptionPostEvent

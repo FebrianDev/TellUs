@@ -29,15 +29,11 @@ fun App() {
                     HomeScreen()
                 )
             }
-
-            println("OSSYSTEM" + getPlatformName())
         }
     }
 }
 
 expect fun getPlatformName(): String
-
-expect fun sharePost()
 
 expect fun openEmail()
 

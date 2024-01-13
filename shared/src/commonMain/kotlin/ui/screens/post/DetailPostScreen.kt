@@ -193,7 +193,7 @@ class DetailPostScreen(private val id: Int) : Screen {
                                 countReadReceiver = 0,
                                 date = getDateNow(),
                                 token_sent = utils.keyValueStorage.fcmToken,
-                                token_receiver = postResponse.token
+                                token_receiver = postResponse.token ?: ""
                             )
 
                             event.onSendPrivateChat = {
@@ -462,15 +462,14 @@ class DetailPostScreen(private val id: Int) : Screen {
                                         ItemComment(item, scaffoldState, coroutineScope, uid, event)
                                     }
                                 }
-
                             }
-
                         }
 
                         else -> {}
 
                     }
                 }.onFailure {
+                    println("ErrMessage "+it.message)
                     showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
                 }
 
@@ -495,25 +494,29 @@ class DetailPostScreen(private val id: Int) : Screen {
 
                                 if (textComment.text.isEmpty()) return@clickable
 
+                                val token = if(getPlatformName() == "Android") keyValueStorage.fcmToken else ""
+
                                 commentViewModel.insertComment(
                                     CommentRequest(
                                         id_post = id,
                                         id_user = uid,
                                         message = textComment.text,
-                                        token = keyValueStorage.observableFCMToken
+                                        token = token
                                     )
                                 )
 
-                                if (postData.token != keyValueStorage.fcmToken && getPlatformName() == "Android") {
-                                    notificationViewModel.sendNotification(
-                                        NotificationRequest(
-                                            NotificationData(
-                                                "Someone Commented On Your Post",
-                                                textComment.text
-                                            ),
-                                            postData.token
+                                if(getPlatformName() == "Android") {
+                                    if (postData.token != keyValueStorage.fcmToken) {
+                                        notificationViewModel.sendNotification(
+                                            NotificationRequest(
+                                                NotificationData(
+                                                    "Someone Commented On Your Post",
+                                                    textComment.text
+                                                ),
+                                                postData.token ?: ""
+                                            )
                                         )
-                                    )
+                                    }
                                 }
 
                                 commentCountState = commentCountState.plus(1)

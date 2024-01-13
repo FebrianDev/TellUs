@@ -10,7 +10,7 @@ class CommentResponse(
     val id_user: String = "",
     val message: String = "",
     val root: Boolean = false,
-    val token:String = "",
+    val token:String? = null,
     val createdAt: String = "",
     val updatedAt: String = "",
     val ReplyComments : List<ReplyCommentResponse> = listOf()

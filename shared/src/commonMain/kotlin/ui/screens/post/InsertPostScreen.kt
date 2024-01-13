@@ -45,6 +45,7 @@ import data.post.model.PostRequest
 import data.post.state.PostState
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
+import getPlatformName
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -101,7 +102,7 @@ class InsertPostScreen : Screen {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Image(
-                        painter = painterResource("drawable/icon_app.png"),
+                        painter = painterResource("drawable/icon_apps.png"),
                         contentDescription = "",
                         modifier = Modifier.size(32.dp)
                     )
@@ -196,7 +197,7 @@ class InsertPostScreen : Screen {
                                 is_private = isPrivate,
                                 message = textMessage.text,
                                 tag = selectedTag,
-                                token = getFcmToken()
+                                token = if (getPlatformName() == "Android") getFcmToken() else ""
                             )
                         )
                     }
@@ -246,6 +247,7 @@ class InsertPostScreen : Screen {
                 }
             }
         }.onFailure {
+            println("ErrMessage ${it.message}")
             showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
 

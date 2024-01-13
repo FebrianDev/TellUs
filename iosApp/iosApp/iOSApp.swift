@@ -3,6 +3,7 @@ import Firebase
 import shared
 import FirebaseCore
 import FirebaseMessaging
+import FirebaseFirestore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
 

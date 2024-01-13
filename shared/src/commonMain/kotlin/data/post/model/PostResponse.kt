@@ -13,7 +13,7 @@ data class PostResponse (
     val comment: Int = 0,
     val message: String = "",
     val tag: String = "",
-    val token: String = "",
+    val token: String? = "",
     val createdAt: String = "",
     val updatedAt: String = "",
     val Likes : List<LikeResponse> = listOf(),

@@ -37,7 +37,7 @@ fun BestPostScreen(
 
     val uid = getIdUser()
 
-    LaunchedEffect(uid) {
+    LaunchedEffect(false) {
         postViewModel.getTrending()
     }
 

@@ -8,5 +8,5 @@ data class PostRequest(
     val is_private: Boolean,
     val message: String,
     val tag: String,
-    val token: String
+    val token: String?
 )

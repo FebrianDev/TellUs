@@ -36,4 +36,5 @@ Pod::Spec.new do |spec|
         }
     ]
     spec.resources = ['src/commonMain/resources/**', 'src/iosMain/resources/**']
+    spec.dependency 'Firebase/Core'
 end

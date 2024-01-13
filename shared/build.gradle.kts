@@ -28,6 +28,8 @@ kotlin {
 
                 api("io.github.mirzemehdi:kmpnotifier:0.2.0")
 
+                implementation ("com.google.firebase:firebase-firestore-ktx:23.0.0")
+
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -133,6 +135,8 @@ sqldelight {
 
 dependencies {
     implementation("androidx.core:core:1.12.0")
+    implementation("com.google.firebase:firebase-firestore:24.10.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
     commonMainApi("dev.icerock.moko:mvvm-core:0.16.1")
     commonMainApi("dev.icerock.moko:mvvm-compose:0.16.1")
     commonMainApi("dev.icerock.moko:mvvm-flow:0.16.1")

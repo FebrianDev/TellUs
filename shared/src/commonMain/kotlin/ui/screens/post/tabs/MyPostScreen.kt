@@ -54,7 +54,7 @@ fun MyPostScreen(
 
     val uid = getIdUser()
 
-    LaunchedEffect(uid) {
+    LaunchedEffect(false) {
         postViewModel.getPostByIdUser(uid)
     }
 
