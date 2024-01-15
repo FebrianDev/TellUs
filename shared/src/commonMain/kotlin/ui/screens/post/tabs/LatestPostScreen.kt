@@ -78,7 +78,6 @@ fun LatestPostScreen(
         LazyRow(modifier = Modifier.padding(start = 6.dp, top = 4.dp, end = 6.dp, bottom = 4.dp)) {
             items(listTagState.size) {
                 ItemTag(listTag[it], isHighlight = selectedItem == it) {
-                    //sharePost()
                     if (selectedItem == it) {
                         selectedItem = -1
                         postViewModel.getAllPost()
@@ -171,7 +170,7 @@ fun LatestPostScreen(
                 else -> {}
             }
         }.onFailure {
-            println("Err "+it.message.toString())
+            println("Err " + it.message.toString())
             showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
         }
 

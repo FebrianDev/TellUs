@@ -21,8 +21,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -85,6 +87,8 @@ fun ItemPostBookmark(
         })
     }
 
+    var sendChat by remember { mutableStateOf(false) }
+
     val cp = LocalClipboardManager.current
 
     event.onCopyText = {
@@ -96,28 +100,40 @@ fun ItemPostBookmark(
         )
     }
 
+    var chat by remember { mutableStateOf(ChatEntity()) }
+
+    val chatEntity = ChatEntity(
+        id_chat = "",
+        id_sent = keyValueStorage.idUser,
+        id_receiver = postResponse.id_user,
+        id_post = postResponse.id.toString(),
+        post_message = postResponse.message,
+        name = generatedFakeName(),
+        message = ArrayList(),
+        countReadSent = 0,
+        countReadReceiver = 0,
+        date = getDateNow(),
+        token_sent = keyValueStorage.fcmToken,
+        token_receiver = postResponse.token?:""
+    )
+
     event.onSendPrivateChat = {
-
-        val chatEntity = ChatEntity(
-            id_chat = "",
-            id_sent = keyValueStorage.idUser,
-            id_receiver = postResponse.id_user,
-            id_post = postResponse.id.toString(),
-            post_message = postResponse.message,
-            name = generatedFakeName(),
-            message = ArrayList(),
-            countReadSent = 0,
-            countReadReceiver = 0,
-            date = getDateNow(),
-            token_sent = keyValueStorage.fcmToken,
-            token_receiver = postResponse.token?:""
-        )
-
+        sendChat = true
+        chat = it
         chatViewModel.createRoom(
-            chatEntity
+            it
         )
+    }
 
-        navigator.push(ChatRoomScreen(chatEntity))
+    if (sendChat) {
+        chatViewModel.createRoom.collectAsState().value.onSuccess {
+            if (it.isNotEmpty()) {
+                chat.id_chat = it
+                navigator.push(ChatRoomScreen(chat))
+            }
+        }.onFailure {
+            showSnackBar(it.message.toString(), coroutineScope, scaffoldState)
+        }
     }
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -159,8 +175,8 @@ fun ItemPostBookmark(
                     if (uid == postResponse.id_user) {
                         MyOptionPost(postResponse, scaffoldState, coroutineScope, event)
                     }
-//                    else
-//                        OptionPost(postResponse, scaffoldState, coroutineScope, event)
+                    else
+                        OptionPost(postResponse, scaffoldState, coroutineScope, chatEntity, event)
                 }
 
                 SpacerH(4.dp)

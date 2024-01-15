@@ -39,7 +39,7 @@ class CommentViewModel : ViewModel() {
     fun insertComment(commentRequest: CommentRequest) {
         _insertCommentState.value = Result.success(InsertCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 sdk.insertComment(commentRequest, apiToken)
                 delay(300)
                 getCommentById(commentRequest.id_post.toString())
@@ -50,7 +50,7 @@ class CommentViewModel : ViewModel() {
     fun insertReplyComment(commentRequest: CommentReplyRequest) {
         _insertCommentState.value = Result.success(InsertCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 sdk.insertReplyComment(commentRequest, apiToken)
                 delay(300)
                 getReplyComment(
@@ -64,7 +64,7 @@ class CommentViewModel : ViewModel() {
     fun getCommentById(idPost: String) {
         _commentState.value = Result.success(CommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 _commentState.value = sdk.getCommentById(idPost, apiToken)
             }
         }
@@ -73,16 +73,15 @@ class CommentViewModel : ViewModel() {
     fun getReplyComment(idPost: String, idComment: String) {
         _replyCommentState.value = Result.success(ReplyCommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken/**/.collectLatest { apiToken ->
                 _replyCommentState.value = sdk.getReplyComment(idPost, idComment, apiToken)
             }
         }
     }
 
     fun deleteComment(idPost: String, idComment: String) {
-        //_commentState.value = Result.success(CommentState.Loading)
         CoroutineScope(Dispatchers.IO).launch {
-            keyValueStorage.observableApiToken?.collectLatest { apiToken ->
+            keyValueStorage.observableApiToken.collectLatest { apiToken ->
                 sdk.deleteComment(idPost, idComment, apiToken)
             }
         }

@@ -207,7 +207,7 @@ class DetailCommentScreen(private val commentResponse: CommentResponse) : Screen
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // ReplyComment(replyMessage)
+                // ReplyComment
                 if (showReplyMessage) {
                     Row(
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)

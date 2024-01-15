@@ -1,9 +1,7 @@
 package data.utils
 
 object Constant {
-    //const val BASE_URL = "http://192.168.1.9:3030"
-    //const val BASE_URL = "http://192.168.1.3:3030"
-   // const val BASE_URL = "http://192.168.92.46:3030"
+   // const val BASE_URL = "http://192.168.1.3:3030"
     const val BASE_URL = "https://tellus-api-production.up.railway.app"
 
     const val SERVER_KEY =

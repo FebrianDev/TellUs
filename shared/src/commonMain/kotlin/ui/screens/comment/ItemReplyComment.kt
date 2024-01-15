@@ -55,24 +55,11 @@ fun ItemReplyComment(
     onClick: (message: String, show: Boolean) -> Unit
 ) {
 
-    val navigator = LocalNavigator.currentOrThrow
-
     val commentViewModel = getViewModel(Unit, viewModelFactory { CommentViewModel() })
     commentViewModel.getReplyComment(
         replyCommentResponse.id_post.toString(),
         replyCommentResponse.id.toString()
     )
-
-    val cp = LocalClipboardManager.current
-
-//    event.onCopyText = {
-//        cp.setText(AnnotatedString(it))
-//        showSnackBar(
-//            "The text has been copied successfully",
-//            coroutineScope,
-//            scaffoldState
-//        )
-//    }
 
     Row(
         modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
@@ -137,11 +124,6 @@ fun ItemReplyComment(
                                 replyCommentResponse.message.toString(),
                                 event
                             )
-//                        OptionComment(
-//                            scaffoldState,
-//                            coroutineScope,
-//                            replyCommentResponse.message.toString()
-//                        )
                     }
 
                     Text(

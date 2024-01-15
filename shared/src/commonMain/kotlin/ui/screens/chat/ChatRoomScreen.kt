@@ -44,7 +44,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.mmk.kmpnotifier.notification.NotifierManager
-import com.mmk.kmpnotifier.notification.PayloadData
 import data.bookmark.network.NotificationData
 import data.bookmark.network.NotificationRequest
 import data.chat.ChatEntity
@@ -79,23 +78,11 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
         val uid = getIdUser()
 
         LaunchedEffect(true) {
-            //   if(chatEntity.id_chat.isNotEmpty())
             NotifierManager.getPushNotifier().subscribeToTopic("topic")
             readChat(chatEntity.id_chat, uid)
-            //chatViewModel.getChat(chatEntity.id_chat)
+
         }
 
-        // chatViewModel.getChat(chatEntity.id_chat)
-
-        NotifierManager.addListener(object : NotifierManager.Listener {
-            override fun onPayloadData(data: PayloadData) {
-                //  chatViewModel.getChat(chatEntity.id_chat)
-                super.onPayloadData(data)
-                //  chatViewModel.getChat(chatEntity.id_chat)
-            }
-        })
-
-        val scaffoldState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
 
         val lazyListState = rememberLazyListState()
@@ -178,7 +165,6 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
             Spacer(modifier = Modifier.weight(1f))
 
             // Send Chat
-
             val message = Message(
                 sender = uid,
                 prev_reply = "",
@@ -252,20 +238,6 @@ class ChatRoomScreen(private var chatEntity: ChatEntity) : Screen {
                 )
 
                 if (showPostMessage) {
-//                    Dialog(
-//                        onDismissRequest = { showPostMessage = false },
-//                    ) {
-//                        Text(
-//                            textPostMessage,
-//                            color = colorPrimary,
-//                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).border(
-//                                BorderStroke(1.dp, colorPrimary), RoundedCornerShape(12.dp)
-//                            ).fillMaxWidth().padding(8.dp).clickable {
-//                                showPostMessage = true
-//                            }
-//                        )
-//                    }
-
                     AlertDialog(
                         containerColor = bgColor,
                         onDismissRequest = { showPostMessage = false },

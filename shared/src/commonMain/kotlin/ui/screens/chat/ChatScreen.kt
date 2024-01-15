@@ -85,7 +85,7 @@ fun ChatScreen(
                                 items(listChat) { item ->
                                     ItemChat(item) {
                                         navigator.push(ChatRoomScreen(item))
-                                    }
+                                    }/**/
                                 }
                             }
                         }

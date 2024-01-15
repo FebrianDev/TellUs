@@ -21,11 +21,6 @@ class CommentSdk {
         }
     }
 
-//    @Throws(Exception::class)
-//    suspend fun insertComment(commentRequest: CommentRequest): Result<String> {
-//        return api.insertComment(commentRequest)
-//    }
-
     @Throws(Exception::class)
     suspend fun insertReplyComment(commentRequest: CommentReplyRequest, apiToken: String): Result<InsertCommentState> {
         return try {

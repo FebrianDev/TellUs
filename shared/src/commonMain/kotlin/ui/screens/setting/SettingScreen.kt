@@ -61,8 +61,6 @@ fun SettingScreen() {
 
     var isExpandProfile by remember { mutableStateOf(false) }
 
-    var isActive by remember { mutableStateOf(keyValueStorage.isNotification) }
-
     var openAboutState by remember { mutableStateOf(false) }
 
     var openAlertDialog by remember { mutableStateOf(false) }
@@ -103,43 +101,6 @@ fun SettingScreen() {
         }
 
         Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
-
-//        Column {
-//            Row(
-//                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 48.dp),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Row {
-//                    Icon(
-//                        modifier = Modifier
-//                            .width(24.dp)
-//                            .height(24.dp),
-//
-//                        imageVector = Icons.Filled.Notifications,
-//                        contentDescription = "Btn Bookmark",
-//                        tint = colorPrimary
-//                    )
-//                    SpacerW(8.dp)
-//                    TextBodyMedium("Notification")
-//                }
-//
-//                Switch(
-//                    checked = isActive,
-//                    onCheckedChange = {
-//                        isActive = it
-//                        keyValueStorage.isNotification = it
-//                    },
-//                    colors = SwitchDefaults.colors(
-//                        checkedThumbColor = colorPrimary,
-//                        checkedTrackColor = colorSecondary,
-//                        uncheckedThumbColor = colorPrimary,
-//                        uncheckedTrackColor = bgColor
-//                    )
-//                )
-//            }
-//            Divider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp))
-//        }
 
         ItemSetting(
             Icons.Filled.Info,
