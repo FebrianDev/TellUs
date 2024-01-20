@@ -29,7 +29,7 @@ Kotlin Multiplatform Compose
 ## Android
 https://github.com/FebrianDev/TellUs/assets/59677015/3e1d6afa-a603-42bf-8e7b-8e33991ceb7a
 
-## iOs
+## iOS
 https://github.com/FebrianDev/TellUs/assets/59677015/45c16819-6244-4ed1-b603-b25268725843
 
 
